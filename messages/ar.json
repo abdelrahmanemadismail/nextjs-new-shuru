@@ -1,0 +1,8 @@
+{
+  "home": {
+    "title": "للبدء، قم بتعديل ملف page.tsx",
+    "description": "تبحث عن نقطة بداية أو تعليمات إضافية؟ توجه إلى <templates>القوالب</templates> أو مركز <learning>التعلم</learning>.",
+    "deploy": "انشر الآن",
+    "documentation": "التوثيق"
+  }
+}
