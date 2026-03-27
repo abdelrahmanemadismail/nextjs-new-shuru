@@ -11,21 +11,21 @@ import { getMessages, getLocale } from "next-intl/server";
 import { getDirection } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n";
 
+
 const fontSans = localFont({
   src: [
-    { path: "../public/fonts/Swis721-Light.woff2", weight: "300" },
-    { path: "../public/fonts/Swis721-Regular.woff2", weight: "400" },
-    { path: "../public/fonts/Swis721-Bold.woff2", weight: "700" },
+    { path: "../public/fonts/Bahij_TheSansArabic-ExtraLight.woff2", weight: "200" },
+    { path: "../public/fonts/Bahij_TheSansArabic-Light.woff2",      weight: "300" },
+    { path: "../public/fonts/Bahij_TheSansArabic-SemiLight.woff2",  weight: "350" },
+    { path: "../public/fonts/Bahij_TheSansArabic-Plain.woff2",      weight: "400" },
+    { path: "../public/fonts/Bahij_TheSansArabic-SemiBold.woff2",   weight: "600" },
+    { path: "../public/fonts/Bahij_TheSansArabic-Bold.woff2",       weight: "700" },
+    { path: "../public/fonts/Bahij_TheSansArabic-ExtraBold.woff2",  weight: "800" },
+    { path: "../public/fonts/Bahij_TheSansArabic-Black.woff2",      weight: "900" },
   ],
   variable: "--font-sans",
 });
-const fontSerif = localFont({
-  src: [
-    { path: "../public/fonts/Bahij-SemiLight.woff2", weight: "300" },
-    { path: "../public/fonts/Bahij-Bold.woff2", weight: "700" },
-  ],
-  variable: "--font-serif",
-});
+
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
@@ -46,7 +46,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"
