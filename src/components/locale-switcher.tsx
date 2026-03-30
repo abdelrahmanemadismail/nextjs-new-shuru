@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { locales, languageLabels, type Locale } from '@/lib/i18n';
 import { setLocale } from '@/lib/locale-actions';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface LocaleSwitcherProps {
   currentLocale: Locale;
@@ -19,12 +19,22 @@ interface LocaleSwitcherProps {
 
 export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isPending, startTransition] = React.useTransition();
+
+  const buildLocalizedPath = React.useCallback(
+    (targetLocale: Locale) => {
+      const segments = pathname.split('/').filter(Boolean);
+      const [, ...rest] = segments;
+      return `/${[targetLocale, ...rest].join('/')}`;
+    },
+    [pathname]
+  );
 
   const handleLocaleChange = (locale: Locale) => {
     startTransition(async () => {
       await setLocale(locale);
-      router.refresh();
+      router.replace(buildLocalizedPath(locale));
     });
   };
 
