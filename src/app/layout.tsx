@@ -14,14 +14,14 @@ import type { Locale } from "@/lib/i18n";
 
 const fontSans = localFont({
   src: [
-    { path: "../public/fonts/Bahij_TheSansArabic-ExtraLight.woff2", weight: "200" },
-    { path: "../public/fonts/Bahij_TheSansArabic-Light.woff2",      weight: "300" },
-    { path: "../public/fonts/Bahij_TheSansArabic-SemiLight.woff2",  weight: "350" },
-    { path: "../public/fonts/Bahij_TheSansArabic-Plain.woff2",      weight: "400" },
-    { path: "../public/fonts/Bahij_TheSansArabic-SemiBold.woff2",   weight: "600" },
-    { path: "../public/fonts/Bahij_TheSansArabic-Bold.woff2",       weight: "700" },
-    { path: "../public/fonts/Bahij_TheSansArabic-ExtraBold.woff2",  weight: "800" },
-    { path: "../public/fonts/Bahij_TheSansArabic-Black.woff2",      weight: "900" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-ExtraLight.woff2", weight: "200" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-Light.woff2",      weight: "300" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-SemiLight.woff2",  weight: "350" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-Plain.woff2",      weight: "400" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-SemiBold.woff2",   weight: "600" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-Bold.woff2",       weight: "700" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-ExtraBold.woff2",  weight: "800" },
+    { path: "../../public/fonts/Bahij_TheSansArabic-Black.woff2",      weight: "900" },
   ],
   variable: "--font-sans",
 });
