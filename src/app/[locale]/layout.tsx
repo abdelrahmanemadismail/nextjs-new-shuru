@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { isLocale, locales } from '@/lib/i18n';
+import { SiteHeader } from '@/components/layout/site-header';
 
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -20,5 +21,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   setRequestLocale(locale);
 
-  return children;
+  return (
+    <>
+      <SiteHeader locale={locale} />
+      {children}
+    </>
+  );
 }

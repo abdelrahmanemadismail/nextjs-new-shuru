@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { LocaleSwitcher } from '@/components/locale-switcher';
-import { ModeToggle } from '@/components/theme-toggle';
 import { HomeContent } from '@/components/home-content';
 import {
   defaultLocale,
@@ -61,13 +59,9 @@ export default async function HomePage({ params }: HomePageProps) {
   const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
-        <LocaleSwitcher currentLocale={locale} />
-        <ModeToggle />
-      </div>
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between bg-white px-16 py-32 dark:bg-black sm:items-start">
-        <HomeContent />
+    <div className="min-h-screen bg-background font-sans">
+      <main>
+        <HomeContent locale={locale} />
       </main>
     </div>
   );

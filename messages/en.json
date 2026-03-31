@@ -1,8 +1,23 @@
 {
   "home": {
-    "title": "To get started, edit the page.tsx file.",
-    "description": "Looking for a starting point or more instructions? Head over to <templates>Templates</templates> or the <learning>Learning</learning> center.",
-    "deploy": "Deploy Now",
-    "documentation": "Documentation"
+    "eyebrow": "Digital Foundation",
+    "title": "Launch multilingual experiences that feel native from day one.",
+    "description": "Shuru helps teams publish fast, stay consistent across languages, and keep content operations simple with a connected CMS and frontend workflow.",
+    "primaryCta": "Explore Services",
+    "secondaryCta": "Contact Team",
+    "cards": {
+      "strategy": {
+        "title": "Strategy",
+        "body": "Define your content model and localization flow before development starts."
+      },
+      "delivery": {
+        "title": "Delivery",
+        "body": "Ship production-ready pages with reusable sections and safe publishing controls."
+      },
+      "growth": {
+        "title": "Growth",
+        "body": "Scale into new markets with predictable iteration and analytics-friendly structure."
+      }
+    }
   }
 }

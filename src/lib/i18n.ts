@@ -23,17 +23,6 @@ export const hrefLang: Record<Locale, string> = {
   ar: "ar",
 };
 
-export const seoCopy: Record<Locale, { title: string; description: string }> = {
-  en: {
-    title: "Shuru",
-    description: "Shuru multilingual experience in English and Arabic.",
-  },
-  ar: {
-    title: "شروع",
-    description: "تجربة شروع متعددة اللغات بالإنجليزية والعربية.",
-  },
-};
-
 export const isLocale = (value: string | null | undefined): value is Locale =>
   locales.includes(value as Locale);
 
