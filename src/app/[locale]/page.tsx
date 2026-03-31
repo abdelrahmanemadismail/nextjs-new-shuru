@@ -11,7 +11,7 @@ import {
   siteUrl,
   type Locale,
 } from '@/lib/i18n';
-import { getGlobalSettings } from '@/lib/strapi';
+import { getGlobalSettings } from '@/strapi/global';
 
 type HomePageProps = Readonly<{
   params: Promise<{ locale: string }>;
