@@ -45,9 +45,18 @@ export type StrapiSeo = {
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string | null;
-  og_image?: StrapiMedia | null;
+  og_image?: OGImageMedia | null;
 };
 
+export type OGImageMedia = {
+  id?: number;
+  documentId?: string;
+  name?: string;
+  alternativeText?: string | null;
+  width?: number;
+  height?: number;
+  url?: string | null;
+};
 const fallbackStrapiUrl = "http://localhost:1337";
 
 export const getStrapiBaseUrl = () =>

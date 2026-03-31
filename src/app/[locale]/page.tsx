@@ -7,7 +7,6 @@ import {
   hrefLang,
   isLocale,
   locales,
-  seoCopy,
   siteUrl,
   type Locale,
 } from '@/lib/i18n';
@@ -21,11 +20,10 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const path = `/${locale}`;
-  const copy = seoCopy[locale];
   const globalData = await getGlobalSettings(locale);
-  const title = globalData?.seoTitle || copy.title;
-  const description = globalData?.seoDescription || copy.description;
-  const siteName = globalData?.siteName || 'Shuru';
+  const title = globalData?.seoTitle;
+  const description = globalData?.seoDescription;
+  const siteName = globalData?.siteName;
 
   return {
     title,

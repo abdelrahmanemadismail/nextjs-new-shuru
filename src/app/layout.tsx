@@ -10,6 +10,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale } from "next-intl/server";
 import { getDirection } from "@/lib/i18n";
 import { defaultLocale, isLocale, siteUrl, type Locale } from "@/lib/i18n";
+import { getGlobalSettings } from "@/strapi/global";
 
 
 const fontSans = localFont({
@@ -30,14 +31,47 @@ const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "Shuru",
-    template: "%s | Shuru",
-  },
-  description: "Shuru multilingual platform.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const requestedLocale = await getLocale();
+  const locale: Locale = isLocale(requestedLocale) ? requestedLocale : defaultLocale;
+  const globalData = await getGlobalSettings(locale);
+
+  const siteName = globalData?.seoTitle?.trim() || globalData?.siteName?.trim() || "Shuru";
+  const description = globalData?.seoDescription || globalData?.siteDescription || "Shuru multilingual platform.";
+  const keywords = globalData?.seoKeywords ? globalData.seoKeywords.split(",").map((kw) => kw.trim()) : undefined;
+  const ogImage = globalData?.ogImage;
+  const ogImageUrl = ogImage?.url ?? undefined;
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description,
+    keywords: keywords,
+    authors: siteName ? [{ name: siteName }] : undefined,
+    creator: siteName || undefined,
+    publisher: siteName,
+    category: "business",
+    classification: "Business & Professional",
+    openGraph: {
+      title: siteName,
+      description,
+      type: "website",
+      siteName,
+      images: ogImageUrl
+        ? [{ url: ogImageUrl, width: ogImage?.width, height: ogImage?.height, alt: ogImage?.alternativeText ?? undefined }]
+        : undefined,
+    },
+    twitter: {
+      card: ogImageUrl ? "summary_large_image" : "summary",
+      title: siteName,
+      description,
+      images: ogImageUrl ? [ogImageUrl] : undefined,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

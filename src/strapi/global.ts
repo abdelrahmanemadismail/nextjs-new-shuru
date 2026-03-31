@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { defaultLocale, type Locale } from "@/lib/i18n";
-import { extractMediaUrl, getStrapiBaseUrl, getStrapiRequestHeaders, toAbsoluteUrl, type StrapiMedia, type StrapiSeo } from "@/lib/strapi";
-
+import { extractMediaUrl, getStrapiBaseUrl, getStrapiRequestHeaders, toAbsoluteUrl } from "@/lib/strapi";
+import type { OGImageMedia, StrapiMedia, StrapiSeo } from "@/lib/strapi";
 
 type StrapiGlobalPayload = {
   data?: StrapiGlobalEntry | null;
@@ -18,7 +18,6 @@ type StrapiGlobalEntry = {
 };
 
 
-
 export type GlobalSettings = {
   locale: Locale;
   siteName: string;
@@ -26,7 +25,7 @@ export type GlobalSettings = {
   seoTitle: string;
   seoDescription: string;
   seoKeywords?: string;
-  ogImageUrl?: string | null;
+  ogImage?: OGImageMedia | null;
   faviconUrl: string | null;
 };
 
@@ -46,7 +45,10 @@ const normalizeGlobal = (locale: Locale, payload: StrapiGlobalPayload): GlobalSe
   const seoTitle = data.defaultSeo?.meta_title?.trim() || siteName;
   const seoDescription = data.defaultSeo?.meta_description?.trim() || siteDescription;
   const seoKeywords = data.defaultSeo?.meta_keywords?.trim() || undefined;
-  const ogImageUrl = toAbsoluteUrl(extractMediaUrl(data.defaultSeo?.og_image)); // TODO: Review back When we add S3
+  const ogImage = data.defaultSeo?.og_image;
+  if (ogImage) {
+    ogImage.url = toAbsoluteUrl(extractMediaUrl(ogImage)); // TODO: Review back When we add S3
+  }
   const faviconUrl = toAbsoluteUrl(extractMediaUrl(data.favicon)); // TODO: Review back When we add S3
 
   return {
@@ -56,7 +58,7 @@ const normalizeGlobal = (locale: Locale, payload: StrapiGlobalPayload): GlobalSe
     seoTitle,
     seoDescription,
     seoKeywords,
-    ogImageUrl,
+    ogImage,
     faviconUrl,
   };
 };
@@ -69,7 +71,7 @@ async function fetchGlobal(locale: Locale) {
   params.append("populate[defaultSeo][fields][0]", "meta_title");
   params.append("populate[defaultSeo][fields][1]", "meta_description");
   params.append("populate[defaultSeo][fields][2]", "meta_keywords");
-  params.append("populate[defaultSeo][populate][og_image][fields][0]", "url");
+  params.append("populate[defaultSeo][populate][og_image][fields]", "name,alternativeText,width,height,url");
   params.append("populate[favicon][fields][0]", "url");
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/global?${params.toString()}`, {
