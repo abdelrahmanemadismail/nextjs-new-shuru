@@ -60,6 +60,47 @@ A modern, fully-featured Next.js template with internationalization, dark mode s
 4. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
+### Environment Variables
+
+Create a `.env.local` file in this project and set:
+
+```bash
+NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
+STRAPI_READ_ONLY_API_TOKEN=your-strapi-read-only-token
+STRAPI_REVALIDATE_SECRET=change-me
+```
+
+The app reads from Strapi using a server-only bearer token (`STRAPI_READ_ONLY_API_TOKEN`).
+
+Create the token in Strapi admin:
+1. Go to `Settings` -> `API Tokens`.
+2. Create a token with `Read-only` type.
+3. Copy the token value into `.env.local`.
+
+Token fallback:
+- If you already use `STRAPI_API_TOKEN`, the app will accept it as a fallback.
+
+### Strapi Webhook Revalidation
+
+When Global content changes in Strapi, call the Next.js revalidation endpoint so cached metadata is refreshed immediately.
+
+1. In Strapi admin, create a webhook for Global entry events (create/update/delete/publish).
+2. Use this URL:
+   `http://localhost:3000/api/revalidate`
+3. Add header:
+   `x-revalidate-secret: <your STRAPI_REVALIDATE_SECRET value>`
+4. Send JSON body:
+   `{ "model": "global" }`
+
+You can also test manually:
+
+```bash
+curl -X POST http://localhost:3000/api/revalidate \
+  -H "Content-Type: application/json" \
+  -H "x-revalidate-secret: change-me" \
+  -d '{"model":"global"}'
+```
+
 5. **First-time setup:**
    See [TEMPLATE_SETUP.md](TEMPLATE_SETUP.md) for detailed setup instructions and customization guide.
 

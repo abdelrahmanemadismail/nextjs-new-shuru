@@ -11,6 +11,7 @@ import {
   siteUrl,
   type Locale,
 } from '@/lib/i18n';
+import { getGlobalSettings } from '@/lib/strapi';
 
 type HomePageProps = Readonly<{
   params: Promise<{ locale: string }>;
@@ -21,10 +22,19 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const path = `/${locale}`;
   const copy = seoCopy[locale];
+  const globalData = await getGlobalSettings(locale);
+  const title = globalData?.seoTitle || copy.title;
+  const description = globalData?.seoDescription || copy.description;
+  const siteName = globalData?.siteName || 'Shuru';
 
   return {
-    title: copy.title,
-    description: copy.description,
+    title,
+    description,
+    icons: globalData?.faviconUrl
+      ? {
+          icon: [{ url: globalData.faviconUrl }],
+        }
+      : undefined,
     alternates: {
       canonical: path,
       languages: {
@@ -35,15 +45,15 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
     openGraph: {
       url: `${siteUrl}${path}`,
       locale,
-      title: copy.title,
-      description: copy.description,
+      title,
+      description,
       type: 'website',
-      siteName: 'Shuru',
+      siteName,
     },
     twitter: {
       card: 'summary_large_image',
-      title: copy.title,
-      description: copy.description,
+      title,
+      description,
     },
   };
 }
