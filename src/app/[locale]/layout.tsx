@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { isLocale, locales } from '@/lib/i18n';
 import { SiteHeader } from '@/components/layout/site-header';
+import { SiteFooter } from '@/components/layout/site-footer';
 
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -24,7 +25,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <>
       <SiteHeader locale={locale} />
-      {children}
+      <main className="flex-1">{children}</main>
+      <SiteFooter locale={locale} />
     </>
   );
 }

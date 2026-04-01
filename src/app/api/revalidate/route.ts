@@ -2,6 +2,7 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { GLOBAL_SETTINGS_TAG } from "@/strapi/global";
 import { HEADER_SETTINGS_TAG } from "@/strapi/header";
+import { FOOTER_SETTINGS_TAG } from "@/strapi/footer";
 
 type RevalidateBody = {
   model?: string;
@@ -13,7 +14,7 @@ const MODEL_TO_TAGS: Record<string, string|null> = {
   article: "article",
   author: "author",
   category: "category",
-  footer: "footer",
+  footer: FOOTER_SETTINGS_TAG,
   header: HEADER_SETTINGS_TAG,
   none: null,
 };

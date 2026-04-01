@@ -19,5 +19,8 @@
         "body": "Scale into new markets with predictable iteration and analytics-friendly structure."
       }
     }
+  },
+  "footer": {
+    "copyright": "© {year} Shuru. All rights reserved."
   }
 }
