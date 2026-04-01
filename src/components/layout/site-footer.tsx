@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { type Locale } from "@/lib/i18n";
-import { getFooterSettings } from "@/strapi/footer";
+import { getFooterSettings, type FooterSettings, type FooterLink } from "@/strapi/footer";
 import { ThemeLogo } from "./theme-logo";
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Music2, Github } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -31,7 +31,7 @@ const SocialIcon = ({ platform }: { platform: string }) => {
 };
 
 export async function SiteFooter({ locale }: SiteFooterProps) {
-  const footerData = await getFooterSettings(locale);
+  const footerData: FooterSettings | null = await getFooterSettings(locale);
   const t = await getTranslations("footer");
 
   if (!footerData) {
@@ -43,19 +43,20 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
   const currentYear = new Date().getFullYear();
   const hardcodedCopyright = t("copyright", { year: currentYear });
 
-  const isRtl = locale === "ar";
-
   return (
-    <footer className="w-full bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12 px-6">
-      <div className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-8 justify-between ${isRtl ? "text-right md:flex-row-reverse" : ""}`}>
+    <footer className="w-full relative overflow-hidden bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800/50 py-12 sm:py-16 px-4 sm:px-6">
+      {/* Subtle top glow */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+      
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 justify-between">
 
         {/* Branding & Description */}
-        <div className="flex flex-col gap-4 max-w-sm">
+        <div className="flex flex-col gap-6 max-w-sm">
           <ThemeLogo
             lightLogoUrl={lightLogoUrl}
             darkLogoUrl={darkLogoUrl}
             alt="Footer Logo"
-            className="h-10 w-auto object-contain"
+            className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
           />
           {description && (
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -70,7 +71,7 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transform hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300"
                   aria-label={social.platform}
                 >
                   <SocialIcon platform={social.platform} />
@@ -81,22 +82,25 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
         </div>
 
         {/* Links Columns */}
-        <div className="flex flex-wrap gap-12 sm:gap-24">
+        <div className="flex flex-wrap gap-8 sm:gap-12 md:gap-24">
           {columns.map((col, index) => (
-            <div key={index} className="flex flex-col gap-4">
-              <h3 className="font-semibold text-sm tracking-wider uppercase text-slate-900 dark:text-slate-100">
+            <div key={index} className="flex flex-col gap-6">
+              <h3 className="font-semibold text-sm tracking-wider uppercase text-slate-900 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-slate-100 dark:to-slate-400">
                 {col.title}
               </h3>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-4">
                 {col.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
                     <Link
                       href={link.url}
                       target={link.openInNewTab ? "_blank" : "_self"}
                       rel={link.openInNewTab ? "noopener noreferrer" : undefined}
-                      className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                      className="group flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors duration-300"
                     >
-                      {link.label}
+                      <span className="relative transform transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
+                        {link.label}
+                        <span className="absolute -bottom-1 start-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -106,18 +110,18 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500 " dir="ltr">
-        <p>{hardcodedCopyright}</p>
+      <div className="max-w-7xl mx-auto mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-slate-200 dark:border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500" dir="ltr">
+        <p className="font-medium text-slate-400">{hardcodedCopyright}</p>
 
         {bottomLinks && bottomLinks.length > 0 && (
           <ul className="flex flex-wrap justify-center gap-6">
-            {bottomLinks.map((link, index) => (
+            {bottomLinks.map((link: FooterLink, index: number) => (
               <li key={index}>
                 <Link
                   href={link.url}
                   target={link.openInNewTab ? "_blank" : "_self"}
                   rel={link.openInNewTab ? "noopener noreferrer" : undefined}
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="hover:text-primary dark:hover:text-primary transition-colors duration-300"
                 >
                   {link.label}
                 </Link>

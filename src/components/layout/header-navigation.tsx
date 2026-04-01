@@ -61,7 +61,7 @@ export function HeaderNavigation({ locale, items, lightLogoUrl, darkLogoUrl, log
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(topBar?.isVisible ?? false);
   const pathname = usePathname();
   const router = useRouter();
@@ -218,19 +218,19 @@ export function HeaderNavigation({ locale, items, lightLogoUrl, darkLogoUrl, log
                 <li
                   key={`${item.label}-${item.url}`}
                   className="header-dropdown-item relative border-b-2 border-transparent transition-colors duration-300 hover:border-primary"
-                  onMouseEnter={() => setOpenDropdown(item.order)}
+                  onMouseEnter={() => setOpenDropdown(item.label)}
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
                   {hasSubItems ? (
                     <button
                       className="inline-flex min-h-11 items-center gap-1 px-2 py-1 text-foreground transition-colors hover:text-primary"
-                      onClick={() => setOpenDropdown(openDropdown === item.order ? null : item.order)}
+                      onClick={() => setOpenDropdown(openDropdown === item.label ? null : item.label)}
                     >
                       {item.label}
                       <ChevronDown
                         className={cn(
                           "h-4 w-4 transition-transform",
-                          openDropdown === item.order ? "rotate-180" : "rotate-0"
+                          openDropdown === item.label ? "rotate-180" : "rotate-0"
                         )}
                       />
                     </button>
@@ -248,7 +248,7 @@ export function HeaderNavigation({ locale, items, lightLogoUrl, darkLogoUrl, log
                     <div
                       className={cn(
                         "absolute start-1/2 top-[calc(100%+0.4rem)] z-50 w-64 ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-lg border border-border bg-popover/95 shadow-xl backdrop-blur transition-all duration-500",
-                        openDropdown === item.order
+                        openDropdown === item.label
                           ? "visible translate-y-0 opacity-100"
                           : "invisible -translate-y-1 opacity-0 pointer-events-none"
                       )}
