@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { CheckCircle, Target, Activity, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const iconMap: Record<string, React.ReactNode> = {
   Activity: <Activity className="h-6 w-6" />,
@@ -16,6 +17,17 @@ function getIcon(name?: string, defaultIcon?: React.ReactNode) {
 }
 
 export function ValueSection({ value }: { value: import('@/strapi/home').StrapiValueBlock }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const points = value.points || [];
+
+  useEffect(() => {
+    if (points.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % points.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [points.length]);
+
   return (
     <section className="py-16 sm:py-24 lg:py-32 bg-background relative overflow-hidden flex flex-col items-center">
       {/* Decorative Glow */}
@@ -39,55 +51,70 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
           )}
         </motion.div>
 
-        <style>{`
-          @keyframes marquee {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(50%); } /* RTL: positive moves container to the right, which makes items flow left natively */
-          }
-          .animate-marquee {
-            animation: marquee 200s linear infinite;
-          }
-          :root[dir="ltr"] .animate-marquee,
-          .ltr .animate-marquee {
-            animation-name: marquee-ltr;
-          }
-          @keyframes marquee-ltr {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
-          }
-          .animate-marquee:hover {
-            animation-play-state: paused;
-          }
-        `}</style>
-
-        <div className="relative w-full overflow-hidden py-4 sm:py-10" dir="rtl">
-          {/* Fading Edges */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 max-w-[150px] bg-gradient-to-r from-background to-transparent z-10"></div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 max-w-[150px] bg-gradient-to-l from-background to-transparent z-10"></div>
-
-          <div className="flex w-max animate-marquee">
-            {Array.from({ length: 20 }).flatMap(() => value.points || []).map((point, index) => (
-              <div
-                key={`${point.id}-${index}`}
-                className="w-[280px] sm:w-[350px] shrink-0 mx-2 sm:mx-3 p-6 sm:p-8 bg-background/60 backdrop-blur-xl rounded-2xl shadow-lg border border-border/50 flex flex-col items-center text-center cursor-pointer group hover:border-primary/50 transition-all duration-300 hover:shadow-primary/5 hover:-translate-y-1 relative overflow-hidden"
+        <div className="relative w-full max-w-5xl mx-auto py-8 sm:py-16 min-h-[450px] flex items-center justify-center perspective-1000">
+          <AnimatePresence mode="wait">
+            {points.length > 0 && (
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, scale: 0.8, rotateY: 30, x: -100 }}
+                animate={{ opacity: 1, scale: 1, rotateY: 0, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8, rotateY: -30, x: 100 }}
+                transition={{ duration: 0.6, type: 'spring', bounce: 0.4 }}
+                className="w-full max-w-3xl p-10 sm:p-14 md:p-20 bg-background/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-border/50 flex flex-col items-center text-center relative overflow-hidden group hover:border-primary/50 transition-colors"
+                style={{ transformStyle: 'preserve-3d' }}
               >
-                {/* Subtle Hover Gradient Glow */}
-                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                {/* Subtle Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-500" />
 
-                <div className="relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-primary/10 mb-5 sm:mb-6 text-primary group-hover:scale-110 transition-transform duration-300 shadow-sm ring-1 ring-primary/20 group-hover:ring-primary/40 group-hover:bg-primary/20">
-                  {getIcon(point.iconName, <CheckCircle className="h-7 w-7 sm:h-8 sm:w-8" />)}
-                </div>
-                <h3 className="relative text-lg sm:text-xl font-bold text-foreground transition-colors group-hover:text-primary mb-2 sm:mb-3">
-                  {point.title}
-                </h3>
-                {point.description && (
-                  <p className="relative text-sm sm:text-base text-muted-foreground leading-relaxed">
-                    {point.description}
-                  </p>
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: 'spring', bounce: 0.5 }}
+                  className="relative flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-[2rem] bg-primary/10 mb-8 sm:mb-10 text-primary shadow-lg ring-1 ring-primary/20 group-hover:scale-110 transition-transform duration-500"
+                >
+                  {getIcon(points[currentIndex].iconName, <CheckCircle className="h-12 w-12 sm:h-14 sm:w-14" />)}
+                </motion.div>
+                
+                <motion.h3 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="relative text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4 sm:mb-6 transition-colors group-hover:text-primary"
+                >
+                  {points[currentIndex].title}
+                </motion.h3>
+                
+                {points[currentIndex].description && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="relative text-base sm:text-xl text-muted-foreground leading-relaxed max-w-2xl"
+                  >
+                    {points[currentIndex].description}
+                  </motion.p>
                 )}
-              </div>
-            ))}
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Dots Indicator */}
+          {points.length > 1 && (
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-3">
+              {points.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  className={`h-2.5 sm:h-3 rounded-full transition-all duration-300 ${
+                    idx === currentIndex 
+                      ? 'w-8 sm:w-10 bg-primary' 
+                      : 'w-2.5 sm:w-3 bg-primary/20 hover:bg-primary/50'
+                  }`}
+                  aria-label={`Show slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
