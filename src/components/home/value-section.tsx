@@ -66,7 +66,7 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
                 {/* Subtle Glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-500" />
 
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: 'spring', bounce: 0.5 }}
@@ -74,8 +74,8 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
                 >
                   {getIcon(points[currentIndex].iconName, <CheckCircle className="h-12 w-12 sm:h-14 sm:w-14" />)}
                 </motion.div>
-                
-                <motion.h3 
+
+                <motion.h3
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -83,9 +83,9 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
                 >
                   {points[currentIndex].title}
                 </motion.h3>
-                
+
                 {points[currentIndex].description && (
-                  <motion.p 
+                  <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
@@ -106,8 +106,8 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
                   className={`h-2.5 sm:h-3 rounded-full transition-all duration-300 ${
-                    idx === currentIndex 
-                      ? 'w-8 sm:w-10 bg-primary' 
+                    idx === currentIndex
+                      ? 'w-8 sm:w-10 bg-primary'
                       : 'w-2.5 sm:w-3 bg-primary/20 hover:bg-primary/50'
                   }`}
                   aria-label={`Show slide ${idx + 1}`}
