@@ -39,6 +39,31 @@ export type StrapiQuoteSectionBlock = {
   author?: string;
 };
 
+export type StrapiSharedMediaBlock = {
+  __component: 'shared.media';
+  id: number;
+  file?: any;
+};
+
+export type StrapiSharedQuoteBlock = {
+  __component: 'shared.quote';
+  id: number;
+  title?: string;
+  body?: string;
+};
+
+export type StrapiSharedRichTextBlock = {
+  __component: 'shared.rich-text';
+  id: number;
+  body?: string;
+};
+
+export type StrapiSharedSliderBlock = {
+  __component: 'shared.slider';
+  id: number;
+  files?: any[];
+};
+
 export type StrapiPageBlock =
   | StrapiHeroBlock
   | StrapiOverviewBlock
@@ -47,7 +72,11 @@ export type StrapiPageBlock =
   | StrapiTestimonialsSectionBlock
   | StrapiChallengesSectionBlock
   | StrapiTimelineSectionBlock
-  | StrapiQuoteSectionBlock;
+  | StrapiQuoteSectionBlock
+  | StrapiSharedMediaBlock
+  | StrapiSharedQuoteBlock
+  | StrapiSharedRichTextBlock
+  | StrapiSharedSliderBlock;
 
 export type StrapiPageEntry = {
   id: number;

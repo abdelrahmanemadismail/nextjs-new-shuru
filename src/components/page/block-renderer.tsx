@@ -6,6 +6,10 @@ import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { ChallengesSection } from "@/components/shared/challenges-section";
 import { TimelineSection } from "@/components/shared/timeline-section";
 import { QuoteSection } from "@/components/shared/quote-section";
+import { MediaBlock } from "@/components/shared/media-block";
+import { QuoteBlock } from "@/components/shared/quote-block";
+import { RichTextBlock } from "@/components/shared/rich-text-block";
+import { SliderBlock } from "@/components/shared/slider-block";
 import type { StrapiPageBlock } from "@/strapi/page";
 
 import { type Locale } from "@/lib/i18n";
@@ -53,6 +57,15 @@ export function BlockRenderer({ block, locale, testimonials }: { block: StrapiPa
           author={block.author}
         />
       );
+
+    case "shared.media":
+      return <MediaBlock block={block as any} />;
+    case "shared.quote":
+      return <QuoteBlock block={block as any} />;
+    case "shared.rich-text":
+      return <RichTextBlock block={block as any} />;
+    case "shared.slider":
+      return <SliderBlock block={block as any} />;
 
     default:
       console.warn(`Block component not found: ${(block as any).__component}`);

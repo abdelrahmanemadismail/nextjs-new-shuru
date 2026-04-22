@@ -120,7 +120,14 @@ export type StrapiHomeBlock =
   | StrapiOverviewBlock
   | StrapiValueBlock
   | StrapiTestimonialsSectionBlock
-  | StrapiCtaFooterBlock;
+  | StrapiCtaFooterBlock
+  | { __component: 'shared.challenges-section'; [key: string]: any }
+  | { __component: 'shared.timeline-section'; [key: string]: any }
+  | { __component: 'shared.quote-section'; [key: string]: any }
+  | { __component: 'shared.media'; [key: string]: any }
+  | { __component: 'shared.quote'; [key: string]: any }
+  | { __component: 'shared.rich-text'; [key: string]: any }
+  | { __component: 'shared.slider'; [key: string]: any };
 
 export type StrapiHomeEntry = {
   id: number;
