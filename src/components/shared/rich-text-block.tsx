@@ -29,7 +29,7 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
   );
 
   return (
-    <section 
+    <section
       className={`my-12 px-4 max-w-3xl mx-auto w-full text-start ${isRtl ? 'rtl' : 'ltr'}`}
       dir={isRtl ? "rtl" : "ltr"}
     >
