@@ -73,7 +73,7 @@ export function TableOfContents({ articleContentId }: { articleContentId: string
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-xl p-4 md:p-5 border border-neutral-200/60 shadow-sm bg-white/50 backdrop-blur-md">
+    <div className="rounded-xl p-4 md:p-5 border border-neutral-200/60 shadow-sm bg-white/50 ">
       <h3 className="font-bold text-[11px] md:text-[12px] uppercase tracking-wider mb-4 text-neutral-800">
         {locale === 'ar' ? 'جدول المحتويات' : 'Table of Contents'}
       </h3>
