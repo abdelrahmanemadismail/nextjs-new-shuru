@@ -1,5 +1,6 @@
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import { useLocale } from "next-intl";
 
 type RichTextBlockProps = {
   block: {
@@ -16,6 +17,9 @@ function getYouTubeId(url: string) {
 }
 
 export function RichTextBlock({ block }: RichTextBlockProps) {
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
   if (!block.body) return null;
 
   // Automatically wrap raw YouTube URLs in markdown links so they trigger the custom anchor renderer
@@ -25,7 +29,10 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
   );
 
   return (
-    <section className="my-12 px-4 max-w-3xl mx-auto w-full">
+    <section 
+      className={`my-12 px-4 max-w-3xl mx-auto w-full text-start ${isRtl ? 'rtl' : 'ltr'}`}
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <div className="prose prose-lg md:prose-xl dark:prose-invert prose-headings:font-bold prose-a:text-primary max-w-none">
         <ReactMarkdown
           rehypePlugins={[rehypeRaw]}
