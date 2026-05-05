@@ -10,8 +10,8 @@ const nextConfig: NextConfig = {
         hostname: "localhost",
       },
       {
-        protocol: "http",
-        hostname: "127.0.0.1",
+        protocol: "https",
+        hostname: "shuru-bkt.s3.eu-west-3.amazonaws.com",
       },
     ],
   },
