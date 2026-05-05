@@ -47,7 +47,7 @@ export default async function ArticlePage({ params }: Props) {
           </p>
         )}
 
-        {article.cover_image?.url && (
+        {article.enable_cover_image !== false && article.cover_image?.url && (
           <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-12">
             <Image
               src={article.cover_image.url}

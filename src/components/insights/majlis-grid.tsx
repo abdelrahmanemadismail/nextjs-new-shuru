@@ -78,9 +78,6 @@ export function MajlisGrid({ majlises, locale, labels }: MajlisGridProps) {
 
             {/* Content */}
             <div className="flex flex-col flex-1 p-5 sm:p-6">
-              {/* Decorative left bar */}
-              <div className="hidden sm:block absolute start-56 inset-y-0 w-px bg-primary/10" />
-
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                 <Calendar className="h-3.5 w-3.5" />
                 <span>{formatDate(majlis.majlis_date, locale)}</span>

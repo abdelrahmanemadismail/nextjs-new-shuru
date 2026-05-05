@@ -12,6 +12,7 @@ export type StrapiArticle = {
   slug: string;
   publish_date: string;
   is_featured?: boolean;
+  enable_cover_image?: boolean;
   cover_image?: StrapiMedia;
   seo?: StrapiSeo;
 };
@@ -155,6 +156,7 @@ export type StrapiAuthor = {
 export type StrapiArticleDetail = StrapiArticle & {
   blocks?: StrapiPageBlock[];
   author?: StrapiAuthor;
+  enable_cover_image?: boolean;
 };
 
 async function fetchArticleBySlug(slug: string, locale: Locale): Promise<StrapiArticleDetail | null> {
