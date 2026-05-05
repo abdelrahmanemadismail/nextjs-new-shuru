@@ -75,7 +75,7 @@ export default async function PodcastPage({ params }: Props) {
                 src={podcast.video_file.url}
                 controls
                 className="absolute inset-0 w-full h-full object-cover"
-                poster={podcast.cover_image?.url}
+                poster={podcast.cover_image?.url || undefined}
               />
             ) : podcast.cover_image?.url ? (
               <Image
