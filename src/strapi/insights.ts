@@ -99,7 +99,12 @@ async function fetchInsightList<T>(
 ): Promise<T[]> {
   const params = new URLSearchParams();
   params.append("locale", locale);
-  params.append("populate", "cover_image");
+
+  const hasPopulate = Object.keys(extraParams).some(k => k.startsWith("populate"));
+  if (!hasPopulate) {
+    params.append("populate", "cover_image");
+  }
+
   params.append("sort[0]", `${sortField}:desc`);
 
   for (const [key, value] of Object.entries(extraParams)) {
@@ -123,8 +128,8 @@ async function fetchInsightList<T>(
 const ARTICLES_TAG = "articles";
 export const getArticlesCached = unstable_cache(
   async (locale: Locale) => fetchInsightList<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], "publish_date", {
-    "populate[categories][fields][0]": "name",
-    "populate[categories][fields][1]": "slug"
+    "populate[0]": "cover_image",
+    "populate[1]": "categories"
   }),
   [ARTICLES_TAG],
   { revalidate: 3600, tags: [ARTICLES_TAG] }
@@ -184,7 +189,12 @@ async function fetchInsightListPaginated<T>(
 ): Promise<PaginatedResult<T>> {
   const params = new URLSearchParams();
   params.append("locale", locale);
-  params.append("populate", "cover_image");
+
+  const hasPopulate = Object.keys(extraParams).some(k => k.startsWith("populate"));
+  if (!hasPopulate) {
+    params.append("populate", "cover_image");
+  }
+
   params.append("sort[0]", `${sortField}:desc`);
   params.append("pagination[page]", page.toString());
   params.append("pagination[pageSize]", pageSize.toString());
@@ -215,8 +225,8 @@ async function fetchInsightListPaginated<T>(
 
 export const getArticlesPaginatedCached = unstable_cache(
   async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], page, pageSize, "publish_date", {
-    "populate[categories][fields][0]": "name",
-    "populate[categories][fields][1]": "slug"
+    "populate[0]": "cover_image",
+    "populate[1]": "categories"
   }),
   [ARTICLES_TAG, "paginated"],
   { revalidate: 3600, tags: [ARTICLES_TAG] }
