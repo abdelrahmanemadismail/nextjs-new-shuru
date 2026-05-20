@@ -48,38 +48,11 @@ export async function POST(request: Request) {
 
   console.log("Revalidation request received with payload:", payload);
 
-  const requestedModel =
-    typeof payload.model === "string" && payload.model.trim().length > 0
-      ? payload.model.trim().toLowerCase()
-      : "none";
-
-  if (requestedModel === 'all') {
-    revalidatePath('/', 'layout');
-    return NextResponse.json({
-      revalidated: true,
-      model: 'all',
-      message: 'Revalidated all pages',
-    });
-  }
-
-  const tag = MODEL_TO_TAGS[requestedModel];
-  if (!tag) {
-    return NextResponse.json(
-      {
-        revalidated: false,
-        skipped: true,
-        model: requestedModel,
-        message: "No matching tag for the provided model. No revalidation performed.",
-      },
-      { status: 400 }
-    );
-  }
-
-  revalidateTag(tag, "max");
+  // Always revalidate all pages on any payload
+  revalidatePath('/', 'layout');
 
   return NextResponse.json({
     revalidated: true,
-    model: requestedModel,
-    tag,
+    message: 'Revalidated all pages',
   });
 }
