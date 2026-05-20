@@ -4,6 +4,7 @@ import { isLocale, locales } from '@/lib/i18n';
 import { SiteHeader } from '@/components/layout/site-header';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { Toaster } from '@/components/ui/sonner';
+import { DynamicBreadcrumb } from '@/components/shared/dynamic-breadcrumb';
 
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -26,6 +27,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <>
       <SiteHeader locale={locale} />
+      <DynamicBreadcrumb locale={locale} />
       <main className="flex-1">{children}</main>
       <SiteFooter locale={locale} />
       <Toaster />

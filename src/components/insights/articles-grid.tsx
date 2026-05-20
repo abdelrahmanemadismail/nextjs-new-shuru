@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiArticle } from '@/strapi/insights';
+import { Badge } from '@/components/ui/badge';
 
 type ArticlesGridProps = {
   articles: StrapiArticle[];
@@ -62,8 +63,7 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
               animate="visible"
               variants={cardVariants}
             >
-              <Link
-                href={`/${locale}/insights/articles/${article.slug}`}
+              <div
                 className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-300 h-full"
               >
                 {article.cover_image?.url ? (
@@ -88,19 +88,34 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                   </div>
                 )}
                 <div className="flex flex-col flex-1 p-6">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{formatDate(article.publish_date, locale)}</span>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>{formatDate(article.publish_date, locale)}</span>
+                    </div>
+                    {article.categories && article.categories.length > 0 && (
+                      <div className="flex gap-1.5 flex-wrap z-10">
+                        {article.categories.map((cat) => (
+                          <Link key={cat.id} href={`/${locale}/insights/categories/${cat.slug}`} onClick={(e) => e.stopPropagation()}>
+                            <Badge variant="secondary" className="hover:bg-primary hover:text-white transition-colors">
+                              {cat.name}
+                            </Badge>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug">
-                    {article.title}
+                    <Link href={`/${locale}/insights/articles/${article.slug}`} className="after:absolute after:inset-0 outline-none">
+                      {article.title}
+                    </Link>
                   </h3>
                   <div className="mt-auto pt-4 flex items-center gap-1 text-sm font-semibold text-primary">
                     {labels.readMore}
                     <Arrow className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                   </div>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -117,9 +132,8 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
               animate="visible"
               variants={cardVariants}
             >
-              <Link
-                href={`/${locale}/insights/articles/${article.slug}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 h-full"
+              <div
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 h-full"
               >
                 {article.cover_image?.url ? (
                   <div className="relative aspect-[1376/768] overflow-hidden">
@@ -135,19 +149,34 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                   <div className="aspect-[1376/768] bg-gradient-to-br from-primary/10 to-accent/10" />
                 )}
                 <div className="flex flex-col flex-1 p-5">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{formatDate(article.publish_date, locale)}</span>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2.5">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>{formatDate(article.publish_date, locale)}</span>
+                    </div>
+                    {article.categories && article.categories.length > 0 && (
+                      <div className="flex gap-1.5 flex-wrap z-10 relative">
+                        {article.categories.map((cat) => (
+                          <Link key={cat.id} href={`/${locale}/insights/categories/${cat.slug}`} onClick={(e) => e.stopPropagation()}>
+                            <Badge variant="secondary" className="hover:bg-primary hover:text-white transition-colors">
+                              {cat.name}
+                            </Badge>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-3 leading-snug">
-                    {article.title}
+                    <Link href={`/${locale}/insights/articles/${article.slug}`} className="after:absolute after:inset-0 outline-none">
+                      {article.title}
+                    </Link>
                   </h3>
                   <div className="mt-auto pt-4 flex items-center gap-1 text-sm font-medium text-primary">
                     {labels.readMore}
                     <Arrow className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                   </div>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))}
         </div>

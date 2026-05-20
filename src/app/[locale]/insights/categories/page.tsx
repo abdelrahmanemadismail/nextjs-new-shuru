@@ -27,17 +27,20 @@ export default async function CategoriesIndexPage({ params }: Props) {
   const t = await getTranslations("common");
   const categories = await getCategoriesCached(locale);
 
-  if (!categories || categories.length === 0) {
+  // Only keep categories that have at least one article
+  const activeCategories = categories?.filter((c: any) => c.articles && c.articles.length > 0) || [];
+
+  if (activeCategories.length === 0) {
     return (
       <main className="container py-24 mx-auto px-4">
         <h1 className="text-4xl font-bold mb-12">Categories</h1>
-        <p className="text-muted-foreground">No categories found.</p>
+        <p className="text-muted-foreground">{locale === "ar" ? "لا توجد فئات." : "No categories found."}</p>
       </main>
     );
   }
 
-  const rootCategories = categories.filter((c: any) => !c.parent_category);
-  const otherCategories = categories.filter((c: any) => c.parent_category);
+  const rootCategories = activeCategories.filter((c: any) => !c.parent_category);
+  const otherCategories = activeCategories.filter((c: any) => c.parent_category);
 
   return (
     <main className="container py-24 mx-auto px-4 max-w-7xl">

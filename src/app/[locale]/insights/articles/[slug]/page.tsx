@@ -5,6 +5,8 @@ import { getArticleBySlugCached } from "@/strapi/insights";
 import { BlockRenderer } from "@/components/page/block-renderer";
 import { ArticleLayout } from "@/components/insights/article-layout";
 import Image from "next/image";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -41,11 +43,26 @@ export default async function ArticlePage({ params }: Props) {
       {/* Article Header */}
       <section className="container mx-auto px-4 py-8 lg:py-16">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">{article.title}</h1>
-        {article.publish_date && (
-          <p className="text-sm text-neutral-500 mb-8">
-            {new Date(article.publish_date).toLocaleDateString(locale)}
-          </p>
-        )}
+
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+          {article.publish_date && (
+            <p className="text-sm text-neutral-500">
+              {new Date(article.publish_date).toLocaleDateString(locale)}
+            </p>
+          )}
+
+          {article.categories && article.categories.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {article.categories.map((cat) => (
+                <Link key={cat.id} href={`/${locale}/insights/categories/${cat.slug}`}>
+                  <Badge variant="secondary" className="hover:bg-primary hover:text-white transition-colors">
+                    {cat.name}
+                  </Badge>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
         {article.enable_cover_image !== false && article.cover_image?.url && (
           <div className="w-full flex justify-center mb-12">

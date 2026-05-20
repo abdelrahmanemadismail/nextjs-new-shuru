@@ -15,6 +15,12 @@ export type StrapiArticle = {
   enable_cover_image?: boolean;
   cover_image?: StrapiMedia;
   seo?: StrapiSeo;
+  categories?: Array<{
+    id: number;
+    documentId: string;
+    name: string;
+    slug: string;
+  }>;
 };
 // 2. News
 export type StrapiNewsItem = {
@@ -88,12 +94,17 @@ async function fetchInsightList<T>(
   endpoint: string,
   locale: Locale,
   tags: string[],
-  sortField: string = "createdAt"
+  sortField: string = "createdAt",
+  extraParams: Record<string, string> = {}
 ): Promise<T[]> {
   const params = new URLSearchParams();
   params.append("locale", locale);
   params.append("populate", "cover_image");
   params.append("sort[0]", `${sortField}:desc`);
+
+  for (const [key, value] of Object.entries(extraParams)) {
+    params.append(key, value);
+  }
 
   const response = await fetch(`${getStrapiBaseUrl()}${endpoint}?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
@@ -111,7 +122,10 @@ async function fetchInsightList<T>(
 
 const ARTICLES_TAG = "articles";
 export const getArticlesCached = unstable_cache(
-  async (locale: Locale) => fetchInsightList<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], "publish_date"),
+  async (locale: Locale) => fetchInsightList<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], "publish_date", {
+    "populate[categories][fields][0]": "name",
+    "populate[categories][fields][1]": "slug"
+  }),
   [ARTICLES_TAG],
   { revalidate: 3600, tags: [ARTICLES_TAG] }
 );
@@ -165,7 +179,8 @@ async function fetchInsightListPaginated<T>(
   tags: string[],
   page: number = 1,
   pageSize: number = 10,
-  sortField: string = "createdAt"
+  sortField: string = "createdAt",
+  extraParams: Record<string, string> = {}
 ): Promise<PaginatedResult<T>> {
   const params = new URLSearchParams();
   params.append("locale", locale);
@@ -173,6 +188,10 @@ async function fetchInsightListPaginated<T>(
   params.append("sort[0]", `${sortField}:desc`);
   params.append("pagination[page]", page.toString());
   params.append("pagination[pageSize]", pageSize.toString());
+
+  for (const [key, value] of Object.entries(extraParams)) {
+    params.append(key, value);
+  }
 
   const response = await fetch(`${getStrapiBaseUrl()}${endpoint}?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
@@ -195,7 +214,10 @@ async function fetchInsightListPaginated<T>(
 }
 
 export const getArticlesPaginatedCached = unstable_cache(
-  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], page, pageSize, "publish_date"),
+  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], page, pageSize, "publish_date", {
+    "populate[categories][fields][0]": "name",
+    "populate[categories][fields][1]": "slug"
+  }),
   [ARTICLES_TAG, "paginated"],
   { revalidate: 3600, tags: [ARTICLES_TAG] }
 );
@@ -248,6 +270,8 @@ async function fetchArticleBySlug(slug: string, locale: Locale): Promise<StrapiA
   params.append("populate[seo][populate]", "*");
   params.append("populate[blocks][populate]", "*");
   params.append("populate[author][populate][avatar]", "true");
+  params.append("populate[categories][fields][0]", "name");
+  params.append("populate[categories][fields][1]", "slug");
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/articles?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
