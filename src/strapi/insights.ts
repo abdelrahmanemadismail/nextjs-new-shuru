@@ -87,12 +87,13 @@ export type StrapiPodcast = {
 async function fetchInsightList<T>(
   endpoint: string,
   locale: Locale,
-  tags: string[]
+  tags: string[],
+  sortField: string = "createdAt"
 ): Promise<T[]> {
   const params = new URLSearchParams();
   params.append("locale", locale);
   params.append("populate", "cover_image");
-  params.append("sort[0]", "createdAt:desc"); // Ideally sort by date field, but createdAt is safer if names differ
+  params.append("sort[0]", `${sortField}:desc`);
 
   const response = await fetch(`${getStrapiBaseUrl()}${endpoint}?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
@@ -110,36 +111,116 @@ async function fetchInsightList<T>(
 
 const ARTICLES_TAG = "articles";
 export const getArticlesCached = unstable_cache(
-  async (locale: Locale) => fetchInsightList<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG]),
+  async (locale: Locale) => fetchInsightList<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], "publish_date"),
   [ARTICLES_TAG],
   { revalidate: 3600, tags: [ARTICLES_TAG] }
 );
 
 const NEWS_TAG = "news-items";
 export const getNewsCached = unstable_cache(
-  async (locale: Locale) => fetchInsightList<StrapiNewsItem>("/api/news-items", locale, [NEWS_TAG]),
+  async (locale: Locale) => fetchInsightList<StrapiNewsItem>("/api/news-items", locale, [NEWS_TAG], "news_date"),
   [NEWS_TAG],
   { revalidate: 3600, tags: [NEWS_TAG] }
 );
 
 const MAGAZINE_TAG = "magazine-issues";
 export const getMagazineIssuesCached = unstable_cache(
-  async (locale: Locale) => fetchInsightList<StrapiMagazineIssue>("/api/magazine-issues", locale, [MAGAZINE_TAG]),
+  async (locale: Locale) => fetchInsightList<StrapiMagazineIssue>("/api/magazine-issues", locale, [MAGAZINE_TAG], "publish_date"),
   [MAGAZINE_TAG],
   { revalidate: 3600, tags: [MAGAZINE_TAG] }
 );
 
 const MAJLIS_TAG = "majlises";
 export const getMajlisCached = unstable_cache(
-  async (locale: Locale) => fetchInsightList<StrapiMajlis>("/api/majlises", locale, [MAJLIS_TAG]),
+  async (locale: Locale) => fetchInsightList<StrapiMajlis>("/api/majlises", locale, [MAJLIS_TAG], "majlis_date"),
   [MAJLIS_TAG],
   { revalidate: 3600, tags: [MAJLIS_TAG] }
 );
 
 const PODCAST_TAG = "podcasts";
 export const getPodcastsCached = unstable_cache(
-  async (locale: Locale) => fetchInsightList<StrapiPodcast>("/api/podcasts", locale, [PODCAST_TAG]),
+  async (locale: Locale) => fetchInsightList<StrapiPodcast>("/api/podcasts", locale, [PODCAST_TAG], "podcast_date"),
   [PODCAST_TAG],
+  { revalidate: 3600, tags: [PODCAST_TAG] }
+);
+
+
+export type PaginationMeta = {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+};
+
+export type PaginatedResult<T> = {
+  data: T[];
+  meta: {
+    pagination: PaginationMeta;
+  };
+};
+
+async function fetchInsightListPaginated<T>(
+  endpoint: string,
+  locale: Locale,
+  tags: string[],
+  page: number = 1,
+  pageSize: number = 10,
+  sortField: string = "createdAt"
+): Promise<PaginatedResult<T>> {
+  const params = new URLSearchParams();
+  params.append("locale", locale);
+  params.append("populate", "cover_image");
+  params.append("sort[0]", `${sortField}:desc`);
+  params.append("pagination[page]", page.toString());
+  params.append("pagination[pageSize]", pageSize.toString());
+
+  const response = await fetch(`${getStrapiBaseUrl()}${endpoint}?${params.toString()}`, {
+    headers: getStrapiRequestHeaders(),
+    next: { tags },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) return { data: [], meta: { pagination: { page, pageSize, pageCount: 0, total: 0 } } };
+    throw new Error(`Failed to fetch ${endpoint} (${response.status})`);
+  }
+
+  const payload = await response.json();
+  const data = (payload.data || []).map((item: any) => {
+    if (item.cover_image) { item.cover_image.url = toAbsoluteUrl(extractMediaUrl(item.cover_image)); }
+    return item;
+  });
+  const meta = payload.meta || { pagination: { page, pageSize, pageCount: 0, total: 0 } };
+
+  return { data, meta };
+}
+
+export const getArticlesPaginatedCached = unstable_cache(
+  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], page, pageSize, "publish_date"),
+  [ARTICLES_TAG, "paginated"],
+  { revalidate: 3600, tags: [ARTICLES_TAG] }
+);
+
+export const getNewsPaginatedCached = unstable_cache(
+  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiNewsItem>("/api/news-items", locale, [NEWS_TAG], page, pageSize, "news_date"),
+  [NEWS_TAG, "paginated"],
+  { revalidate: 3600, tags: [NEWS_TAG] }
+);
+
+export const getMagazineIssuesPaginatedCached = unstable_cache(
+  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiMagazineIssue>("/api/magazine-issues", locale, [MAGAZINE_TAG], page, pageSize, "publish_date"),
+  [MAGAZINE_TAG, "paginated"],
+  { revalidate: 3600, tags: [MAGAZINE_TAG] }
+);
+
+export const getMajlisPaginatedCached = unstable_cache(
+  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiMajlis>("/api/majlises", locale, [MAJLIS_TAG], page, pageSize, "majlis_date"),
+  [MAJLIS_TAG, "paginated"],
+  { revalidate: 3600, tags: [MAJLIS_TAG] }
+);
+
+export const getPodcastsPaginatedCached = unstable_cache(
+  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiPodcast>("/api/podcasts", locale, [PODCAST_TAG], page, pageSize, "podcast_date"),
+  [PODCAST_TAG, "paginated"],
   { revalidate: 3600, tags: [PODCAST_TAG] }
 );
 

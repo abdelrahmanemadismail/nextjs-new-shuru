@@ -48,12 +48,15 @@ export default async function ArticlePage({ params }: Props) {
         )}
 
         {article.enable_cover_image !== false && article.cover_image?.url && (
-          <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-12">
+          <div className="w-full flex justify-center mb-12">
             <Image
               src={article.cover_image.url}
               alt={article.title}
-              fill
-              className="object-cover"
+              width={1376}
+              height={768}
+              sizes="(max-width: 1376px) 100vw, 1376px"
+              className="w-full h-auto rounded-xl object-cover"
+              style={{ maxWidth: 1376, maxHeight: 768 }}
               priority
             />
           </div>

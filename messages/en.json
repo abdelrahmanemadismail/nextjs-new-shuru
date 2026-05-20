@@ -29,7 +29,15 @@
     "featured": "Featured",
     "readMore": "Read More",
     "empty": "No articles found in this category.",
-    "all": "All"
+    "all": "All",
+    "tabs": {
+      "articles": "Articles",
+      "news": "News",
+      "magazine": "Magazine",
+      "majlis": "Majlis",
+      "podcasts": "Podcasts",
+      "subtitle": "Stay updated with the latest insights."
+    }
   },
   "shared": {
     "challengesSection": {
@@ -40,5 +48,33 @@
   },
   "common": {
     "back": "Back"
+  },
+  "Pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "more_pages": "More pages",
+    "go_to_previous_page": "Go to previous page",
+    "go_to_next_page": "Go to next page"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "We'd love to hear from you. Please fill out the form below.",
+    "form": {
+      "fullName": "Full Name *",
+      "email": "Email *",
+      "phone": "Phone Number",
+      "company": "Company / Organization",
+      "subject": "Subject *",
+      "message": "Message *",
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": "Your message has been sent successfully!",
+      "error": "There was an error sending your message. Please try again."
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "minLength": "Must be at least {min} characters"
+    }
   }
 }

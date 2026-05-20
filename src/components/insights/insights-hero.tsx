@@ -9,7 +9,7 @@ const tabs = [
   { id: 'news', icon: Newspaper },
   { id: 'magazine', icon: BookMarked },
   { id: 'majlis', icon: Users },
-  { id: 'podcasts', icon: Mic },
+  // { id: 'podcasts', icon: Mic },
 ] as const;
 
 type InsightsHeroProps = {

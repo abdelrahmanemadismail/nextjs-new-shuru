@@ -61,12 +61,13 @@ export function MagazineGrid({ issues, locale, labels }: MagazineGridProps) {
             className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/15 hover:-translate-y-2 transition-all duration-300 h-full"
           >
             {/* Magazine cover - portrait aspect ratio */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
+            <div className="relative aspect-[2480/3508] overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
               {issue.cover_image?.url ? (
                 <Image
                   src={issue.cover_image.url}
                   alt={issue.title || issue.title}
                   fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (

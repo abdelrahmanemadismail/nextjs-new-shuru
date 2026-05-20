@@ -59,17 +59,18 @@ export function NewsGrid({ news, locale, labels }: NewsGridProps) {
             className="group relative flex flex-col sm:flex-row overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300"
           >
             {featured.cover_image?.url ? (
-              <div className="relative sm:w-1/2 h-60 sm:h-auto overflow-hidden shrink-0">
+              <div className="relative sm:w-1/2 aspect-[1536/1024] sm:aspect-auto sm:min-h-full overflow-hidden shrink-0">
                 <Image
                   src={featured.cover_image.url}
                   alt={featured.title || featured.title}
                   fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10" />
               </div>
             ) : (
-              <div className="sm:w-1/2 h-60 sm:h-auto bg-gradient-to-br from-primary/20 to-accent/20 shrink-0" />
+              <div className="sm:w-1/2 aspect-[1536/1024] sm:aspect-auto sm:min-h-full bg-gradient-to-br from-primary/20 to-accent/20 shrink-0" />
             )}
             <div className="flex flex-col justify-center p-6 sm:p-8 flex-1">
               <span className="inline-flex items-center gap-1 self-start rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold mb-4">
@@ -111,16 +112,17 @@ export function NewsGrid({ news, locale, labels }: NewsGridProps) {
               className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 h-full"
             >
               {item.cover_image?.url ? (
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative aspect-[1536/1024] overflow-hidden">
                   <Image
                     src={item.cover_image.url}
                     alt={item.title || item.title}
                     fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
               ) : (
-                <div className="h-44 bg-gradient-to-br from-primary/10 to-accent/10" />
+                <div className="aspect-[1536/1024] bg-gradient-to-br from-primary/10 to-accent/10" />
               )}
               <div className="flex flex-col flex-1 p-5">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2.5">

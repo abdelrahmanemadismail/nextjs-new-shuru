@@ -67,7 +67,7 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                 className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-300 h-full"
               >
                 {article.cover_image?.url ? (
-                  <div className="relative h-52 sm:h-64 overflow-hidden">
+                  <div className="relative aspect-[1376/768] overflow-hidden">
                     <Image
                       src={article.cover_image.url}
                       alt={article.title || article.title}
@@ -81,7 +81,7 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                     </span>
                   </div>
                 ) : (
-                  <div className="relative h-52 sm:h-64 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                  <div className="relative aspect-[1376/768] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                     <span className="absolute top-4 start-4 inline-flex items-center gap-1 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-white">
                       <Star className="h-3 w-3" /> {labels.featured}
                     </span>
@@ -122,16 +122,17 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                 className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 h-full"
               >
                 {article.cover_image?.url ? (
-                  <div className="relative h-44 overflow-hidden">
+                  <div className="relative aspect-[1376/768] overflow-hidden">
                     <Image
                       src={article.cover_image.url}
                       alt={article.title || article.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                 ) : (
-                  <div className="h-44 bg-gradient-to-br from-primary/10 to-accent/10" />
+                  <div className="aspect-[1376/768] bg-gradient-to-br from-primary/10 to-accent/10" />
                 )}
                 <div className="flex flex-col flex-1 p-5">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2.5">

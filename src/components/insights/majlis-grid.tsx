@@ -62,16 +62,17 @@ export function MajlisGrid({ majlises, locale, labels }: MajlisGridProps) {
           >
             {/* Cover image - landscape left side */}
             {majlis.cover_image?.url ? (
-              <div className="relative sm:w-56 h-44 sm:h-auto overflow-hidden shrink-0">
+              <div className="relative w-full sm:w-[40%] md:w-[45%] lg:w-[480px] xl:w-[540px] aspect-[1376/768] shrink-0 overflow-hidden">
                 <Image
                   src={majlis.cover_image.url}
                   alt={majlis.title || majlis.title}
                   fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
             ) : (
-              <div className="sm:w-56 h-44 sm:h-auto bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
+              <div className="w-full sm:w-[40%] md:w-[45%] lg:w-[480px] xl:w-[540px] aspect-[1376/768] bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
                 <Users className="h-12 w-12 text-primary/30" />
               </div>
             )}
