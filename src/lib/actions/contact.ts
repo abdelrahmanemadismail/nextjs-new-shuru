@@ -11,14 +11,15 @@ export async function sendContactEmail(data: any) {
       port: Number(process.env.SMTP_PORT) || 587,
       secure: process.env.SMTP_PORT === "465",
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USERNAME || process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD || process.env.SMTP_PASS,
       },
     });
 
     const mailOptions = {
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: process.env.CONTACT_EMAIL_TO,
+      from: process.env.SMTP_FROM || process.env.SMTP_USERNAME || process.env.SMTP_USER || 'noreply@shuru.sa',
+      to: process.env.CONTACT_EMAIL_TO || 'info@shuru.sa',
+      replyTo: email,
       subject: `New Contact Form Submission: ${subject}`,
       text: `
         Name: ${fullName}

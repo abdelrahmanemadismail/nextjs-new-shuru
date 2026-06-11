@@ -76,5 +76,26 @@
       "invalidEmail": "Please enter a valid email address",
       "minLength": "Must be at least {min} characters"
     }
+  },
+  "consultation": {
+    "title": "Book a Consultation",
+    "description": "Schedule a practical consultation session with our experts. Please fill in the details below.",
+    "form": {
+      "fullName": "Full Name *",
+      "email": "Email *",
+      "phone": "Phone Number",
+      "company": "Company / Organization",
+      "preferredDateTime": "Preferred Date & Time *",
+      "message": "Consultation Details *",
+      "submit": "Request Consultation",
+      "submitting": "Submitting...",
+      "success": "Your consultation request has been submitted successfully!",
+      "error": "There was an error submitting your request. Please try again."
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "minLength": "Must be at least {min} characters"
+    }
   }
 }
