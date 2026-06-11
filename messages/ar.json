@@ -39,6 +39,17 @@
       "majlis": "المجلس",
       "podcasts": "البودكاست",
       "subtitle": "ابق على اطلاع بأحدث الرؤى."
+    },
+    "magazineSingle": {
+      "issueNumber": "العدد {number}",
+      "publishDate": "تاريخ النشر: {date}",
+      "readPdf": "قراءة المجلة PDF",
+      "downloadPdf": "تحميل المجلة PDF",
+      "share": "شارك هذا العدد",
+      "exploreOther": "استكشف أعداد أخرى",
+      "browseAll": "تصفح جميع الأعداد",
+      "articlesInIssue": "مقالات هذا العدد",
+      "back": "رجوع"
     }
   },
   "shared": {

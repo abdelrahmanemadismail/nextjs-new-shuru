@@ -39,6 +39,17 @@
       "majlis": "Majlis",
       "podcasts": "Podcasts",
       "subtitle": "Stay updated with the latest insights."
+    },
+    "magazineSingle": {
+      "issueNumber": "Issue {number}",
+      "publishDate": "Publish Date: {date}",
+      "readPdf": "Read Magazine PDF",
+      "downloadPdf": "Download Magazine PDF",
+      "share": "Share this issue",
+      "exploreOther": "Explore other issues",
+      "browseAll": "Browse all issues",
+      "articlesInIssue": "Articles in this issue",
+      "back": "Back"
     }
   },
   "shared": {
