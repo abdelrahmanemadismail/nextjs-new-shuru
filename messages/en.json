@@ -28,6 +28,8 @@
     "categories": "Categories",
     "featured": "Featured",
     "readMore": "Read More",
+    "latestIssue": "Latest Issue",
+    "readLatest": "Read Latest Issue",
     "empty": "No articles found in this category.",
     "all": "All",
     "tabs": {

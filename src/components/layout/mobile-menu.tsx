@@ -2,10 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, LogIn } from "lucide-react";
+import Image from "next/image";
+import { ChevronDown, LogIn, ArrowRight, ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { locales, type Locale } from "@/lib/i18n";
 import type { HeaderMenuItem } from "@/strapi/header";
+import type { StrapiMagazineIssue } from "@/strapi/insights";
 import { cn } from "@/lib/utils";
 
 type MobileMenuProps = {
@@ -13,6 +16,7 @@ type MobileMenuProps = {
   onClose: () => void;
   locale: Locale;
   items: HeaderMenuItem[];
+  latestMagazine?: StrapiMagazineIssue | null;
 };
 
 const localePathPattern = new RegExp(`^/(${locales.join("|")})(/|$)`);
@@ -47,8 +51,9 @@ const getLinkProps = (openInNewTab: boolean) =>
       }
     : {};
 
-export default function MobileMenu({ isOpen, onClose, locale, items }: MobileMenuProps) {
+export default function MobileMenu({ isOpen, onClose, locale, items, latestMagazine }: MobileMenuProps) {
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
+  const t = useTranslations("insights");
 
   const menuItems = useMemo(() => {
     const sideItems = items.filter((item) => item.onSideBar);
@@ -60,6 +65,9 @@ export default function MobileMenu({ isOpen, onClose, locale, items }: MobileMen
       prev.includes(itemOrder) ? prev.filter((value) => value !== itemOrder) : [...prev, itemOrder]
     );
   };
+
+  const isRtl = locale === "ar";
+  const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
 
   return (
     <>
@@ -74,60 +82,104 @@ export default function MobileMenu({ isOpen, onClose, locale, items }: MobileMen
 
       <aside
         className={cn(
-          "fixed inset-y-0 end-0 z-50 w-[280px] border-s border-border bg-card p-3 shadow-2xl transition-transform duration-300 sm:w-[320px]",
+          "fixed inset-y-0 end-0 z-50 w-[280px] border-s border-border bg-card p-3 shadow-2xl transition-transform duration-300 sm:w-[320px] overflow-y-auto flex flex-col justify-between",
           isOpen ? "translate-x-0" : "ltr:translate-x-full rtl:-translate-x-full"
         )}
         aria-label="Mobile menu"
       >
-        <div className="mb-3 border-b border-border pb-3 pt-2">
-          {menuItems.map((item) => {
-            const hasSubItems = item.subItems.length > 0;
-            const expanded = expandedItems.includes(item.order);
+        <div className="flex-1 pb-6">
+          <div className="mb-3 border-b border-border pb-3 pt-2">
+            {menuItems.map((item) => {
+              const hasSubItems = item.subItems.length > 0;
+              const expanded = expandedItems.includes(item.order);
 
-            return (
-              <div key={`${item.label}-${item.url}`}>
-                {hasSubItems ? (
-                  <Button
-                    variant="ghost"
-                    size="default"
-                    className="min-h-12 w-full justify-between px-3 py-3 text-base font-medium"
-                    onClick={() => toggleExpanded(item.order)}
-                  >
-                    <span>{item.label}</span>
-                    <ChevronDown className={cn("h-4 w-4 transition-transform", expanded ? "rotate-180" : "rotate-0")} />
-                  </Button>
-                ) : (
-                  <Link
-                    href={toLocaleAwareUrl(item.url, locale)}
-                    {...getLinkProps(item.openInNewTab)}
-                    onClick={onClose}
-                    className="inline-flex min-h-12 w-full items-center justify-center rounded-md px-3 py-3 text-base font-medium hover:bg-accent"
-                  >
-                    {item.label}
-                  </Link>
-                )}
+              return (
+                <div key={`${item.label}-${item.url}`}>
+                  {hasSubItems ? (
+                    <Button
+                      variant="ghost"
+                      size="default"
+                      className="min-h-12 w-full justify-between px-3 py-3 text-base font-medium"
+                      onClick={() => toggleExpanded(item.order)}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown className={cn("h-4 w-4 transition-transform", expanded ? "rotate-180" : "rotate-0")} />
+                    </Button>
+                  ) : (
+                    <Link
+                      href={toLocaleAwareUrl(item.url, locale)}
+                      {...getLinkProps(item.openInNewTab)}
+                      onClick={onClose}
+                      className="inline-flex min-h-12 w-full items-center justify-center rounded-md px-3 py-3 text-base font-medium hover:bg-accent"
+                    >
+                      {item.label}
+                    </Link>
+                  )}
 
-                {hasSubItems && expanded ? (
-                  <div className="mb-2 mt-1 space-y-1 rounded-md bg-accent/60 p-2">
-                    {item.subItems.map((subItem) => (
-                      <Link
-                        key={`${subItem.label}-${subItem.url}`}
-                        href={toLocaleAwareUrl(subItem.url, locale)}
-                        {...getLinkProps(subItem.openInNewTab)}
-                        onClick={onClose}
-                        className="inline-flex min-h-11 w-full items-center justify-center rounded-md px-3 py-2 text-sm hover:bg-card"
-                      >
-                        {subItem.label}
-                      </Link>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+                  {hasSubItems && expanded ? (
+                    <div className="mb-2 mt-1 space-y-1 rounded-md bg-accent/60 p-2">
+                      {item.subItems.map((subItem) => (
+                        <Link
+                          key={`${subItem.label}-${subItem.url}`}
+                          href={toLocaleAwareUrl(subItem.url, locale)}
+                          {...getLinkProps(subItem.openInNewTab)}
+                          onClick={onClose}
+                          className="inline-flex min-h-11 w-full items-center justify-center rounded-md px-3 py-2 text-sm hover:bg-card"
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Magazine Poster Card */}
+          {latestMagazine && (
+            <div className="mt-6 px-1">
+              <h3 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("latestIssue")}
+              </h3>
+              <Link
+                href={`/${locale}/insights/magazine/${latestMagazine.slug}`}
+                onClick={onClose}
+                className="group relative flex flex-col overflow-hidden rounded-xl border border-border/50 bg-accent/30 p-2.5 transition-all duration-300 hover:bg-accent/60 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5"
+              >
+                {/* Cover image - portrait aspect ratio */}
+                <div className="relative aspect-[2480/3508] w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-accent/10">
+                  {latestMagazine.cover_image?.url ? (
+                    <Image
+                      src={latestMagazine.cover_image.url}
+                      alt={latestMagazine.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 300px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      priority
+                    />
+                  ) : null}
+                  {latestMagazine.issue_number && (
+                    <div className="absolute top-2 end-2 rounded-full bg-primary/90 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                      #{latestMagazine.issue_number}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-col gap-1 px-1">
+                  <p className="line-clamp-2 text-sm font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
+                    {latestMagazine.title}
+                  </p>
+                  <span className="inline-flex items-center text-xs font-medium text-primary mt-1 gap-1.5">
+                    {t("readLatest")}
+                    <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1 ltr:group-hover:translate-x-1.5 rtl:group-hover:-translate-x-1.5" />
+                  </span>
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
 
-        <div className="space-y-2 px-2">
+        <div className="space-y-2 px-2 pt-4 border-t border-border/50">
           <Link href={`/${locale}/auth/login`} onClick={onClose} className="block">
             <Button variant="outline" className="w-full justify-center">
               <LogIn className="me-2 h-4 w-4" />

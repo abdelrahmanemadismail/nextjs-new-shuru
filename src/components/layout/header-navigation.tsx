@@ -7,6 +7,7 @@ import { ChevronDown, Menu, Search, User } from "lucide-react";
 import { locales, type Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { HeaderMenuItem, StrapiTopBar } from "@/strapi/header";
+import type { StrapiMagazineIssue } from "@/strapi/insights";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ModeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ type HeaderNavigationProps = {
   darkLogoUrl: string | null;
   logoAlt: string;
   topBar: StrapiTopBar | null;
+  latestMagazine?: StrapiMagazineIssue | null;
 };
 
 const localePathPattern = new RegExp(`^/(${locales.join("|")})(/|$)`);
@@ -56,7 +58,15 @@ const getLinkProps = (openInNewTab: boolean) =>
       }
     : {};
 
-export function HeaderNavigation({ locale, items, lightLogoUrl, darkLogoUrl, logoAlt, topBar }: HeaderNavigationProps) {
+export function HeaderNavigation({
+  locale,
+  items,
+  lightLogoUrl,
+  darkLogoUrl,
+  logoAlt,
+  topBar,
+  latestMagazine,
+}: HeaderNavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -280,6 +290,7 @@ export function HeaderNavigation({ locale, items, lightLogoUrl, darkLogoUrl, log
         onClose={() => setIsMenuOpen(false)}
         locale={locale}
         items={items}
+        latestMagazine={latestMagazine}
       />
 
       <SearchOverlay
