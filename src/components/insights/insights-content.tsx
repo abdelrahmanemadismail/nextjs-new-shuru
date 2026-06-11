@@ -30,6 +30,8 @@ type InsightsContentProps = {
   searchQuery?: string;
   categorySlug?: string;
   sortOrder?: 'newest' | 'oldest';
+  savedIds?: string[];
+  isLoggedIn?: boolean;
 };
 
 const defaultLabels = {
@@ -69,6 +71,8 @@ export function InsightsContent({
   searchQuery = '',
   categorySlug = 'all',
   sortOrder = 'newest',
+  savedIds = [],
+  isLoggedIn = false,
 }: InsightsContentProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -134,10 +138,10 @@ export function InsightsContent({
           </div>
         )}
 
-        {activeTab === 'articles' && <ArticlesGrid articles={articles} locale={locale} labels={labels} />}
-        {activeTab === 'news' && <NewsGrid news={news} locale={locale} labels={labels} />}
-        {activeTab === 'magazine' && <MagazineGrid issues={magazines} locale={locale} labels={labels} />}
-        {activeTab === 'majlis' && <MajlisGrid majlises={majlises} locale={locale} labels={labels} />}
+        {activeTab === 'articles' && <ArticlesGrid articles={articles} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
+        {activeTab === 'news' && <NewsGrid news={news} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
+        {activeTab === 'magazine' && <MagazineGrid issues={magazines} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
+        {activeTab === 'majlis' && <MajlisGrid majlises={majlises} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
 
         {meta && meta[activeTab] && meta[activeTab].pagination.pageCount > 1 && (
           <PaginationControls

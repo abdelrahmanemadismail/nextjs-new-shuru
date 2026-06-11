@@ -2,13 +2,15 @@ import { type Locale } from "@/lib/i18n";
 import { getHeaderSettings } from "@/strapi/header";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
 import { getMagazineIssuesCached } from "@/strapi/insights";
+import { getMe } from "@/lib/actions/auth";
 
 type SiteHeaderProps = {
   locale: Locale;
 };
 
 export async function SiteHeader({ locale }: SiteHeaderProps) {
-  const [headerData, magazineIssues] = await Promise.all([
+  const [session, headerData, magazineIssues] = await Promise.all([
+    getMe(),
     getHeaderSettings(locale),
     getMagazineIssuesCached(locale).catch((err) => {
       console.error("Error fetching magazine issues in SiteHeader:", err);
@@ -32,6 +34,7 @@ export async function SiteHeader({ locale }: SiteHeaderProps) {
         logoAlt={headerData.logoAlt}
         topBar={headerData.topBar}
         latestMagazine={latestMagazine}
+        user={session?.user || null}
       />
     </header>
   );

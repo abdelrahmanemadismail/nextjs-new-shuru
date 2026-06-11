@@ -152,5 +152,42 @@
       "category": "الفئة",
       "allCategories": "كل الفئات"
     }
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "username": "اسم المستخدم",
+    "fullName": "الاسم الكامل",
+    "orSignInWith": "أو تسجيل الدخول بواسطة",
+    "orSignUpWith": "أو إنشاء حساب بواسطة",
+    "google": "جوجل",
+    "linkedin": "لينكد إن",
+    "profile": "الملف الشخصي",
+    "editProfile": "تعديل الملف الشخصي",
+    "savedInsights": "الرؤى المحفوظة",
+    "save": "حفظ",
+    "saved": "تم الحفظ",
+    "noSavedItems": "لم تقم بحفظ أي عناصر بعد.",
+    "accountDetails": "تفاصيل الحساب",
+    "changePassword": "تغيير كلمة المرور",
+    "updating": "جاري التحديث...",
+    "successProfileUpdate": "تم تحديث الملف الشخصي بنجاح!",
+    "successPasswordUpdate": "تم تغيير كلمة المرور بنجاح!",
+    "pleaseLogin": "يرجى تسجيل الدخول لحفظ الرؤى",
+    "loginRedirect": "جاري التحويل إلى صفحة تسجيل الدخول...",
+    "saving": "جاري الحفظ...",
+    "saveSuccess": "تم حفظ الرؤية بنجاح!",
+    "unsaveSuccess": "تم إزالة الحفظ بنجاح!"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+    "minLength": "يجب أن يحتوي على الأقل على {min} أحرف"
   }
 }

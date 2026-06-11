@@ -7,11 +7,14 @@ import { Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiArticle } from '@/strapi/insights';
 import { Badge } from '@/components/ui/badge';
+import { SaveButton } from './save-button';
 
 type ArticlesGridProps = {
   articles: StrapiArticle[];
   locale: Locale;
   labels: Record<string, string>;
+  savedIds?: string[];
+  isLoggedIn?: boolean;
 };
 
 function formatDate(dateStr: string, locale: Locale) {
@@ -35,7 +38,13 @@ const cardVariants = {
   }),
 };
 
-export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
+export function ArticlesGrid({
+  articles,
+  locale,
+  labels,
+  savedIds = [],
+  isLoggedIn = false,
+}: ArticlesGridProps) {
   const isRtl = locale === 'ar';
   const Arrow = isRtl ? ArrowLeft : ArrowRight;
 
@@ -79,12 +88,30 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                     <span className="absolute top-4 start-4 inline-flex items-center gap-1 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-white">
                       <Star className="h-3 w-3" /> {labels.featured}
                     </span>
+                    <div className="absolute top-4 end-4 z-20">
+                      <SaveButton
+                        insightId={article.documentId}
+                        insightType="article"
+                        initialIsSaved={savedIds.includes(article.documentId)}
+                        isLoggedIn={isLoggedIn}
+                        locale={locale}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="relative aspect-[1376/768] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                     <span className="absolute top-4 start-4 inline-flex items-center gap-1 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-white">
                       <Star className="h-3 w-3" /> {labels.featured}
                     </span>
+                    <div className="absolute top-4 end-4 z-20">
+                      <SaveButton
+                        insightId={article.documentId}
+                        insightType="article"
+                        initialIsSaved={savedIds.includes(article.documentId)}
+                        isLoggedIn={isLoggedIn}
+                        locale={locale}
+                      />
+                    </div>
                   </div>
                 )}
                 <div className="flex flex-col flex-1 p-6">
@@ -144,9 +171,28 @@ export function ArticlesGrid({ articles, locale, labels }: ArticlesGridProps) {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    <div className="absolute top-4 end-4 z-20">
+                      <SaveButton
+                        insightId={article.documentId}
+                        insightType="article"
+                        initialIsSaved={savedIds.includes(article.documentId)}
+                        isLoggedIn={isLoggedIn}
+                        locale={locale}
+                      />
+                    </div>
                   </div>
                 ) : (
-                  <div className="aspect-[1376/768] bg-gradient-to-br from-primary/10 to-accent/10" />
+                  <div className="relative aspect-[1376/768] bg-gradient-to-br from-primary/10 to-accent/10">
+                    <div className="absolute top-4 end-4 z-20">
+                      <SaveButton
+                        insightId={article.documentId}
+                        insightType="article"
+                        initialIsSaved={savedIds.includes(article.documentId)}
+                        isLoggedIn={isLoggedIn}
+                        locale={locale}
+                      />
+                    </div>
+                  </div>
                 )}
                 <div className="flex flex-col flex-1 p-5">
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-2.5">

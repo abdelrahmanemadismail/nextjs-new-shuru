@@ -8,6 +8,9 @@ import { ArticlesGrid } from "@/components/insights/articles-grid";
 import ReactMarkdown from 'react-markdown';
 import { DownloadPdfButton } from "@/components/ui/download-pdf-button";
 import { ShareButtons } from "@/components/insights/share-buttons";
+import { SaveButton } from "@/components/insights/save-button";
+import { getMe } from "@/lib/actions/auth";
+import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { Calendar, Eye, Download } from "lucide-react";
 
 type Props = {
@@ -64,6 +67,11 @@ export default async function MagazineIssuePage({ params }: Props) {
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
   const pageUrl = `${baseUrl}/${locale}/insights/magazine/${issue.slug}`;
+
+  const [session, isSaved] = await Promise.all([
+    getMe(),
+    isInsightSavedAction(issue.documentId, 'magazine-issue'),
+  ]);
 
   return (
     <div className="flex-1 pb-16 lg:pb-24">
@@ -164,8 +172,16 @@ export default async function MagazineIssuePage({ params }: Props) {
             )}
 
             {/* Share Section */}
-            <div className="border-t border-border/50 pt-6">
+            <div className="border-t border-border/50 pt-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <ShareButtons url={pageUrl} title={issue.title} shareLabel={shareText} />
+              <SaveButton
+                insightId={issue.documentId}
+                insightType="magazine-issue"
+                initialIsSaved={isSaved}
+                isLoggedIn={!!session}
+                locale={locale}
+                variant="default"
+              />
             </div>
           </div>
         </div>

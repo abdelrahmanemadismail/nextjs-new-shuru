@@ -24,6 +24,7 @@ type HeaderNavigationProps = {
   logoAlt: string;
   topBar: StrapiTopBar | null;
   latestMagazine?: StrapiMagazineIssue | null;
+  user?: { id: number; username: string; email: string } | null;
 };
 
 const localePathPattern = new RegExp(`^/(${locales.join("|")})(/|$)`);
@@ -66,6 +67,7 @@ export function HeaderNavigation({
   logoAlt,
   topBar,
   latestMagazine,
+  user = null,
 }: HeaderNavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -199,15 +201,21 @@ export function HeaderNavigation({
           </div>
 
           <div className="flex items-center justify-end gap-1 sm:gap-2">
-            {/* <Button
+            <Button
               variant="ghost"
               size="sm"
-              className="h-9 px-2 text-xs sm:px-3 sm:text-sm"
-              onClick={() => router.push(`/${locale}/auth/login`)}
-              aria-label="Login"
+              className={cn(
+                "h-9 px-2 text-xs sm:px-3 sm:text-sm flex items-center gap-1.5 rounded-xl border border-transparent transition-all cursor-pointer",
+                user
+                  ? "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 font-bold"
+                  : "hover:border-border"
+              )}
+              onClick={() => router.push(user ? `/${locale}/profile` : `/${locale}/auth/login`)}
+              aria-label={user ? "Profile" : "Login"}
             >
               <User className="h-4 w-4" />
-            </Button> */}
+              {user && <span className="hidden md:inline font-bold text-xs">{user.username}</span>}
+            </Button>
 
             <ModeToggle />
             <LocaleSwitcher currentLocale={locale} />

@@ -13,6 +13,8 @@ import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
 
 import { InsightsContent } from "@/components/insights/insights-content";
+import { getMe } from "@/lib/actions/auth";
+import { getSavedInsightIdsAction } from "@/lib/actions/saved-insights";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -35,7 +37,9 @@ export default async function Page({ params, searchParams }: Props) {
   const categorySlug = typeof sp.category === 'string' ? sp.category : undefined;
   const sortOrder = sp.sort === 'oldest' ? 'oldest' : 'newest';
 
-  const [author, articlesData, newsData, magazinesData, majlisesData, podcastsData, categories] = await Promise.all([
+  const [session, savedIds, author, articlesData, newsData, magazinesData, majlisesData, podcastsData, categories] = await Promise.all([
+    getMe(),
+    getSavedInsightIdsAction(),
     authorId ? getAuthorCached(authorId, locale) : Promise.resolve(null),
     getArticlesPaginatedCached(locale, tab === 'articles' ? current_page : 1, 9, authorId, searchQuery, categorySlug, sortOrder),
     getNewsPaginatedCached(locale, tab === 'news' ? current_page : 1, 9, searchQuery, sortOrder),
@@ -69,6 +73,8 @@ export default async function Page({ params, searchParams }: Props) {
         searchQuery={searchQuery || ""}
         categorySlug={categorySlug || "all"}
         sortOrder={sortOrder}
+        savedIds={savedIds}
+        isLoggedIn={!!session}
       />
     </main>
   );

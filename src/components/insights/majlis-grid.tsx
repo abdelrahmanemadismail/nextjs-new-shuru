@@ -6,11 +6,14 @@ import { motion } from 'framer-motion';
 import { Calendar, Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiMajlis } from '@/strapi/insights';
+import { SaveButton } from './save-button';
 
 type MajlisGridProps = {
   majlises: StrapiMajlis[];
   locale: Locale;
   labels: Record<string, string>;
+  savedIds?: string[];
+  isLoggedIn?: boolean;
 };
 
 function formatDate(dateStr: string, locale: Locale) {
@@ -34,7 +37,13 @@ const cardVariants = {
   }),
 };
 
-export function MajlisGrid({ majlises, locale, labels }: MajlisGridProps) {
+export function MajlisGrid({
+  majlises,
+  locale,
+  labels,
+  savedIds = [],
+  isLoggedIn = false,
+}: MajlisGridProps) {
   const isRtl = locale === 'ar';
   const Arrow = isRtl ? ArrowLeft : ArrowRight;
 
@@ -56,10 +65,16 @@ export function MajlisGrid({ majlises, locale, labels }: MajlisGridProps) {
           animate="visible"
           variants={cardVariants}
         >
-          <Link
-            href={`/${locale}/insights/majlis/${majlis.slug}`}
-            className="group flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5 transition-all duration-300"
+          <div
+            className="group relative flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5 transition-all duration-300"
           >
+            {/* Absolute link overlay */}
+            <Link
+              href={`/${locale}/insights/majlis/${majlis.slug}`}
+              className="absolute inset-0 z-10"
+              aria-label={majlis.title}
+            />
+
             {/* Cover image - landscape left side */}
             {majlis.cover_image?.url ? (
               <div className="relative w-full sm:w-[40%] md:w-[45%] lg:w-[480px] xl:w-[540px] aspect-[1376/768] shrink-0 overflow-hidden">
@@ -70,15 +85,33 @@ export function MajlisGrid({ majlises, locale, labels }: MajlisGridProps) {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+                <div className="absolute top-3 end-3 z-20">
+                  <SaveButton
+                    insightId={majlis.documentId}
+                    insightType="majlis"
+                    initialIsSaved={savedIds.includes(majlis.documentId)}
+                    isLoggedIn={isLoggedIn}
+                    locale={locale}
+                  />
+                </div>
               </div>
             ) : (
-              <div className="w-full sm:w-[40%] md:w-[45%] lg:w-[480px] xl:w-[540px] aspect-[1376/768] bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
+              <div className="relative w-full sm:w-[40%] md:w-[45%] lg:w-[480px] xl:w-[540px] aspect-[1376/768] bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
                 <Users className="h-12 w-12 text-primary/30" />
+                <div className="absolute top-3 end-3 z-20">
+                  <SaveButton
+                    insightId={majlis.documentId}
+                    insightType="majlis"
+                    initialIsSaved={savedIds.includes(majlis.documentId)}
+                    isLoggedIn={isLoggedIn}
+                    locale={locale}
+                  />
+                </div>
               </div>
             )}
 
             {/* Content */}
-            <div className="flex flex-col flex-1 p-5 sm:p-6">
+            <div className="flex flex-col flex-1 p-5 sm:p-6 z-20 pointer-events-none">
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                 <Calendar className="h-3.5 w-3.5" />
                 <span>{formatDate(majlis.majlis_date, locale)}</span>
@@ -99,7 +132,7 @@ export function MajlisGrid({ majlises, locale, labels }: MajlisGridProps) {
                 <Arrow className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
               </div>
             </div>
-          </Link>
+          </div>
         </motion.div>
       ))}
     </div>

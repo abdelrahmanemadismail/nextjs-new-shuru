@@ -5,6 +5,8 @@ import { getNewsItemBySlugCached } from "@/strapi/insights";
 import Image from "next/image";
 import { ArticleLayout } from "@/components/insights/article-layout";
 import { RichTextBlock } from "@/components/shared/rich-text-block";
+import { getMe } from "@/lib/actions/auth";
+import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -38,6 +40,11 @@ export default async function NewsPage({ params }: Props) {
 
   const blocks = news.content ? [{ __component: "shared.rich-text" as const, id: 1, body: news.content }] : [];
 
+  const [session, isSaved] = await Promise.all([
+    getMe(),
+    isInsightSavedAction(news.documentId, 'news-item'),
+  ]);
+
   return (
     <div className="flex-1 pb-16 lg:pb-24">
       {/* News Header */}
@@ -63,7 +70,15 @@ export default async function NewsPage({ params }: Props) {
       </section>
 
       {/* News Content */}
-      <ArticleLayout shareUrl={pageUrl} shareTitle={news.title}>
+      <ArticleLayout
+        shareUrl={pageUrl}
+        shareTitle={news.title}
+        insightId={news.documentId}
+        insightType="news-item"
+        isLoggedIn={!!session}
+        initialIsSaved={isSaved}
+        locale={locale}
+      >
         {blocks.map((block) => (
           <RichTextBlock key={block.id} block={block} />
         ))}

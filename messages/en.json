@@ -152,5 +152,42 @@
       "category": "Category",
       "allCategories": "All Categories"
     }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "username": "Username",
+    "fullName": "Full Name",
+    "orSignInWith": "Or sign in with",
+    "orSignUpWith": "Or sign up with",
+    "google": "Google",
+    "linkedin": "LinkedIn",
+    "profile": "Profile",
+    "editProfile": "Edit Profile",
+    "savedInsights": "Saved Insights",
+    "save": "Save",
+    "saved": "Saved",
+    "noSavedItems": "You haven't saved any items yet.",
+    "accountDetails": "Account Details",
+    "changePassword": "Change Password",
+    "updating": "Updating...",
+    "successProfileUpdate": "Profile updated successfully!",
+    "successPasswordUpdate": "Password changed successfully!",
+    "pleaseLogin": "Please log in to save insights",
+    "loginRedirect": "Redirecting to login...",
+    "saving": "Saving...",
+    "saveSuccess": "Insight saved!",
+    "unsaveSuccess": "Insight unsaved!"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "minLength": "Must be at least {min} characters"
   }
 }

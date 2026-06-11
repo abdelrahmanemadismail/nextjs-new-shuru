@@ -6,11 +6,14 @@ import { motion } from 'framer-motion';
 import { Calendar, Hash, ArrowRight, ArrowLeft } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiMagazineIssue } from '@/strapi/insights';
+import { SaveButton } from './save-button';
 
 type MagazineGridProps = {
   issues: StrapiMagazineIssue[];
   locale: Locale;
   labels: Record<string, string>;
+  savedIds?: string[];
+  isLoggedIn?: boolean;
 };
 
 function formatDate(dateStr: string, locale: Locale) {
@@ -34,7 +37,13 @@ const cardVariants = {
   }),
 };
 
-export function MagazineGrid({ issues, locale, labels }: MagazineGridProps) {
+export function MagazineGrid({
+  issues,
+  locale,
+  labels,
+  savedIds = [],
+  isLoggedIn = false,
+}: MagazineGridProps) {
   const isRtl = locale === 'ar';
   const Arrow = isRtl ? ArrowLeft : ArrowRight;
 
@@ -56,10 +65,16 @@ export function MagazineGrid({ issues, locale, labels }: MagazineGridProps) {
           animate="visible"
           variants={cardVariants}
         >
-          <Link
-            href={`/${locale}/insights/magazine/${issue.slug}`}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/15 hover:-translate-y-2 transition-all duration-300 h-full"
+          <div
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/15 hover:-translate-y-2 transition-all duration-300 h-full"
           >
+            {/* Absolute link overlay to make whole card clickable safely */}
+            <Link
+              href={`/${locale}/insights/magazine/${issue.slug}`}
+              className="absolute inset-0 z-10"
+              aria-label={issue.title}
+            />
+
             {/* Magazine cover - portrait aspect ratio */}
             <div className="relative aspect-[2480/3508] overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
               {issue.cover_image?.url ? (
@@ -78,10 +93,20 @@ export function MagazineGrid({ issues, locale, labels }: MagazineGridProps) {
                 </div>
               )}
               {issue.issue_number && (
-                <div className="absolute top-2 end-2 rounded-full bg-primary/90 text-white text-[11px] font-bold px-2.5 py-1">
+                <div className="absolute top-2 start-2 rounded-full bg-primary/90 text-white text-[11px] font-bold px-2.5 py-1 z-20">
                   #{issue.issue_number}
                 </div>
               )}
+              {/* Save button overlay */}
+              <div className="absolute top-2 end-2 z-20">
+                <SaveButton
+                  insightId={issue.documentId}
+                  insightType="magazine-issue"
+                  initialIsSaved={savedIds.includes(issue.documentId)}
+                  isLoggedIn={isLoggedIn}
+                  locale={locale}
+                />
+              </div>
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
                 <span className="text-white text-xs font-semibold flex items-center gap-1">
@@ -91,7 +116,7 @@ export function MagazineGrid({ issues, locale, labels }: MagazineGridProps) {
               </div>
             </div>
 
-            <div className="p-4 flex flex-col gap-1.5">
+            <div className="p-4 flex flex-col gap-1.5 z-20 pointer-events-none">
               <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                 {issue.title}
               </h3>
@@ -100,7 +125,7 @@ export function MagazineGrid({ issues, locale, labels }: MagazineGridProps) {
                 <span>{formatDate(issue.publish_date, locale)}</span>
               </div>
             </div>
-          </Link>
+          </div>
         </motion.div>
       ))}
     </div>
