@@ -25,6 +25,7 @@
   },
   "insights": {
     "title": "Insights",
+    "share": "Share",
     "categories": "Categories",
     "featured": "Featured",
     "readMore": "Read More",
@@ -126,6 +127,30 @@
       "required": "This field is required",
       "invalidEmail": "Please enter a valid email address",
       "minLength": "Must be at least {min} characters"
+    }
+  },
+  "search": {
+    "placeholder": "Search articles, categories, pages, authors, magazines...",
+    "loading": "Searching...",
+    "noResults": "No results found for \"{query}\"",
+    "suggestions": "Try checking your spelling or searching for different keywords.",
+    "sections": {
+      "articles": "Articles",
+      "categories": "Categories",
+      "pages": "Pages",
+      "authors": "Authors",
+      "magazine": "Magazines",
+      "news": "News",
+      "majilis": "Majlis"
+    },
+    "filter": {
+      "author": "Showing articles by {name}",
+      "clear": "Clear Filter",
+      "sortBy": "Sort By",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "category": "Category",
+      "allCategories": "All Categories"
     }
   }
 }

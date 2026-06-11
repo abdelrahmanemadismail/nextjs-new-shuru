@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
-import { getCategoryBySlugCached } from "@/strapi/insights";
+import { getCategoryBySlugCached, getArticlesPaginatedCached } from "@/strapi/insights";
 import Link from "next/link";
 import { MoveLeft, MoveRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { ArticlesGrid } from "@/components/insights/articles-grid";
 import { cn } from "@/lib/utils";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -86,47 +88,34 @@ export default async function CategoryPage(props: Props) {
 
   if (!category) notFound();
 
-  const articles = category.articles || [];
-
-  // Use the new Strapi schema property: children_categories are actually accessible by category.children_categories directly.
   const subcategories = category.children_categories || [];
 
   const subcategoryQuery = searchParams.subcategory;
   const currentSubcategory =
     typeof subcategoryQuery === "string" ? subcategoryQuery : undefined;
 
-  let displayedArticles = articles;
+  const pageQuery = searchParams.page;
+  const page = typeof pageQuery === "string" ? parseInt(pageQuery, 10) : 1;
+  const current_page = isNaN(page) || page < 1 ? 1 : page;
 
-  if (currentSubcategory) {
-    const subcat = await getCategoryBySlugCached(currentSubcategory, locale);
-    if (subcat && subcat.articles) {
-      displayedArticles = subcat.articles;
-    } else {
-      displayedArticles = [];
-    }
-  } else {
-    const allChildArticles = [];
-    for (const sub of subcategories) {
-      const subcat = await getCategoryBySlugCached(sub.slug, locale);
-      if (subcat && subcat.articles) {
-        allChildArticles.push(...subcat.articles);
-      }
-    }
+  const searchQuery = typeof searchParams.q === 'string' ? searchParams.q : undefined;
+  const sortOrder = searchParams.sort === 'oldest' ? 'oldest' : 'newest';
 
-    // Combine and deduplicate articles by ID
-    const combined = [...articles, ...allChildArticles];
-    const uniqueArticles = new Map();
-    for (const art of combined) {
-      uniqueArticles.set(art.id, art);
-    }
+  // If a subcategory is selected, we filter only by it.
+  // Otherwise, we match the parent category or any of its children.
+  const targetCategorySlugs = currentSubcategory 
+    ? currentSubcategory 
+    : [slug, ...subcategories.map(sub => sub.slug)];
 
-    // Sort combined articles by date descending
-    displayedArticles = Array.from(uniqueArticles.values()).sort((a: any, b: any) => {
-      const dateA = new Date(a.publish_date || a.createdAt || 0).getTime();
-      const dateB = new Date(b.publish_date || b.createdAt || 0).getTime();
-      return dateB - dateA;
-    });
-  }
+  const { data: displayedArticles, meta } = await getArticlesPaginatedCached(
+    locale as Locale,
+    current_page,
+    9,
+    undefined,
+    searchQuery,
+    targetCategorySlugs,
+    sortOrder
+  );
 
   const labels = {
     empty: it("empty") || "No articles",
@@ -167,24 +156,36 @@ export default async function CategoryPage(props: Props) {
         allLabel={it("all") || "All"}
       />
 
+      <SearchFilterControls
+        searchQuery={searchQuery || ""}
+        sortOrder={sortOrder}
+        showCategoryFilter={false}
+      />
+
       {displayedArticles.length === 0 ? (
         <div className="text-center py-24 border border-border/50 bg-muted/20 rounded-xl">
           <h3 className="text-xl font-bold mb-4">
             {currentSubcategory ? (locale === 'ar' ? 'لا توجد مقالات في هذه الفئة الفرعية' : 'No articles in this subcategory') : (it("empty") || "No articles found")}
           </h3>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            {locale === 'ar' ? 'لم يتم نشر أي مقالات هنا حتى الآن.' : 'No articles have been published here yet.'}
+            {locale === 'ar' ? 'لم يتم العثور على أي مقالات تطابق اختياراتك.' : 'No articles match your search criteria.'}
           </p>
           <Link href={`/${locale}/insights`} className="px-6 py-3 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">
             {locale === 'ar' ? 'تصفح الرؤى' : 'Browse Insights'}
           </Link>
         </div>
       ) : (
-        <ArticlesGrid
-          articles={displayedArticles as any}
-          locale={locale as Locale}
-          labels={labels}
-        />
+        <>
+          <ArticlesGrid
+            articles={displayedArticles as any}
+            locale={locale as Locale}
+            labels={labels}
+          />
+          <PaginationControls
+            currentPage={current_page}
+            pageCount={meta.pagination.pageCount}
+          />
+        </>
       )}
     </main>
   );

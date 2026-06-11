@@ -33,6 +33,9 @@ export default async function MajlisPage({ params }: Props) {
     notFound();
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
+  const pageUrl = `${baseUrl}/${locale}/insights/majlis/${majlis.slug}`;
+
   // Create blocks array for RichTextBlock from 'content' using a dummy ID
   const blocks = majlis.content ? [{ __component: "shared.rich-text" as const, id: 1, body: majlis.content }] : [];
 
@@ -61,7 +64,7 @@ export default async function MajlisPage({ params }: Props) {
       </section>
 
       {/* Majlis Content & Layout */}
-      <ArticleLayout>
+      <ArticleLayout shareUrl={pageUrl} shareTitle={majlis.title}>
         {blocks.map((block) => (
           <RichTextBlock key={block.id} block={block} />
         ))}

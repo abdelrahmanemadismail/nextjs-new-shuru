@@ -4,14 +4,19 @@ import Image from 'next/image';
 import { TableOfContents } from './table-of-contents';
 import { useHasHeaders } from '@/hooks/use-has-headers';
 import type { StrapiAuthor } from '@/strapi/insights';
+import { ShareButtons } from './share-buttons';
+import { useTranslations } from 'next-intl';
 
 interface ArticleLayoutProps {
   children: React.ReactNode;
   author?: StrapiAuthor;
+  shareUrl?: string;
+  shareTitle?: string;
 }
 
-export function ArticleLayout({ children, author }: ArticleLayoutProps) {
+export function ArticleLayout({ children, author, shareUrl, shareTitle }: ArticleLayoutProps) {
   const hasHeaders = useHasHeaders('article-content');
+  const t = useTranslations('insights');
 
   if (hasHeaders) {
     // Two-column layout with sidebar
@@ -81,6 +86,13 @@ export function ArticleLayout({ children, author }: ArticleLayoutProps) {
             </div>
           )}
 
+          {/* Share Buttons */}
+          {shareUrl && shareTitle && (
+            <div className="bg-white p-6 lg:p-8 border border-neutral-200 shadow-sm rounded-xl">
+              <ShareButtons url={shareUrl} title={shareTitle} shareLabel={t('share')} />
+            </div>
+          )}
+
           {/* Desktop Table of Contents - Hidden on mobile */}
           <div className="hidden lg:block sticky top-32 z-10">
             <TableOfContents articleContentId="article-content" />
@@ -96,6 +108,13 @@ export function ArticleLayout({ children, author }: ArticleLayoutProps) {
       {/* Article Content - Full Width */}
       <main id="article-content" dir="rtl">
         {children}
+
+        {/* Share Buttons */}
+        {shareUrl && shareTitle && (
+          <div className="mt-12 pt-6 border-t border-neutral-200">
+            <ShareButtons url={shareUrl} title={shareTitle} shareLabel={t('share')} />
+          </div>
+        )}
 
         {/* Author Card - Inline after content when no sidebar */}
         {author && (

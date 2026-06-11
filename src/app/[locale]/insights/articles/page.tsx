@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
-import { getArticlesPaginatedCached } from "@/strapi/insights";
+import { getArticlesPaginatedCached, getCategoriesCached } from "@/strapi/insights";
 import Link from "next/link";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -20,18 +21,37 @@ export default async function Page({ params, searchParams }: Props) {
   const page = typeof sp.page === 'string' ? parseInt(sp.page, 10) : 1;
   const current_page = isNaN(page) || page < 1 ? 1 : page;
 
-  const { data: articles, meta } = await getArticlesPaginatedCached(locale, current_page, 9); // 9 articles per page for a 3-column grid
+  const searchQuery = typeof sp.q === 'string' ? sp.q : undefined;
+  const categorySlug = typeof sp.category === 'string' ? sp.category : undefined;
+  const sortOrder = sp.sort === 'oldest' ? 'oldest' : 'newest';
+
+  const [articlesData, categories] = await Promise.all([
+    getArticlesPaginatedCached(locale, current_page, 9, undefined, searchQuery, categorySlug, sortOrder),
+    getCategoriesCached(locale)
+  ]);
+
+  const { data: articles, meta } = articlesData;
   const t = await getTranslations({ locale, namespace: 'insights' });
 
   return (
-    <main className="container py-24 mx-auto px-4">
+    <main className="container py-24 mx-auto px-4 max-w-7xl">
       <div className="mb-12 border-b border-border/50 pb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">{t('tabs.articles')}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{t('tabs.subtitle')}</p>
       </div>
 
+      <SearchFilterControls
+        searchQuery={searchQuery || ""}
+        sortOrder={sortOrder}
+        categories={categories}
+        selectedCategory={categorySlug || "all"}
+        showCategoryFilter={true}
+      />
+
       {articles.length === 0 ? (
-        <p>No articles found.</p>
+        <div className="text-center py-12 border border-dashed rounded-xl bg-muted/10">
+          <p className="text-muted-foreground">{locale === 'ar' ? 'لم يتم العثور على مقالات.' : 'No articles found.'}</p>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

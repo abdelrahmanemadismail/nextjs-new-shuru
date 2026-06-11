@@ -33,6 +33,9 @@ export default async function PodcastPage({ params }: Props) {
     notFound();
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
+  const pageUrl = `${baseUrl}/${locale}/insights/podcasts/${podcast.slug}`;
+
   const blocks = podcast.content ? [{ __component: "shared.rich-text" as const, id: 1, body: podcast.content }] : [];
 
   return (
@@ -99,7 +102,7 @@ export default async function PodcastPage({ params }: Props) {
       </section>
 
       {/* Podcast Content & Layout */}
-      <ArticleLayout>
+      <ArticleLayout shareUrl={pageUrl} shareTitle={podcast.title}>
         {blocks.length > 0 && (
           <div className="mb-12">
             {blocks.map((block) => (

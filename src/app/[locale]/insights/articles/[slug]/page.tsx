@@ -37,6 +37,9 @@ export default async function ArticlePage({ params }: Props) {
     notFound();
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
+  const pageUrl = `${baseUrl}/${locale}/insights/articles/${article.slug}`;
+
   // Pass an empty testimonials array since generic blocks might require it but usually don't if they aren't the testimonial block
   return (
     <div className="flex-1 pb-16 lg:pb-24">
@@ -81,7 +84,7 @@ export default async function ArticlePage({ params }: Props) {
       </section>
 
       {/* Article Blocks & Layout */}
-      <ArticleLayout author={article.author}>
+      <ArticleLayout author={article.author} shareUrl={pageUrl} shareTitle={article.title}>
         {article.blocks?.map((block) => (
           <BlockRenderer
             key={block.id}

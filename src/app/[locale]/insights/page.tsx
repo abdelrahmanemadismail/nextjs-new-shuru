@@ -3,7 +3,9 @@ import {
   getNewsPaginatedCached,
   getMagazineIssuesPaginatedCached,
   getMajlisPaginatedCached,
-  getPodcastsPaginatedCached
+  getPodcastsPaginatedCached,
+  getAuthorCached,
+  getCategoriesCached
 } from "@/strapi/insights";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
@@ -27,13 +29,20 @@ export default async function Page({ params, searchParams }: Props) {
   const tab = typeof sp.tab === 'string' ? sp.tab : 'articles';
   const page = typeof sp.page === 'string' ? parseInt(sp.page, 10) : 1;
   const current_page = isNaN(page) || page < 1 ? 1 : page;
+  const authorId = typeof sp.author === 'string' ? sp.author : undefined;
+  
+  const searchQuery = typeof sp.q === 'string' ? sp.q : undefined;
+  const categorySlug = typeof sp.category === 'string' ? sp.category : undefined;
+  const sortOrder = sp.sort === 'oldest' ? 'oldest' : 'newest';
 
-  const [articlesData, newsData, magazinesData, majlisesData, podcastsData] = await Promise.all([
-    getArticlesPaginatedCached(locale, tab === 'articles' ? current_page : 1, 9),
-    getNewsPaginatedCached(locale, tab === 'news' ? current_page : 1, 9),
-    getMagazineIssuesPaginatedCached(locale, tab === 'magazine' ? current_page : 1, 9),
-    getMajlisPaginatedCached(locale, tab === 'majlis' ? current_page : 1, 9),
-    getPodcastsPaginatedCached(locale, tab === 'podcasts' ? current_page : 1, 9),
+  const [author, articlesData, newsData, magazinesData, majlisesData, podcastsData, categories] = await Promise.all([
+    authorId ? getAuthorCached(authorId, locale) : Promise.resolve(null),
+    getArticlesPaginatedCached(locale, tab === 'articles' ? current_page : 1, 9, authorId, searchQuery, categorySlug, sortOrder),
+    getNewsPaginatedCached(locale, tab === 'news' ? current_page : 1, 9, searchQuery, sortOrder),
+    getMagazineIssuesPaginatedCached(locale, tab === 'magazine' ? current_page : 1, 9, searchQuery, sortOrder),
+    getMajlisPaginatedCached(locale, tab === 'majlis' ? current_page : 1, 9, searchQuery, sortOrder),
+    getPodcastsPaginatedCached(locale, tab === 'podcasts' ? current_page : 1, 9, searchQuery, sortOrder),
+    getCategoriesCached(locale),
   ]);
   
 
@@ -55,6 +64,11 @@ export default async function Page({ params, searchParams }: Props) {
         magazines={magazinesData.data}
         majlises={majlisesData.data}
         podcasts={podcastsData.data}
+        author={author || undefined}
+        categories={categories}
+        searchQuery={searchQuery || ""}
+        categorySlug={categorySlug || "all"}
+        sortOrder={sortOrder}
       />
     </main>
   );

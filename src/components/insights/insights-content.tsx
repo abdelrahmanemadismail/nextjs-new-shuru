@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { PaginationControls } from '@/components/ui/pagination-controls';
-import type { PaginationMeta } from '@/strapi/insights';
+import type { PaginationMeta, StrapiCategory } from '@/strapi/insights';
 import { type Locale } from '@/lib/i18n';
 import { InsightsHero } from './insights-hero';
 import { ArticlesGrid } from './articles-grid';
 import { NewsGrid } from './news-grid';
 import { MagazineGrid } from './magazine-grid';
 import { MajlisGrid } from './majlis-grid';
-import type { StrapiArticle, StrapiNewsItem, StrapiMagazineIssue, StrapiMajlis, StrapiPodcast } from '@/strapi/insights';
+import type { StrapiArticle, StrapiNewsItem, StrapiMagazineIssue, StrapiMajlis, StrapiPodcast, StrapiAuthor } from '@/strapi/insights';
+import { useTranslations } from 'next-intl';
+import { X } from 'lucide-react';
+import { SearchFilterControls } from './search-filter-controls';
 
 type InsightsContentProps = {
   activeTab?: string;
@@ -21,7 +24,12 @@ type InsightsContentProps = {
   news: StrapiNewsItem[];
   magazines: StrapiMagazineIssue[];
   majlises: StrapiMajlis[];
-  podcasts: StrapiPodcast[]; // Provide if you have a grid for it, otherwise we leave empty array
+  podcasts: StrapiPodcast[];
+  author?: StrapiAuthor;
+  categories?: StrapiCategory[];
+  searchQuery?: string;
+  categorySlug?: string;
+  sortOrder?: 'newest' | 'oldest';
 };
 
 const defaultLabels = {
@@ -33,7 +41,7 @@ const defaultLabels = {
     news: 'News',
     magazine: 'Magazine',
     majlis: 'Majlis',
-    // podcasts: 'Podcasts',
+    empty: 'No items found matching your filters.',
   },
   ar: {
     badge: 'مركز المعرفة',
@@ -43,7 +51,7 @@ const defaultLabels = {
     news: 'أخبار',
     magazine: 'مجلة',
     majlis: 'مجلس',
-    // podcasts: 'بودكاست',
+    empty: 'لم يتم العثور على عناصر تطابق اختياراتك.',
   }
 };
 
@@ -56,11 +64,16 @@ export function InsightsContent({
   news,
   magazines,
   majlises,
-  // podcasts
+  author,
+  categories = [],
+  searchQuery = '',
+  categorySlug = 'all',
+  sortOrder = 'newest',
 }: InsightsContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const tSearch = useTranslations("search");
   
   const [activeTab, setActiveTab] = useState(initialTab);
   useEffect(() => {
@@ -68,7 +81,6 @@ export function InsightsContent({
       setActiveTab(initialTab);
     }
   }, [initialTab]);
-
 
   // When tab changes, we want to update the URL so we get page 1 for the new tab
   const handleTabChange = (tab: string) => {
@@ -78,6 +90,14 @@ export function InsightsContent({
     params.set('page', '1');
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
+
+  const handleClearAuthorFilter = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('author');
+    params.set('page', '1');
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   const labels = defaultLabels[locale] || defaultLabels['en'];
 
   return (
@@ -88,16 +108,36 @@ export function InsightsContent({
         onTabChange={handleTabChange}
         labels={labels}
       />
-      <div className="container mx-auto px-4 pb-24 pt-12">
+      <div className="container mx-auto px-4 pb-24 pt-12" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        {/* Search & Filters Controls */}
+        <SearchFilterControls
+          searchQuery={searchQuery}
+          sortOrder={sortOrder}
+          categories={categories}
+          selectedCategory={categorySlug}
+          showCategoryFilter={activeTab === 'articles'}
+        />
+
+        {/* Author filter banner */}
+        {activeTab === 'articles' && author && (
+          <div className="mb-8 flex items-center justify-between rounded-lg bg-primary/10 border border-primary/20 px-4 py-3 text-sm text-primary">
+            <span className="font-semibold">
+              {tSearch("filter.author", { name: author.name })}
+            </span>
+            <button
+              onClick={handleClearAuthorFilter}
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-primary/20 transition-colors cursor-pointer"
+              aria-label={tSearch("filter.clear")}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         {activeTab === 'articles' && <ArticlesGrid articles={articles} locale={locale} labels={labels} />}
         {activeTab === 'news' && <NewsGrid news={news} locale={locale} labels={labels} />}
         {activeTab === 'magazine' && <MagazineGrid issues={magazines} locale={locale} labels={labels} />}
         {activeTab === 'majlis' && <MajlisGrid majlises={majlises} locale={locale} labels={labels} />}
-        {/* {activeTab === 'podcasts' && (
-          <div className="text-center py-12 text-muted-foreground border rounded-lg">
-            Podcasts coming soon...
-          </div>
-        )} */}
 
         {meta && meta[activeTab] && meta[activeTab].pagination.pageCount > 1 && (
           <PaginationControls

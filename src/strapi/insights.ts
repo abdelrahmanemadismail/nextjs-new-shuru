@@ -195,7 +195,12 @@ async function fetchInsightListPaginated<T>(
     params.append("populate", "cover_image");
   }
 
-  params.append("sort[0]", `${sortField}:desc`);
+  if (sortField.includes(":")) {
+    params.append("sort[0]", sortField);
+  } else {
+    params.append("sort[0]", `${sortField}:desc`);
+  }
+
   params.append("pagination[page]", page.toString());
   params.append("pagination[pageSize]", pageSize.toString());
 
@@ -223,38 +228,220 @@ async function fetchInsightListPaginated<T>(
   return { data, meta };
 }
 
-export const getArticlesPaginatedCached = unstable_cache(
-  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiArticle>("/api/articles", locale, [ARTICLES_TAG], page, pageSize, "publish_date", {
-    "populate[0]": "cover_image",
-    "populate[1]": "categories"
-  }),
-  [ARTICLES_TAG, "paginated"],
-  { revalidate: 3600, tags: [ARTICLES_TAG] }
-);
+export const getArticlesPaginatedCached = (
+  locale: Locale,
+  page: number = 1,
+  pageSize: number = 12,
+  authorId?: string,
+  searchQuery?: string,
+  categorySlug?: string | string[],
+  sortOrder: "newest" | "oldest" = "newest"
+) => {
+  const categoryKey = Array.isArray(categorySlug) ? categorySlug.join(",") : (categorySlug || "all");
+  const cacheKey = [
+    ARTICLES_TAG,
+    "paginated",
+    locale,
+    page.toString(),
+    pageSize.toString(),
+    authorId || "all",
+    searchQuery || "",
+    categoryKey,
+    sortOrder
+  ];
+  return unstable_cache(
+    async () => {
+      const extraParams: Record<string, string> = {
+        "populate[0]": "cover_image",
+        "populate[1]": "categories"
+      };
+      if (authorId) {
+        extraParams["filters[author][documentId][$eq]"] = authorId;
+      }
+      if (categorySlug && categorySlug !== "all") {
+        if (Array.isArray(categorySlug)) {
+          categorySlug.forEach((slugVal, index) => {
+            extraParams[`filters[categories][slug][$in][${index}]`] = slugVal;
+          });
+        } else {
+          extraParams["filters[categories][slug][$eq]"] = categorySlug;
+        }
+      }
+      if (searchQuery) {
+        extraParams["filters[$or][0][title][$containsi]"] = searchQuery;
+        extraParams["filters[$or][1][description][$containsi]"] = searchQuery;
+      }
+      const sortField = sortOrder === "oldest" ? "publish_date:asc" : "publish_date:desc";
+      return fetchInsightListPaginated<StrapiArticle>(
+        "/api/articles",
+        locale,
+        [ARTICLES_TAG],
+        page,
+        pageSize,
+        sortField,
+        extraParams
+      );
+    },
+    cacheKey,
+    { revalidate: 3600, tags: [ARTICLES_TAG] }
+  )();
+};
 
-export const getNewsPaginatedCached = unstable_cache(
-  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiNewsItem>("/api/news-items", locale, [NEWS_TAG], page, pageSize, "news_date"),
-  [NEWS_TAG, "paginated"],
-  { revalidate: 3600, tags: [NEWS_TAG] }
-);
+export const getNewsPaginatedCached = (
+  locale: Locale,
+  page: number = 1,
+  pageSize: number = 12,
+  searchQuery?: string,
+  sortOrder: "newest" | "oldest" = "newest"
+) => {
+  const cacheKey = [
+    NEWS_TAG,
+    "paginated",
+    locale,
+    page.toString(),
+    pageSize.toString(),
+    searchQuery || "",
+    sortOrder
+  ];
+  return unstable_cache(
+    async () => {
+      const extraParams: Record<string, string> = {};
+      if (searchQuery) {
+        extraParams["filters[$or][0][title][$containsi]"] = searchQuery;
+        extraParams["filters[$or][1][description][$containsi]"] = searchQuery;
+      }
+      const sortField = sortOrder === "oldest" ? "news_date:asc" : "news_date:desc";
+      return fetchInsightListPaginated<StrapiNewsItem>(
+        "/api/news-items",
+        locale,
+        [NEWS_TAG],
+        page,
+        pageSize,
+        sortField,
+        extraParams
+      );
+    },
+    cacheKey,
+    { revalidate: 3600, tags: [NEWS_TAG] }
+  )();
+};
 
-export const getMagazineIssuesPaginatedCached = unstable_cache(
-  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiMagazineIssue>("/api/magazine-issues", locale, [MAGAZINE_TAG], page, pageSize, "publish_date"),
-  [MAGAZINE_TAG, "paginated"],
-  { revalidate: 3600, tags: [MAGAZINE_TAG] }
-);
+export const getMagazineIssuesPaginatedCached = (
+  locale: Locale,
+  page: number = 1,
+  pageSize: number = 12,
+  searchQuery?: string,
+  sortOrder: "newest" | "oldest" = "newest"
+) => {
+  const cacheKey = [
+    MAGAZINE_TAG,
+    "paginated",
+    locale,
+    page.toString(),
+    pageSize.toString(),
+    searchQuery || "",
+    sortOrder
+  ];
+  return unstable_cache(
+    async () => {
+      const extraParams: Record<string, string> = {};
+      if (searchQuery) {
+        extraParams["filters[$or][0][title][$containsi]"] = searchQuery;
+        extraParams["filters[$or][1][description][$containsi]"] = searchQuery;
+      }
+      const sortField = sortOrder === "oldest" ? "publish_date:asc" : "publish_date:desc";
+      return fetchInsightListPaginated<StrapiMagazineIssue>(
+        "/api/magazine-issues",
+        locale,
+        [MAGAZINE_TAG],
+        page,
+        pageSize,
+        sortField,
+        extraParams
+      );
+    },
+    cacheKey,
+    { revalidate: 3600, tags: [MAGAZINE_TAG] }
+  )();
+};
 
-export const getMajlisPaginatedCached = unstable_cache(
-  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiMajlis>("/api/majlises", locale, [MAJLIS_TAG], page, pageSize, "majlis_date"),
-  [MAJLIS_TAG, "paginated"],
-  { revalidate: 3600, tags: [MAJLIS_TAG] }
-);
+export const getMajlisPaginatedCached = (
+  locale: Locale,
+  page: number = 1,
+  pageSize: number = 12,
+  searchQuery?: string,
+  sortOrder: "newest" | "oldest" = "newest"
+) => {
+  const cacheKey = [
+    MAJLIS_TAG,
+    "paginated",
+    locale,
+    page.toString(),
+    pageSize.toString(),
+    searchQuery || "",
+    sortOrder
+  ];
+  return unstable_cache(
+    async () => {
+      const extraParams: Record<string, string> = {};
+      if (searchQuery) {
+        extraParams["filters[$or][0][title][$containsi]"] = searchQuery;
+        extraParams["filters[$or][1][description][$containsi]"] = searchQuery;
+      }
+      const sortField = sortOrder === "oldest" ? "majlis_date:asc" : "majlis_date:desc";
+      return fetchInsightListPaginated<StrapiMajlis>(
+        "/api/majlises",
+        locale,
+        [MAJLIS_TAG],
+        page,
+        pageSize,
+        sortField,
+        extraParams
+      );
+    },
+    cacheKey,
+    { revalidate: 3600, tags: [MAJLIS_TAG] }
+  )();
+};
 
-export const getPodcastsPaginatedCached = unstable_cache(
-  async (locale: Locale, page: number = 1, pageSize: number = 12) => fetchInsightListPaginated<StrapiPodcast>("/api/podcasts", locale, [PODCAST_TAG], page, pageSize, "podcast_date"),
-  [PODCAST_TAG, "paginated"],
-  { revalidate: 3600, tags: [PODCAST_TAG] }
-);
+export const getPodcastsPaginatedCached = (
+  locale: Locale,
+  page: number = 1,
+  pageSize: number = 12,
+  searchQuery?: string,
+  sortOrder: "newest" | "oldest" = "newest"
+) => {
+  const cacheKey = [
+    PODCAST_TAG,
+    "paginated",
+    locale,
+    page.toString(),
+    pageSize.toString(),
+    searchQuery || "",
+    sortOrder
+  ];
+  return unstable_cache(
+    async () => {
+      const extraParams: Record<string, string> = {};
+      if (searchQuery) {
+        extraParams["filters[$or][0][title][$containsi]"] = searchQuery;
+        extraParams["filters[$or][1][description][$containsi]"] = searchQuery;
+      }
+      const sortField = sortOrder === "oldest" ? "podcast_date:asc" : "podcast_date:desc";
+      return fetchInsightListPaginated<StrapiPodcast>(
+        "/api/podcasts",
+        locale,
+        [PODCAST_TAG],
+        page,
+        pageSize,
+        sortField,
+        extraParams
+      );
+    },
+    cacheKey,
+    { revalidate: 3600, tags: [PODCAST_TAG] }
+  )();
+};
 
 export type StrapiAuthor = {
   id: number;
@@ -559,3 +746,38 @@ export const getCategoriesCached = unstable_cache(
   ["categories"],
   { revalidate: 3600, tags: ["categories"] }
 );
+
+async function fetchAuthor(documentId: string, locale: Locale): Promise<StrapiAuthor | null> {
+  const params = new URLSearchParams();
+  params.append("locale", locale);
+  params.append("populate[avatar][fields][0]", "url");
+
+  const response = await fetch(`${getStrapiBaseUrl()}/api/authors/${documentId}?${params.toString()}`, {
+    headers: getStrapiRequestHeaders(),
+    next: { tags: ["authors", documentId] },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(`Failed to fetch author ${documentId} (${response.status})`);
+  }
+
+  const payload = await response.json();
+  const author = payload.data;
+  if (!author) return null;
+
+  if (author.avatar) {
+    author.avatar.url = toAbsoluteUrl(extractMediaUrl(author.avatar));
+  }
+
+  return author as StrapiAuthor;
+}
+
+export const getAuthorCached = (documentId: string, locale: Locale) => {
+  const cacheKey = ["authors", documentId, locale];
+  return unstable_cache(
+    async () => fetchAuthor(documentId, locale),
+    cacheKey,
+    { revalidate: 3600, tags: ["authors"] }
+  )();
+};

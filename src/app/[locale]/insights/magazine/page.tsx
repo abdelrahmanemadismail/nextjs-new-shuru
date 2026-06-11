@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import { getMagazineIssuesPaginatedCached } from "@/strapi/insights";
 import Link from "next/link";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -20,18 +21,29 @@ export default async function Page({ params, searchParams }: Props) {
   const page = typeof sp.page === 'string' ? parseInt(sp.page, 10) : 1;
   const current_page = isNaN(page) || page < 1 ? 1 : page;
 
-  const { data: issues, meta } = await getMagazineIssuesPaginatedCached(locale, current_page, 9);
+  const searchQuery = typeof sp.q === 'string' ? sp.q : undefined;
+  const sortOrder = sp.sort === 'oldest' ? 'oldest' : 'newest';
+
+  const { data: issues, meta } = await getMagazineIssuesPaginatedCached(locale, current_page, 9, searchQuery, sortOrder);
   const t = await getTranslations({ locale, namespace: 'insights' });
 
   return (
-    <main className="container py-24 mx-auto px-4">
+    <main className="container py-24 mx-auto px-4 max-w-7xl">
       <div className="mb-12 border-b border-border/50 pb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">{t('tabs.magazine')}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{t('tabs.subtitle')}</p>
       </div>
 
+      <SearchFilterControls
+        searchQuery={searchQuery || ""}
+        sortOrder={sortOrder}
+        showCategoryFilter={false}
+      />
+
       {issues.length === 0 ? (
-        <p>No magazine issues found.</p>
+        <div className="text-center py-12 border border-dashed rounded-xl bg-muted/10">
+          <p className="text-muted-foreground">{locale === 'ar' ? 'لم يتم العثور على أعداد مجلة.' : 'No magazine issues found.'}</p>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

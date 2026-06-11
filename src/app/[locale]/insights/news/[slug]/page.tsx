@@ -33,6 +33,9 @@ export default async function NewsPage({ params }: Props) {
     notFound();
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
+  const pageUrl = `${baseUrl}/${locale}/insights/news/${news.slug}`;
+
   const blocks = news.content ? [{ __component: "shared.rich-text" as const, id: 1, body: news.content }] : [];
 
   return (
@@ -60,7 +63,7 @@ export default async function NewsPage({ params }: Props) {
       </section>
 
       {/* News Content */}
-      <ArticleLayout>
+      <ArticleLayout shareUrl={pageUrl} shareTitle={news.title}>
         {blocks.map((block) => (
           <RichTextBlock key={block.id} block={block} />
         ))}
