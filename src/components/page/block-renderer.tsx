@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/home/hero-section";
 import dynamic from "next/dynamic";
 import type { StrapiPageBlock } from "@/strapi/page";
+import { LazySection } from "@/components/shared/lazy-section";
 
 import { type Locale } from "@/lib/i18n";
 import type { StrapiTestimonial } from "@/strapi/home";
@@ -48,48 +49,81 @@ export function BlockRenderer({ block, locale, testimonials }: { block: StrapiPa
       return <OverviewSection overview={block} />;
 
     case "home.value":
-      return <ValueSection value={block} />;
+      return (
+        <LazySection placeholderHeight={450}>
+          <ValueSection value={block} />
+        </LazySection>
+      );
 
     case "home.testimonials-section":
-      return <TestimonialsSection section={block} testimonials={testimonials} />;
-
+      return (
+        <LazySection placeholderHeight={350}>
+          <TestimonialsSection section={block} testimonials={testimonials} />
+        </LazySection>
+      );
 
     case "home.cta-footer":
-      return <CtaFooterSection cta={block} locale={locale} />;
+      return (
+        <LazySection placeholderHeight={300}>
+          <CtaFooterSection cta={block} locale={locale} />
+        </LazySection>
+      );
 
     case "shared.challenges-section":
       return (
-        <ChallengesSection
-          title={block.title}
-          introText={block.introText}
-          challenges={block.challenges}
-        />
+        <LazySection placeholderHeight={400}>
+          <ChallengesSection
+            title={block.title}
+            introText={block.introText}
+            challenges={block.challenges}
+          />
+        </LazySection>
       );
 
     case "shared.timeline-section":
       return (
-        <TimelineSection
-          title={block.title}
-          steps={block.steps}
-        />
+        <LazySection placeholderHeight={500}>
+          <TimelineSection
+            title={block.title}
+            steps={block.steps}
+          />
+        </LazySection>
       );
 
     case "shared.quote-section":
       return (
-        <QuoteSection
-          quoteText={block.quoteText}
-          author={block.author}
-        />
+        <LazySection placeholderHeight={250}>
+          <QuoteSection
+            quoteText={block.quoteText}
+            author={block.author}
+          />
+        </LazySection>
       );
 
     case "shared.media":
-      return <MediaBlock block={block as any} />;
+      return (
+        <LazySection placeholderHeight={300}>
+          <MediaBlock block={block as any} />
+        </LazySection>
+      );
     case "shared.quote":
-      return <QuoteBlock block={block as any} />;
+      return (
+        <LazySection placeholderHeight={200}>
+          <QuoteBlock block={block as any} />
+        </LazySection>
+      );
     case "shared.rich-text":
-      return <RichTextBlock block={block as any} />;
+      return (
+        <LazySection placeholderHeight={300}>
+          <RichTextBlock block={block as any} />
+        </LazySection>
+      );
     case "shared.slider":
-      return <SliderBlock block={block as any} />;
+      return (
+        <LazySection placeholderHeight={400}>
+          <SliderBlock block={block as any} />
+        </LazySection>
+      );
 
     default:
       console.warn(`Block component not found: ${(block as any).__component}`);
