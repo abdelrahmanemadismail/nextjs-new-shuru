@@ -22,7 +22,27 @@ function CallbackContent({ locale }: CallbackContentProps) {
     // Auto-detect provider
     let provider = searchParams.get('provider');
     if (!provider) {
-      provider = searchParams.get('id_token') ? 'google' : 'linkedin';
+      const idToken = searchParams.get('id_token');
+      if (idToken) {
+        try {
+          const payloadPart = idToken.split('.')[1];
+          if (payloadPart) {
+            const decoded = JSON.parse(atob(payloadPart.replace(/-/g, '+').replace(/_/g, '/')));
+            if (decoded.iss?.includes('google')) {
+              provider = 'google';
+            } else if (decoded.iss?.includes('linkedin')) {
+              provider = 'linkedin';
+            }
+          }
+        } catch (e) {
+          console.error('Error decoding ID token:', e);
+        }
+      }
+      
+      // Fallback detection using token prefix
+      if (!provider) {
+        provider = accessToken?.startsWith('ya29.') ? 'google' : 'linkedin';
+      }
     }
 
     if (errorMsg) {
