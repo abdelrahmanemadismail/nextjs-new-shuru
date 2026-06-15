@@ -67,8 +67,10 @@ export function MagazineGrid({
                   src={issue.cover_image.url}
                   alt={issue.title || issue.title}
                   fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSIxMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSIxMSIgZmlsbD0iI2UyZThmMCIvPjwvc3ZnPg=="
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-4 gap-3">

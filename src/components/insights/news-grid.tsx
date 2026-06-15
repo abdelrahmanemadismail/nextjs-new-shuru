@@ -69,8 +69,11 @@ export function NewsGrid({
                   src={featured.cover_image.url}
                   alt={featured.title || featured.title}
                   fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority
+                  sizes="(max-width: 640px) 100vw, 50vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjUiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4="
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10" />
                 <div className="absolute top-4 end-4 z-20">
@@ -143,8 +146,10 @@ export function NewsGrid({
                     src={item.cover_image.url}
                     alt={item.title || item.title}
                     fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjUiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4="
                   />
                   <div className="absolute top-4 end-4 z-20">
                     <SaveButton
