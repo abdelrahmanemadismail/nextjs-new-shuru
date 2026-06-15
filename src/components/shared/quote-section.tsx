@@ -1,7 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 interface QuoteSectionProps {
   quoteText: string;
   author?: string;
@@ -11,10 +7,7 @@ export function QuoteSection({ quoteText, author }: QuoteSectionProps) {
   return (
     <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
+        <div
           className="max-w-4xl mx-auto text-center space-y-8"
         >
           <svg className="w-12 h-12 md:w-16 md:h-16 mx-auto text-primary-foreground/30 mb-8" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
@@ -28,7 +21,7 @@ export function QuoteSection({ quoteText, author }: QuoteSectionProps) {
               &mdash; {author}
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

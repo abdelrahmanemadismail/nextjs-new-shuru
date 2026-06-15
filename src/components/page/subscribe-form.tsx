@@ -73,10 +73,10 @@ export function SubscribeForm() {
         {!isSuccess ? (
           <motion.div
             key="form"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
           >
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -156,39 +156,27 @@ export function SubscribeForm() {
         ) : (
           <motion.div
             key="success"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="flex flex-col items-center text-center py-8 px-4"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.15, type: "spring", stiffness: 200, damping: 15 }}
+            <div
               className="bg-primary/10 p-4 rounded-full mb-6 border border-primary/20"
             >
               <CheckCircle2 className="h-16 w-16 text-primary" />
-            </motion.div>
-            <motion.h3
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+            </div>
+            <h3
               className="text-2xl font-bold tracking-tight text-foreground mb-3"
             >
               {t("form.success")}
-            </motion.h3>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+            </h3>
+            <p
               className="text-muted-foreground text-sm max-w-sm"
             >
               {t("description")}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+            </p>
+            <div
               className="mt-8"
             >
               <Button
@@ -198,7 +186,7 @@ export function SubscribeForm() {
               >
                 {t("form.submit")}
               </Button>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

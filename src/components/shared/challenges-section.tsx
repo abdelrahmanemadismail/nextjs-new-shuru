@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { StrapiChallengeCard } from "@/strapi/page";
@@ -18,35 +15,24 @@ export function ChallengesSection({ title, introText, challenges }: ChallengesSe
     <section className="py-24 bg-gradient-to-b from-background to-muted/20 overflow-hidden relative">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-20 space-y-4">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <h2
             className="text-4xl md:text-5xl font-bold tracking-tight text-foreground"
           >
             {title}
-          </motion.h2>
+          </h2>
           {introText && (
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+            <p
               className="text-xl text-muted-foreground max-w-3xl mx-auto"
             >
               {introText}
-            </motion.p>
+            </p>
           )}
         </div>
 
         <div className="flex flex-col gap-8 max-w-5xl mx-auto">
           {challenges.map((challenge, idx) => (
-            <motion.div
+            <div
               key={challenge.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
               className="bg-card border rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="grid md:grid-cols-12 md:divide-x divide-border">
@@ -92,7 +78,7 @@ export function ChallengesSection({ title, introText, challenges }: ChallengesSe
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

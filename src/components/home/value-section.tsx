@@ -34,11 +34,7 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
       <div className="absolute top-1/2 start-0 -translate-y-1/2 -ms-32 h-96 w-96 rounded-full bg-primary/10 blur-[100px] -z-10"></div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+        <div
           className="mx-auto max-w-2xl lg:text-center mb-16 sm:mb-24"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
@@ -49,50 +45,40 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
               {value.introText}
             </p>
           )}
-        </motion.div>
+        </div>
 
         <div className="relative w-full max-w-5xl mx-auto py-8 sm:py-16 min-h-[450px] flex items-center justify-center perspective-1000">
           <AnimatePresence mode="wait">
             {points.length > 0 && (
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, scale: 0.8, rotateY: 30, x: -100 }}
-                animate={{ opacity: 1, scale: 1, rotateY: 0, x: 0 }}
-                exit={{ opacity: 0, scale: 0.8, rotateY: -30, x: 100 }}
-                transition={{ duration: 0.6, type: 'spring', bounce: 0.4 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
                 className="w-full max-w-3xl p-10 sm:p-14 md:p-20 bg-background/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-border/50 flex flex-col items-center text-center relative overflow-hidden group hover:border-primary/50 transition-colors"
-                style={{ transformStyle: 'preserve-3d' }}
               >
                 {/* Subtle Glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-500" />
 
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: 'spring', bounce: 0.5 }}
+                <div
                   className="relative flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-[2rem] bg-primary/10 mb-8 sm:mb-10 text-primary shadow-lg ring-1 ring-primary/20 group-hover:scale-110 transition-transform duration-500"
                 >
                   {getIcon(points[currentIndex].iconName, <CheckCircle className="h-12 w-12 sm:h-14 sm:w-14" />)}
-                </motion.div>
+                </div>
 
-                <motion.h3
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
+                <h3
                   className="relative text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4 sm:mb-6 transition-colors group-hover:text-primary"
                 >
                   {points[currentIndex].title}
-                </motion.h3>
+                </h3>
 
                 {points[currentIndex].description && (
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
+                  <p
                     className="relative text-base sm:text-xl text-muted-foreground leading-relaxed max-w-2xl"
                   >
                     {points[currentIndex].description}
-                  </motion.p>
+                  </p>
                 )}
               </motion.div>
             )}

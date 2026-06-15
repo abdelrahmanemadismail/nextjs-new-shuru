@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Calendar, Clock } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiPodcast } from '@/strapi/insights';
@@ -28,15 +27,6 @@ function formatDate(dateStr: string, locale: Locale) {
   }
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: 'easeOut' as const },
-  }),
-};
-
 export function PodcastsGrid({
   podcasts,
   locale,
@@ -56,13 +46,9 @@ export function PodcastsGrid({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {podcasts.map((podcast, i) => (
-        <motion.div
+      {podcasts.map((podcast) => (
+        <div
           key={podcast.id}
-          custom={i}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
           className="h-full"
         >
           <div className="group relative flex flex-col h-full rounded-2xl border border-border/50 bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-300">
@@ -133,7 +119,7 @@ export function PodcastsGrid({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

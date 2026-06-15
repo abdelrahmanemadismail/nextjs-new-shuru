@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiNewsItem } from '@/strapi/insights';
@@ -27,15 +26,6 @@ function formatDate(dateStr: string, locale: Locale) {
     return dateStr;
   }
 }
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 28 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay: i * 0.07, ease: [0.25, 0.1, 0.25, 1] as const },
-  }),
-};
 
 export function NewsGrid({
   news,
@@ -62,7 +52,7 @@ export function NewsGrid({
     <div className="space-y-8">
       {/* Featured news - wide card */}
       {featured && (
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <div>
           <div
             className="group relative flex flex-col sm:flex-row overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300"
           >
@@ -128,18 +118,14 @@ export function NewsGrid({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Rest of news */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {rest.map((item, i) => (
-          <motion.div
+        {rest.map((item) => (
+          <div
             key={item.id}
-            custom={i}
-            initial="hidden"
-            animate="visible"
-            variants={cardVariants}
           >
             <div
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 h-full"
@@ -200,7 +186,7 @@ export function NewsGrid({
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

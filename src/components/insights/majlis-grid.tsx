@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Calendar, Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiMajlis } from '@/strapi/insights';
@@ -28,15 +27,6 @@ function formatDate(dateStr: string, locale: Locale) {
   }
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.5, delay: i * 0.07, ease: 'easeOut' as const },
-  }),
-};
-
 export function MajlisGrid({
   majlises,
   locale,
@@ -57,13 +47,9 @@ export function MajlisGrid({
 
   return (
     <div className="flex flex-col gap-5">
-      {majlises.map((majlis, i) => (
-        <motion.div
+      {majlises.map((majlis) => (
+        <div
           key={majlis.id}
-          custom={i}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
         >
           <div
             className="group relative flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5 transition-all duration-300"
@@ -133,7 +119,7 @@ export function MajlisGrid({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

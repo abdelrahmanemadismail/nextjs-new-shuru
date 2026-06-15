@@ -1,6 +1,3 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import { BookOpen, Newspaper, BookMarked, Users, Mic } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 
@@ -28,11 +25,7 @@ export function InsightsHero({ locale, activeTab, onTabChange, labels }: Insight
       <div className="absolute top-1/4 -end-32 -z-10 h-[400px] w-[400px] rounded-full bg-accent/20 blur-[100px] opacity-40" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
+        <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-6">
             <BookOpen className="h-4 w-4" />
             {labels.badge}
@@ -45,13 +38,10 @@ export function InsightsHero({ locale, activeTab, onTabChange, labels }: Insight
           <p className="mx-auto mt-5 max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
             {labels.subtitle}
           </p>
-        </motion.div>
+        </div>
 
         {/* Category tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
+        <div
           className="mt-12 flex justify-center"
         >
           <div className="inline-flex items-center gap-1 rounded-2xl border border-border/60 bg-background/80 backdrop-blur-sm p-1.5 shadow-sm flex-wrap justify-center">
@@ -73,7 +63,7 @@ export function InsightsHero({ locale, activeTab, onTabChange, labels }: Insight
               );
             })}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom fade */}

@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiArticle } from '@/strapi/insights';
@@ -28,15 +27,6 @@ function formatDate(dateStr: string, locale: Locale) {
     return dateStr;
   }
 }
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, delay: i * 0.07, ease: [0.25, 0.1, 0.25, 1] as const },
-  }),
-};
 
 export function ArticlesGrid({
   articles,
@@ -64,13 +54,9 @@ export function ArticlesGrid({
       {/* Featured Articles */}
       {featured.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {featured.slice(0, 2).map((article, i) => (
-            <motion.div
+          {featured.slice(0, 2).map((article) => (
+            <div
               key={article.id}
-              custom={i}
-              initial="hidden"
-              animate="visible"
-              variants={cardVariants}
             >
               <div
                 className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-300 h-full"
@@ -143,7 +129,7 @@ export function ArticlesGrid({
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}
@@ -151,13 +137,9 @@ export function ArticlesGrid({
       {/* Regular Articles */}
       {rest.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rest.map((article, i) => (
-            <motion.div
+          {rest.map((article) => (
+            <div
               key={article.id}
-              custom={featured.length + i}
-              initial="hidden"
-              animate="visible"
-              variants={cardVariants}
             >
               <div
                 className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 h-full"
@@ -223,7 +205,7 @@ export function ArticlesGrid({
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

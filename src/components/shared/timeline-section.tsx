@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import type { StrapiTimelineStep } from "@/strapi/page";
 
 interface TimelineSectionProps {
@@ -12,14 +9,11 @@ export function TimelineSection({ title, steps }: TimelineSectionProps) {
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4 md:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+        <div
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{title}</h2>
-        </motion.div>
+        </div>
 
         <div className="max-w-4xl mx-auto relative">
           {/* Vertical line through steps */}
@@ -27,12 +21,8 @@ export function TimelineSection({ title, steps }: TimelineSectionProps) {
 
           <div className="space-y-12 md:space-y-24">
             {steps.map((step, idx) => (
-              <motion.div
+              <div
                 key={step.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5 }}
                 className={`relative flex flex-col md:flex-row gap-8 items-center ${
                   idx % 2 === 0 ? "md:flex-row-reverse" : ""
                 }`}
@@ -53,7 +43,7 @@ export function TimelineSection({ title, steps }: TimelineSectionProps) {
                    <span className="text-primary font-bold text-lg">{idx + 1}</span>
                 </div>
 
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

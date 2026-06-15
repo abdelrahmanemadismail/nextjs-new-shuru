@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Calendar, Hash, ArrowRight, ArrowLeft } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiMagazineIssue } from '@/strapi/insights';
@@ -27,16 +26,6 @@ function formatDate(dateStr: string, locale: Locale) {
   }
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: 'easeOut' as const },
-  }),
-};
-
 export function MagazineGrid({
   issues,
   locale,
@@ -57,13 +46,9 @@ export function MagazineGrid({
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-      {issues.map((issue, i) => (
-        <motion.div
+      {issues.map((issue) => (
+        <div
           key={issue.id}
-          custom={i}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
         >
           <div
             className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/15 hover:-translate-y-2 transition-all duration-300 h-full"
@@ -126,7 +111,7 @@ export function MagazineGrid({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
