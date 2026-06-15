@@ -7,7 +7,8 @@ export const defaultLocale: Locale = "en";
 export const localePrefix = "always" as const;
 
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  (process.env.NODE_ENV === "production" ? "https://shuru.sa" : "http://localhost:3000");
 
 export const localeCookie = "locale";
 

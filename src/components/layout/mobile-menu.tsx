@@ -149,14 +149,13 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
               >
                 {/* Cover image - portrait aspect ratio */}
                 <div className="relative aspect-[2480/3508] w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-accent/10">
-                  {latestMagazine.cover_image?.url ? (
+                  {isOpen && latestMagazine.cover_image?.url ? (
                     <Image
                       src={latestMagazine.cover_image.url}
                       alt={latestMagazine.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 300px"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      priority
                     />
                   ) : null}
                   {latestMagazine.issue_number && (

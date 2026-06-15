@@ -80,26 +80,30 @@ export function TestimonialsSection({
             <div className="flex justify-center items-center gap-6 mt-8">
               <button 
                 onClick={prev} 
-                className="p-3 rounded-full bg-background border border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="h-12 w-12 flex items-center justify-center rounded-full bg-background border border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 aria-label="Previous testimonial"
               >
                 <ChevronLeft className="h-5 w-5 rtl:rotate-180 scale-125" />
               </button>
               
-              <div className="flex gap-2.5">
+              <div className="flex items-center gap-1">
                 {testimonials.map((_, i) => (
                   <button 
                     key={i} 
                     onClick={() => setCurrentIndex(i)} 
                     aria-label={`Go to testimonial ${i + 1}`}
-                    className={`h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 ${i === currentIndex ? 'w-8 bg-primary rounded-full' : 'w-2.5 bg-primary/20 hover:bg-primary/50'}`} 
-                  />
+                    className="group flex h-12 w-12 items-center justify-center focus:outline-none" 
+                  >
+                    <span 
+                      className={`h-2.5 rounded-full transition-all duration-300 group-focus-visible:ring-2 group-focus-visible:ring-primary/50 ${i === currentIndex ? 'w-8 bg-primary' : 'w-2.5 bg-primary/20 group-hover:bg-primary/50'}`} 
+                    />
+                  </button>
                 ))}
               </div>
               
               <button 
                 onClick={next} 
-                className="p-3 rounded-full bg-background border border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="h-12 w-12 flex items-center justify-center rounded-full bg-background border border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 aria-label="Next testimonial"
               >
                 <ChevronRight className="h-5 w-5 rtl:rotate-180 scale-125" />

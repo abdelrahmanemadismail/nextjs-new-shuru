@@ -100,18 +100,22 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
 
           {/* Dots Indicator */}
           {points.length > 1 && (
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-3">
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center gap-1">
               {points.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
-                  className={`h-2.5 sm:h-3 rounded-full transition-all duration-300 ${
-                    idx === currentIndex
-                      ? 'w-8 sm:w-10 bg-primary'
-                      : 'w-2.5 sm:w-3 bg-primary/20 hover:bg-primary/50'
-                  }`}
+                  className="group flex h-12 w-12 items-center justify-center focus:outline-none"
                   aria-label={`Show slide ${idx + 1}`}
-                />
+                >
+                  <span
+                    className={`h-2.5 rounded-full transition-all duration-300 group-focus-visible:ring-2 group-focus-visible:ring-primary/50 ${
+                      idx === currentIndex
+                        ? 'w-8 bg-primary'
+                        : 'w-2.5 bg-primary/20 group-hover:bg-primary/50'
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           )}

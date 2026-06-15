@@ -172,7 +172,7 @@ export function HeaderNavigation({
               aria-label="Menu"
               variant="ghost"
               size="icon"
-              className="h-9 w-9"
+              className="h-12 w-12 md:h-9 md:w-9"
               onClick={() => setIsMenuOpen(true)}
             >
               <Menu className="h-5 w-5" />
@@ -182,7 +182,7 @@ export function HeaderNavigation({
               aria-label="Search"
               variant="ghost"
               size="icon"
-              className="h-9 w-9"
+              className="h-12 w-12 md:h-9 md:w-9"
               onClick={() => setIsSearchOpen((value) => !value)}
             >
               <Search className="h-4 w-4" />
@@ -196,6 +196,7 @@ export function HeaderNavigation({
                 darkLogoUrl={darkLogoUrl}
                 alt={logoAlt}
                 className="h-14 w-auto pb-1 object-contain sm:h-16 lg:h-20 max-w-[240px] sm:max-w-[300px] lg:max-w-[400px]"
+                priority={true}
               />
             </Link>
           </div>
@@ -205,7 +206,7 @@ export function HeaderNavigation({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-9 px-2 text-xs sm:px-3 sm:text-sm flex items-center gap-1.5 rounded-xl border border-transparent transition-all cursor-pointer",
+                "h-12 md:h-9 px-2 text-xs sm:px-3 sm:text-sm flex items-center gap-1.5 rounded-xl border border-transparent transition-all cursor-pointer",
                 user
                   ? "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 font-bold"
                   : "hover:border-border"

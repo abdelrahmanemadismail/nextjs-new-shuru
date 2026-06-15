@@ -1,13 +1,25 @@
 import React from "react";
+import Image from "next/image";
 
 type ThemeLogoProps = {
   lightLogoUrl: string | null;
   darkLogoUrl: string | null;
   alt: string;
   className?: string;
+  width?: number;
+  height?: number;
+  priority?: boolean;
 };
 
-export function ThemeLogo({ lightLogoUrl, darkLogoUrl, alt, className = "" }: ThemeLogoProps) {
+export function ThemeLogo({
+  lightLogoUrl,
+  darkLogoUrl,
+  alt,
+  className = "",
+  width = 400,
+  height = 120,
+  priority = false,
+}: ThemeLogoProps) {
   if (!lightLogoUrl && !darkLogoUrl) {
     return <span className="text-lg font-semibold tracking-wide">Shuru</span>;
   }
@@ -19,19 +31,23 @@ export function ThemeLogo({ lightLogoUrl, darkLogoUrl, alt, className = "" }: Th
   return (
     <>
       {effectiveLightUrl && (
-        <img
+        <Image
           src={effectiveLightUrl}
           alt={alt}
+          width={width}
+          height={height}
           className={`${className} dark:hidden`}
-          loading="lazy"
+          priority={priority}
         />
       )}
       {effectiveDarkUrl && (
-        <img
+        <Image
           src={effectiveDarkUrl}
           alt={alt}
+          width={width}
+          height={height}
           className={`${className} hidden dark:block`}
-          loading="lazy"
+          priority={priority}
         />
       )}
     </>
