@@ -239,7 +239,7 @@ export function HeaderNavigation({
         >
           {/* Scrollable nav strip — swipeable on mobile, centered on desktop */}
           <div className="overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]">
-            <ul className="flex flex-row items-end justify-start sm:justify-center gap-x-0 sm:gap-x-1 text-xs sm:text-sm min-w-max sm:min-w-0 mx-auto px-1 sm:px-0">
+            <ul className="flex flex-row items-end justify-center gap-x-0 sm:gap-x-1 text-xs sm:text-sm min-w-full px-1 sm:px-0">
               {headerItems.map((item) => {
                 const hasSubItems = item.subItems.length > 0;
                 const isActive = isItemActive(item.url);
