@@ -154,7 +154,7 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
                       src={latestMagazine.cover_image.url}
                       alt={latestMagazine.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, 300px"
+                      sizes="(max-width: 768px) 280px, 300px"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : null}

@@ -68,9 +68,9 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
             darkLogoUrl={darkLogoUrl}
             alt="Footer Logo"
             className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
-            width={200}
-            height={60}
-            sizes="(max-width: 640px) 150px, 200px"
+            width={640}
+            height={410}
+            sizes="63px"
           />
           {description && (
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
