@@ -199,8 +199,8 @@ export function HeaderNavigation({
                 priority={true}
                 width={640}
                 height={410}
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 100px, 125px"
-                quality={70}
+                sizes="(max-width: 640px) 270px, (max-width: 1024px) 300px, 375px"
+                quality={85}
               />
             </Link>
           </div>

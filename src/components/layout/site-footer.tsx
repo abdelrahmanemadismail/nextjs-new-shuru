@@ -70,8 +70,8 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
             className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
             width={640}
             height={410}
-            sizes="63px"
-            quality={70}
+            sizes="180px"
+            quality={85}
           />
           {description && (
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
