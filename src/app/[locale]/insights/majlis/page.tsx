@@ -4,6 +4,7 @@ import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
 import { getMajlisPaginatedCached } from "@/strapi/insights";
 import Link from "next/link";
+import Image from "next/image";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 
@@ -52,10 +53,12 @@ export default async function Page({ params, searchParams }: Props) {
                 <div className="border rounded-lg overflow-hidden flex flex-col h-full bg-card hover:shadow-lg transition">
                   <div className="aspect-video bg-muted relative">
                     {item.cover_image?.url && (
-                      <img
+                      <Image
                         src={item.cover_image.url}
                         alt={item.title}
-                        className="object-cover w-full h-full"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
                       />
                     )}
                   </div>

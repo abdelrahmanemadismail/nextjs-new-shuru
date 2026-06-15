@@ -19,6 +19,12 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     inlineCss: true,
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "radix-ui",
+      "sonner"
+    ],
   },
 };
 

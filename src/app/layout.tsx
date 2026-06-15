@@ -25,11 +25,13 @@ const fontSans = localFont({
     { path: "../../public/fonts/Bahij_TheSansArabic-Black.woff2",      weight: "900" },
   ],
   variable: "--font-sans",
+  display: "swap",
 });
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
 });
 export async function generateMetadata(): Promise<Metadata> {
   const requestedLocale = await getLocale();
