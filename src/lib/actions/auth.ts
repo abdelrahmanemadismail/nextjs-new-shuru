@@ -305,3 +305,42 @@ export async function changePasswordAction(data: any) {
     return { success: false, error: err.message || 'An error occurred' };
   }
 }
+
+export async function exchangeOAuthTokenAction(provider: string, accessToken: string) {
+  try {
+    const res = await fetch(`${getStrapiBaseUrl()}/api/auth/${provider}/callback?access_token=${accessToken}`, {
+      cache: 'no-store',
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: result.error?.message || 'OAuth exchange failed' };
+    }
+
+    const session: UserSession = {
+      jwt: result.jwt,
+      user: {
+        id: result.user.id,
+        username: result.user.username,
+        email: result.user.email,
+        documentId: result.user.documentId,
+      },
+    };
+
+    const cookieStore = await cookies();
+    const encodedSession = Buffer.from(JSON.stringify(session)).toString('base64');
+
+    cookieStore.set(COOKIE_NAME, encodedSession, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to complete OAuth exchange' };
+  }
+}

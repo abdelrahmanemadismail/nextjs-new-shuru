@@ -1,12 +1,16 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { setOAuthSessionAction } from '@/lib/actions/auth';
+import { exchangeOAuthTokenAction } from '@/lib/actions/auth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-function CallbackContent() {
+interface CallbackContentProps {
+  locale: string;
+}
+
+function CallbackContent({ locale }: CallbackContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -14,35 +18,41 @@ function CallbackContent() {
   useEffect(() => {
     const accessToken = searchParams.get('access_token');
     const errorMsg = searchParams.get('error') || searchParams.get('message');
+    
+    // Auto-detect provider
+    let provider = searchParams.get('provider');
+    if (!provider) {
+      provider = searchParams.get('id_token') ? 'google' : 'linkedin';
+    }
 
     if (errorMsg) {
       setError(errorMsg);
       toast.error(`Authentication error: ${errorMsg}`);
-      setTimeout(() => router.push('/en/auth/login'), 2000);
+      setTimeout(() => router.push(`/${locale}/auth/login`), 2000);
       return;
     }
 
     if (!accessToken) {
       setError('No access token found.');
       toast.error('Authentication failed: Missing access token');
-      setTimeout(() => router.push('/en/auth/login'), 2000);
+      setTimeout(() => router.push(`/${locale}/auth/login`), 2000);
       return;
     }
 
     async function handleExchange() {
-      const res = await setOAuthSessionAction(accessToken!);
+      const res = await exchangeOAuthTokenAction(provider!, accessToken!);
       if (res.success) {
         toast.success('Logged in successfully!');
-        router.push('/en/profile');
+        router.push(`/${locale}/profile`);
       } else {
         setError(res.error || 'Failed to initialize session');
         toast.error(res.error || 'Session initialization failed');
-        setTimeout(() => router.push('/en/auth/login'), 2500);
+        setTimeout(() => router.push(`/${locale}/auth/login`), 2500);
       }
     }
 
     handleExchange();
-  }, [searchParams, router]);
+  }, [searchParams, router, locale]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
@@ -73,14 +83,16 @@ function CallbackContent() {
   );
 }
 
-export default function AuthCallbackPage() {
+export default function AuthCallbackPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = use(params);
+
   return (
     <Suspense fallback={
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     }>
-      <CallbackContent />
+      <CallbackContent locale={locale} />
     </Suspense>
   );
 }
