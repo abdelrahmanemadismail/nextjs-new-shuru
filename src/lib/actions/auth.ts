@@ -30,34 +30,7 @@ export async function getSession(): Promise<UserSession | null> {
 }
 
 export async function getMe() {
-  const session = await getSession();
-  if (!session) return null;
-
-  try {
-    const res = await fetch(`${getStrapiBaseUrl()}/api/users/me`, {
-      headers: {
-        Authorization: `Bearer ${session.jwt}`,
-      },
-      cache: 'no-store',
-    });
-
-    if (res.ok) {
-      const freshUser = await res.json();
-      return {
-        jwt: session.jwt,
-        user: {
-          id: freshUser.id,
-          username: freshUser.username,
-          email: freshUser.email,
-          documentId: freshUser.documentId,
-        },
-      };
-    }
-  } catch (err) {
-    console.error("Error fetching users/me from Strapi:", err);
-  }
-
-  return session;
+  return getSession();
 }
 
 export async function loginAction(data: any) {
