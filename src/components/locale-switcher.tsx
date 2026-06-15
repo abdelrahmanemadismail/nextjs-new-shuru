@@ -40,7 +40,7 @@ export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" disabled={isPending} className="h-12 w-12 md:h-9 md:w-9">
+        <Button variant="outline" size="icon" disabled={isPending} className="h-9 w-9 sm:h-9 sm:w-9">
           <Languages className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Switch language</span>
         </Button>

@@ -167,12 +167,12 @@ export function HeaderNavigation({
       ) : null}
 
       <div
-        className="relative rounded-none border border-border bg-card/90 px-3 pt-2 pb-0"
+        className="relative rounded-none border border-border bg-card/90 px-2 sm:px-3 pt-1.5 sm:pt-2 pb-0"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="grid min-h-[50px] grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <div className="flex items-center gap-1 sm:gap-2">
+        <div className="grid min-h-[48px] sm:min-h-[50px] grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-0.5 sm:gap-2">
             <Button
               aria-label="Menu"
               variant="ghost"
@@ -194,37 +194,36 @@ export function HeaderNavigation({
             </Button>
           </div>
 
-          <div className="flex items-center justify-center pb-2 sm:pb-3" aria-label="Shuru logo">
+          <div className="flex items-center justify-center pb-1 sm:pb-2" aria-label="Shuru logo">
             <Link href={`/${locale}`} className="inline-flex items-center justify-center">
               <ThemeLogo
                 lightLogoUrl={lightLogoUrl}
                 darkLogoUrl={darkLogoUrl}
                 alt={logoAlt}
-                className="h-14 w-auto pb-1 object-contain sm:h-16 lg:h-20 max-w-[240px] sm:max-w-[300px] lg:max-w-[400px]"
+                className="h-11 w-auto object-contain sm:h-14 lg:h-20 max-w-[160px] sm:max-w-[260px] lg:max-w-[400px]"
                 priority={true}
                 width={640}
                 height={410}
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 100px, 142px"
+                sizes="(max-width: 640px) 80px, (max-width: 1024px) 100px, 142px"
                 quality={85}
               />
             </Link>
           </div>
 
-          <div className="flex items-center justify-end gap-1 sm:gap-2">
+          <div className="flex items-center justify-end gap-0.5 sm:gap-2">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               className={cn(
-                "h-12 md:h-9 px-2 text-xs sm:px-3 sm:text-sm flex items-center gap-1.5 rounded-xl border border-transparent transition-all cursor-pointer",
+                "h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl border border-transparent transition-all cursor-pointer",
                 user
-                  ? "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 font-bold"
+                  ? "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20"
                   : "hover:border-border"
               )}
               onClick={() => router.push(user ? `/${locale}/profile` : `/${locale}/auth/login`)}
               aria-label={user ? "Profile" : "Login"}
             >
               <User className="h-4 w-4" />
-              {user && <span className="hidden md:inline font-bold text-xs">{user.username}</span>}
             </Button>
 
             <ModeToggle />
@@ -234,7 +233,7 @@ export function HeaderNavigation({
 
         <div
           className={cn(
-            "flex overflow-visible border-t border-border/70 transition-all duration-300 items-end justify-center",
+            "hidden sm:flex overflow-visible border-t border-border/70 transition-all duration-300 items-end justify-center",
             isScrolled && !isHovered ? "max-h-0 opacity-0" : "max-h-[200px] pt-2 opacity-100"
           )}
         >
