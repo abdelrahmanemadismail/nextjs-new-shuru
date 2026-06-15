@@ -8,6 +8,10 @@ import Image from "next/image";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 
+// Shared blur placeholder for all news card images — defined once to avoid inline duplication
+const BLUR_DATA_URL =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjUiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=";
+
 type Props = {
   params: Promise<{ locale: Locale }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -48,7 +52,7 @@ export default async function Page({ params, searchParams }: Props) {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {newsItems.map((news) => (
+            {newsItems.map((news, index) => (
               <Link key={news.id} href={`/${locale}/insights/news/${news.slug}`} className="block group">
                 <div className="border rounded-lg overflow-hidden flex flex-col h-full bg-card hover:shadow-lg transition">
                   <div className="aspect-video bg-muted relative">
@@ -59,6 +63,11 @@ export default async function Page({ params, searchParams }: Props) {
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover"
+                        // First image gets priority (LCP candidate); rest lazy-load
+                        priority={index === 0}
+                        loading={index === 0 ? undefined : "lazy"}
+                        placeholder="blur"
+                        blurDataURL={BLUR_DATA_URL}
                       />
                     )}
                   </div>

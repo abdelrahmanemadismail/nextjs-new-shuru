@@ -1,8 +1,4 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes";
 
 type ThemeLogoProps = {
   lightLogoUrl: string | null;
@@ -16,6 +12,11 @@ type ThemeLogoProps = {
   quality?: number;
 };
 
+/**
+ * Renders both logo variants server-side and uses CSS dark-mode classes to
+ * show the correct one — no JS/useState/useEffect needed, which eliminates
+ * the hydration flash that was delaying LCP.
+ */
 export function ThemeLogo({
   lightLogoUrl,
   darkLogoUrl,
@@ -27,37 +28,58 @@ export function ThemeLogo({
   sizes,
   quality = 75,
 }: ThemeLogoProps) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  // If neither logo is available, render a text fallback.
   if (!lightLogoUrl && !darkLogoUrl) {
     return <span className="text-lg font-semibold tracking-wide">Shuru</span>;
   }
 
-  // If we only have one logo, use it for both themes
+  // If only one logo is provided, use it for both themes.
   const effectiveLightUrl = lightLogoUrl || darkLogoUrl;
   const effectiveDarkUrl = darkLogoUrl || lightLogoUrl;
 
-  // Fallback to light logo on SSR/initial mount to prevent hydration mismatch.
-  // Switch to the resolved theme logo once mounted.
-  const activeLogoUrl = mounted && resolvedTheme === "dark" ? effectiveDarkUrl : effectiveLightUrl;
+  // Both images are the same — just render once.
+  if (effectiveLightUrl === effectiveDarkUrl) {
+    return (
+      <Image
+        src={effectiveLightUrl!}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        priority={priority}
+        sizes={sizes}
+        quality={quality}
+      />
+    );
+  }
 
-  if (!activeLogoUrl) return null;
-
+  // Render both server-side; CSS dark class controls visibility.
+  // This avoids any JS-dependent render and prevents the LCP flash.
   return (
-    <Image
-      src={activeLogoUrl}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      priority={priority}
-      sizes={sizes}
-      quality={quality}
-    />
+    <>
+      {/* Light logo: visible in light mode, hidden in dark mode */}
+      <Image
+        src={effectiveLightUrl!}
+        alt={alt}
+        width={width}
+        height={height}
+        className={`${className} dark:hidden`}
+        priority={priority}
+        sizes={sizes}
+        quality={quality}
+      />
+      {/* Dark logo: hidden in light mode, visible in dark mode */}
+      <Image
+        src={effectiveDarkUrl!}
+        alt={alt}
+        width={width}
+        height={height}
+        className={`${className} hidden dark:block`}
+        priority={priority}
+        sizes={sizes}
+        quality={quality}
+        aria-hidden="true"
+      />
+    </>
   );
 }

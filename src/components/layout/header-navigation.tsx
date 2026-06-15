@@ -105,8 +105,13 @@ export function HeaderNavigation({
   }, []);
 
   useEffect(() => {
+    let lastScrolled = window.scrollY > 0;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
+      const next = window.scrollY > 0;
+      if (next !== lastScrolled) {
+        lastScrolled = next;
+        setIsScrolled(next);
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

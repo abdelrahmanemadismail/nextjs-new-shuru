@@ -747,6 +747,37 @@ export const getCategoriesCached = unstable_cache(
   { revalidate: 3600, tags: ["categories"] }
 );
 
+/**
+ * Lightweight category list for filter dropdowns — fetches only name and slug,
+ * no article or cover_image population. Much cheaper than getCategoriesCached.
+ */
+async function fetchCategoriesForFilter(locale: string): Promise<Pick<StrapiCategory, 'id' | 'documentId' | 'name' | 'slug'>[]> {
+  const params = new URLSearchParams();
+  params.append("locale", locale);
+  params.append("fields[0]", "name");
+  params.append("fields[1]", "slug");
+  params.append("sort[0]", "name:asc");
+
+  const response = await fetch(`${getStrapiBaseUrl()}/api/categories?${params.toString()}`, {
+    headers: getStrapiRequestHeaders(),
+    next: { tags: ["categories"] },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404 || response.status === 401) return [];
+    throw new Error(`Failed to fetch categories for filter (${response.status})`);
+  }
+
+  const payload = await response.json();
+  return payload.data || [];
+}
+
+export const getCategoriesForFilterCached = unstable_cache(
+  async (locale: Locale) => fetchCategoriesForFilter(locale),
+  ["categories-filter"],
+  { revalidate: 3600, tags: ["categories"] }
+);
+
 async function fetchAuthor(documentId: string, locale: Locale): Promise<StrapiAuthor | null> {
   const params = new URLSearchParams();
   params.append("locale", locale);
