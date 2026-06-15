@@ -27,7 +27,7 @@ export function CtaFooterSection({ cta, locale }: { cta: import('@/strapi/home')
             {cta.alternativeText && (
               <div className="text-white/90 text-base font-medium">
                 {cta.alternativeLink ? (
-                  <Link href={`/${locale}${cta.alternativeLink}`} className="hover:text-white transition-colors underline decoration-white/30 hover:decoration-white underline-offset-4 decoration-2">
+                  <Link href={cta.alternativeLink.startsWith('mailto:') || cta.alternativeLink.startsWith('http') ? cta.alternativeLink : `/${locale}${cta.alternativeLink}`} className="hover:text-white transition-colors underline decoration-white/30 hover:decoration-white underline-offset-4 decoration-2">
                     {cta.alternativeText}
                   </Link>
                 ) : (
