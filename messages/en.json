@@ -56,7 +56,7 @@
   "shared": {
     "challengesSection": {
       "challengeLabel": "The Challenge",
-      "interventionLabel": "Our Intervention",
+      "solutionLabel": "OUR SOLUTION",
       "resultLabel": "The Result"
     }
   },

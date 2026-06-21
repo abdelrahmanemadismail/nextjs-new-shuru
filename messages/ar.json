@@ -56,7 +56,7 @@
   "shared": {
     "challengesSection": {
       "challengeLabel": "التحدي",
-      "interventionLabel": "تدخلنا",
+      "solutionLabel": "حلولنا",
       "resultLabel": "النتيجة"
     }
   },

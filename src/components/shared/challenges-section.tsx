@@ -56,11 +56,11 @@ export function ChallengesSection({ title, introText, challenges }: ChallengesSe
                     <div className="flex items-center gap-2 mb-2">
                       <ArrowRight className="w-4 h-4 text-primary" />
                       <h4 className="font-semibold text-primary uppercase tracking-widest text-xs">
-                        {t("interventionLabel")}
+                        {t("solutionLabel")}
                       </h4>
                     </div>
                     <p className="text-muted-foreground text-lg leading-relaxed">
-                      {challenge.intervention}
+                      {challenge.solution}
                     </p>
                   </div>
                 </div>

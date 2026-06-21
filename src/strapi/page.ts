@@ -6,7 +6,7 @@ import type { StrapiHeroBlock, StrapiOverviewBlock, StrapiValueBlock, StrapiCtaF
 export type StrapiChallengeCard = {
   id: number;
   pain: string;
-  intervention: string;
+  solution: string;
   result: string;
 };
 
