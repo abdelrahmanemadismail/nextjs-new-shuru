@@ -102,7 +102,7 @@ export default async function Page({ params, searchParams }: Props) {
   ]);
 
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col min-h-dvh">
       <InsightsContent
         activeTab={tab}
         currentPage={current_page}

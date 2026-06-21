@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, LogIn, ArrowRight, ArrowLeft } from "lucide-react";
@@ -53,6 +53,17 @@ const getLinkProps = (openInNewTab: boolean) =>
 
 export default function MobileMenu({ isOpen, onClose, locale, items, latestMagazine }: MobileMenuProps) {
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
   const t = useTranslations("insights");
 
   const menuItems = useMemo(() => {

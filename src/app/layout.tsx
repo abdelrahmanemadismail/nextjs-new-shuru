@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { JetBrains_Mono } from "next/font/google";
 
@@ -29,6 +29,12 @@ const fontMono = JetBrains_Mono({
   variable: "--font-mono",
   display: "swap",
 });
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const requestedLocale = await getLocale();
   const locale: Locale = isLocale(requestedLocale) ? requestedLocale : defaultLocale;
@@ -83,7 +89,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${fontSans.variable} ${fontMono.variable} antialiased min-h-dvh flex flex-col`}
       >
         <ThemeProvider
           attribute="class"

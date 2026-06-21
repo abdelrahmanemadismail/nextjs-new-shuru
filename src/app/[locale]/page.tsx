@@ -70,7 +70,7 @@ export default async function HomePage({ params }: HomePageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-dvh bg-background font-sans">
       <main>
         {homeData ? (
           <HomeContent
@@ -79,7 +79,7 @@ export default async function HomePage({ params }: HomePageProps) {
             testimonials={testimonials}
           />
         ) : (
-          <div className="flex h-screen items-center justify-center">
+          <div className="flex h-dvh items-center justify-center">
             <p className="text-muted-foreground text-lg">No homepage content found.</p>
           </div>
         )}

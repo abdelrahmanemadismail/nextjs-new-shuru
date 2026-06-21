@@ -28,7 +28,7 @@ export function SimplePdfViewer({
   const loadingLabel = isRtl ? 'جاري التحميل...' : 'Downloading...';
 
   return (
-    <div className="flex flex-col h-screen w-full bg-neutral-900 text-white font-sans" dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col h-dvh w-full bg-neutral-900 text-white font-sans" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-neutral-800 border-b border-neutral-700 select-none">
         <div className="flex items-center space-x-3 rtl:space-x-reverse min-w-0">

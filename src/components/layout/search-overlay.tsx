@@ -167,7 +167,7 @@ export default function SearchOverlay({ isOpen, onClose, locale, items }: Search
 
   return (
     <div className="fixed inset-0 z-[70] bg-background/90 backdrop-blur-md overflow-y-auto" dir={locale === "ar" ? "rtl" : "ltr"}>
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 min-h-screen flex flex-col">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 min-h-dvh flex flex-col">
         {/* Search Header Input Bar */}
         <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 shadow-lg">
           <div className="relative flex-1">

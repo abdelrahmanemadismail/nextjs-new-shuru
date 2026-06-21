@@ -97,7 +97,7 @@ export function SearchFilterControls({
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             placeholder={t('placeholder')}
-            className="w-full h-12 ps-11 pe-10 bg-background/50 border border-border/80 rounded-xl text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+            className="w-full h-12 ps-11 pe-10 bg-background/50 border border-border/80 rounded-xl text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-sm"
           />
           {localSearch && (
             <button
@@ -121,7 +121,7 @@ export function SearchFilterControls({
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                className="w-full h-12 ps-9 pe-8 bg-background/50 border border-border/80 rounded-xl text-foreground text-sm outline-none cursor-pointer transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
+                className="w-full h-12 ps-9 pe-8 bg-background/50 border border-border/80 rounded-xl text-foreground text-base md:text-sm outline-none cursor-pointer transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
               >
                 <option value="all">{t('filter.allCategories')}</option>
                 {categories.map((category) => (
@@ -146,7 +146,7 @@ export function SearchFilterControls({
             <select
               value={sortOrder}
               onChange={handleSortChange}
-              className="w-full h-12 ps-9 pe-8 bg-background/50 border border-border/80 rounded-xl text-foreground text-sm outline-none cursor-pointer transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
+              className="w-full h-12 ps-9 pe-8 bg-background/50 border border-border/80 rounded-xl text-foreground text-base md:text-sm outline-none cursor-pointer transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
             >
               <option value="newest">{t('filter.newest')}</option>
               <option value="oldest">{t('filter.oldest')}</option>
