@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, LogIn, ArrowRight, ArrowLeft } from "lucide-react";
+import { ChevronDown, LogIn, ArrowRight, ArrowLeft, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { locales, type Locale } from "@/lib/i18n";
@@ -93,13 +93,29 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
 
       <aside
         className={cn(
-          "fixed inset-y-0 end-0 z-50 w-[280px] border-s border-border bg-card p-3 shadow-2xl transition-transform duration-300 sm:w-[320px] overflow-y-auto flex flex-col justify-between",
+          "fixed inset-y-0 end-0 z-50 w-[280px] border-s border-border bg-card p-3 shadow-2xl transition-transform duration-300 transform-gpu sm:w-[320px] overflow-y-auto flex flex-col justify-between",
           isOpen ? "translate-x-0" : "ltr:translate-x-full rtl:-translate-x-full"
         )}
         aria-label="Mobile menu"
       >
         <div className="flex-1 pb-6">
-          <div className="mb-3 border-b border-border pb-3 pt-2">
+          {/* Menu Header with Close Button */}
+          <div className="flex items-center justify-between pb-2 mb-3 border-b border-border pt-1">
+            <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase px-1.5">
+              {locale === "ar" ? "القائمة" : "Menu"}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 hover:bg-accent rounded-xl cursor-pointer"
+              onClick={onClose}
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <div className="mb-3 border-b border-border pb-3">
             {menuItems.map((item) => {
               const hasSubItems = item.subItems.length > 0;
               const expanded = expandedItems.includes(item.order);
