@@ -167,7 +167,7 @@ export function HeaderNavigation({
       ) : null}
 
       <div
-        className="relative rounded-none border border-border bg-card/90 px-2 sm:px-3 pt-1.5 sm:pt-2 pb-0"
+        className="relative rounded-none border border-border bg-card/90 px-2 sm:px-3 px-safe pt-1.5 sm:pt-2 pb-0"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -239,7 +239,7 @@ export function HeaderNavigation({
         >
           {/* Scrollable nav strip — swipeable on mobile, centered on desktop */}
           <div className="overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]">
-            <ul className="flex flex-row items-end justify-center gap-x-0 sm:gap-x-1 text-xs sm:text-sm min-w-full px-1 sm:px-0">
+            <ul className="flex flex-row items-end justify-start md:justify-center gap-x-0 sm:gap-x-1 text-xs sm:text-sm min-w-full px-4 md:px-0">
               {headerItems.map((item) => {
                 const hasSubItems = item.subItems.length > 0;
                 const isActive = isItemActive(item.url);

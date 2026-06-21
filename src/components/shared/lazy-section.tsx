@@ -27,7 +27,7 @@ export function LazySection({ children, placeholderHeight = 250 }: LazySectionPr
         }
       },
       {
-        rootMargin: '200px 0px', // Preload when component is within 200px of viewport
+        rootMargin: '600px 0px', // Preload when component is within 600px of viewport
       }
     );
 
