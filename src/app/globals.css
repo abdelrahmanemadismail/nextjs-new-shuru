@@ -186,10 +186,3 @@
 .pr-safe {
   padding-right: env(safe-area-inset-right);
 }
-
-/* Momentum scrolling for scrollable containers on iOS */
-.overflow-x-auto,
-.overflow-y-auto,
-[class*="overflow-"] {
-  -webkit-overflow-scrolling: touch;
-}
