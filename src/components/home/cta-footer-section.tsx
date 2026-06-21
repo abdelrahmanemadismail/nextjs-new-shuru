@@ -3,7 +3,7 @@ import { type Locale } from '@/lib/i18n';
 
 export function CtaFooterSection({ cta, locale }: { cta: import('@/strapi/home').StrapiCtaFooterBlock; locale: Locale }) {
   return (
-    <section className="py-16 sm:py-24 bg-background relative z-10">
+    <section className="py-16 sm:py-24 gpu-accelerated bg-background relative z-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div 
           className="relative isolate overflow-hidden group bg-gradient-to-br from-primary via-primary to-primary/80 px-6 py-16 sm:py-24 text-center shadow-2xl shadow-primary/20 sm:rounded-3xl sm:px-16 hover:shadow-primary/30 transition-shadow duration-500 border border-primary/20"

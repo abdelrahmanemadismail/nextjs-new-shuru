@@ -186,3 +186,9 @@
 .pr-safe {
   padding-right: env(safe-area-inset-right);
 }
+
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
