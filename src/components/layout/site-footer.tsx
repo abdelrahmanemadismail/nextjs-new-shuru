@@ -55,7 +55,7 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
   const hardcodedCopyright = t("copyright", { year: currentYear });
 
   return (
-    <footer className="w-full gpu-accelerated relative overflow-hidden bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800/50 py-12 sm:py-16 px-4 sm:px-6">
+    <footer className="w-full gpu-accelerated relative overflow-hidden bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800/50 pt-12 pb-[calc(3rem+env(safe-area-inset-bottom))] sm:py-16 px-4 sm:px-6">
       {/* Subtle top glow */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
       

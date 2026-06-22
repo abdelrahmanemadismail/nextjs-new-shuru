@@ -37,7 +37,7 @@ export function HeroSection({ hero, locale }: { hero: import('@/strapi/home').St
           {hero.secondaryCtaText && hero.secondaryCtaLink && (
             <Link
               href={`/${locale}${hero.secondaryCtaLink}`}
-              className="inline-flex h-14 items-center justify-center rounded-full border border-border/60 bg-background/50 backdrop-blur-sm px-10 text-base font-semibold text-foreground shadow-sm hover:bg-accent/10 hover:border-accent/50 hover:text-accent-foreground hover:-translate-y-1 transition-all duration-300"
+              className="group inline-flex h-14 items-center justify-center rounded-full border border-border/60 bg-background/50 backdrop-blur-sm px-10 text-base font-semibold text-foreground shadow-sm hover:bg-accent/10 hover:border-accent/50 hover:text-accent-foreground hover:-translate-y-1 transition-all duration-300"
             >
               {hero.secondaryCtaText}
               <Icon className="mx-2 h-5 w-5 transform transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />

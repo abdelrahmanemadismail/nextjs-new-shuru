@@ -171,8 +171,9 @@
     @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    touch-action: manipulation;
   }
 }
 
@@ -191,4 +192,8 @@
   transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+.scrollable-container {
+  -webkit-overflow-scrolling: touch;
 }
