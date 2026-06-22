@@ -234,7 +234,7 @@ export function HeaderNavigation({
         <div
           className={cn(
             "border-t border-border/70 transition-all duration-300",
-            isScrolled && !isHovered ? "max-h-0 opacity-0 overflow-hidden" : "max-h-[200px] pt-1.5 sm:pt-2 opacity-100"
+            isScrolled && !isHovered ? "md:max-h-0 md:opacity-0 md:overflow-hidden max-h-[200px] pt-1.5 sm:pt-2 opacity-100" : "max-h-[200px] pt-1.5 sm:pt-2 opacity-100"
           )}
         >
           {/* Scrollable nav strip — swipeable on mobile, centered on desktop */}
