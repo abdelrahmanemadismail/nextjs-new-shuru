@@ -30,8 +30,8 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
 
   return (
     <section className="py-16 sm:py-24 lg:py-32 bg-background relative overflow-hidden flex flex-col items-center">
-      {/* Decorative Glow */}
-      <div className="absolute top-1/2 start-0 -translate-y-1/2 -ms-32 h-96 w-96 rounded-full bg-primary/10 blur-[100px] -z-10 gpu-accelerated"></div>
+      {/* Decorative Glow - hidden on mobile for performance, optimized on desktop */}
+      <div className="hidden md:block absolute top-1/2 start-0 -translate-y-1/2 -ms-32 h-96 w-96 rounded-full bg-primary/5 blur-[100px] -z-10"></div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full z-10">
         <div

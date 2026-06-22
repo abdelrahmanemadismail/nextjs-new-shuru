@@ -21,8 +21,9 @@ export function InsightsHero({ locale, activeTab, onTabChange, labels }: Insight
     <section className="relative overflow-hidden bg-background pt-20 pb-0">
       {/* Gradient background */}
       <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent" />
-      <div className="absolute top-1/4 -start-32 -z-10 h-[400px] w-[400px] rounded-full bg-primary/20 blur-[100px] opacity-40" />
-      <div className="absolute top-1/4 -end-32 -z-10 h-[400px] w-[400px] rounded-full bg-accent/20 blur-[100px] opacity-40" />
+      {/* Decorative blurs - hidden on mobile */}
+      <div className="hidden md:block absolute top-1/4 -start-32 -z-10 h-[400px] w-[400px] rounded-full bg-primary/20 blur-[100px] opacity-40" />
+      <div className="hidden md:block absolute top-1/4 -end-32 -z-10 h-[400px] w-[400px] rounded-full bg-accent/20 blur-[100px] opacity-40" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
         <div>

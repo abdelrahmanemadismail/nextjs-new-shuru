@@ -42,7 +42,8 @@ export function OverviewSection({ overview }: { overview: import('@/strapi/home'
                 key={card.id} 
                 className="group relative rounded-3xl border border-border/50 bg-card p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 overflow-hidden"
               >
-                <div className="absolute top-0 end-0 -m-8 h-32 w-32 rounded-full bg-primary/5 blur-2xl transition-all duration-300 group-hover:bg-primary/10"></div>
+                {/* Decorative background blur circle - hidden on mobile for performance */}
+                <div className="hidden md:block absolute top-0 end-0 -m-8 h-32 w-32 rounded-full bg-primary/5 blur-2xl transition-all duration-300 group-hover:bg-primary/10"></div>
                 
                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-[inset_0_1px_rgba(255,255,255,0.2)]">
                   <div className="transform group-hover:scale-110 transition-transform duration-300">
