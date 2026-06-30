@@ -19,8 +19,19 @@ export interface BuildMetadataOptions {
   noIndex?: boolean;
 }
 
-export function getOptimizedOgImageUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
+export function getOptimizedOgImageUrl(
+  url: string | null | undefined,
+  title?: string,
+  description?: string,
+  locale?: string
+): string | null {
+  if (!url) {
+    const params = new URLSearchParams();
+    if (title) params.set('title', title);
+    if (description) params.set('description', description);
+    if (locale) params.set('locale', locale);
+    return `${siteUrl}/api/og?${params.toString()}`;
+  }
   if (
     url.includes("web-app-manifest") ||
     url.endsWith(".svg") ||
@@ -62,10 +73,9 @@ export async function buildMetadata({
 
   const ogImageUrl =
     toAbsoluteUrl(ogImage?.url) ||
-    globalData?.ogImage?.url ||
-    `${siteUrl}/web-app-manifest-512x512.png`;
+    globalData?.ogImage?.url;
 
-  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl);
+  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl, finalTitle, finalDescription, locale);
   const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
 
   const robots = noIndex ? { index: false, follow: false } : undefined;

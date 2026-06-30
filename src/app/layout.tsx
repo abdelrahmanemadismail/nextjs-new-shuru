@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const keywords = globalData?.seoKeywords ? globalData.seoKeywords.split(",").map((kw) => kw.trim()) : undefined;
   const ogImage = globalData?.ogImage;
   const ogImageUrl = ogImage?.url ?? undefined;
-  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl);
+  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl, siteName, description, locale);
   const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
 
   return {
