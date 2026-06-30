@@ -10,6 +10,7 @@ import {
 } from '@/lib/i18n';
 import { getGlobalSettings } from '@/strapi/global';
 import { getHomeCached, getTestimonialsCached } from '@/strapi/home';
+import { buildMetadata } from '@/lib/seo';
 
 type HomePageProps = Readonly<{
   params: Promise<{ locale: string }>;
@@ -18,45 +19,35 @@ type HomePageProps = Readonly<{
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
-  const path = `/${locale}`;
 
   const [globalData, homeData] = await Promise.all([
     getGlobalSettings(locale),
     getHomeCached(locale)
   ]);
 
-  const title = homeData?.seo?.meta_title || globalData?.seoTitle;
-  const description = homeData?.seo?.meta_description || globalData?.seoDescription;
-  const siteName = globalData?.siteName;
+  const seo = homeData?.seo;
+  const ogImg = seo?.og_image;
+
+  const metadata = await buildMetadata({
+    locale,
+    path: "/",
+    title: seo?.meta_title || globalData?.seoTitle,
+    description: seo?.meta_description || globalData?.seoDescription,
+    ogImage: ogImg ? {
+      url: ogImg.url,
+      width: ogImg.width,
+      height: ogImg.height,
+      alt: ogImg.alternativeText,
+    } : undefined,
+  });
 
   return {
-    title,
-    description,
+    ...metadata,
     icons: globalData?.faviconUrl
       ? {
           icon: [{ url: globalData.faviconUrl }],
         }
       : undefined,
-    alternates: {
-      canonical: path,
-      languages: {
-        ...Object.fromEntries(locales.map((item) => [hrefLang[item], `/${item}`])),
-        'x-default': `/${defaultLocale}`,
-      },
-    },
-    openGraph: {
-      url: `${siteUrl}${path}`,
-      locale,
-      title,
-      description,
-      type: 'website',
-      siteName,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
   };
 }
 

@@ -48,11 +48,15 @@ export async function buildMetadata({
   const finalTitle = title ? title : (globalData?.seoTitle || siteName);
   const finalDescription = description || globalData?.seoDescription || globalData?.siteDescription || "";
 
-  const ogImageUrl = toAbsoluteUrl(ogImage?.url) || globalData?.ogImage?.url || undefined;
+  const ogImageUrl =
+    toAbsoluteUrl(ogImage?.url) ||
+    globalData?.ogImage?.url ||
+    `${siteUrl}/web-app-manifest-512x512.png`;
 
   const robots = noIndex ? { index: false, follow: false } : undefined;
 
   return {
+    metadataBase: new URL(siteUrl),
     title: finalTitle,
     description: finalDescription,
     keywords: keywords || (globalData?.seoKeywords ? globalData.seoKeywords.split(",").map((kw) => kw.trim()) : undefined),
@@ -74,8 +78,8 @@ export async function buildMetadata({
         ? [
             {
               url: ogImageUrl,
-              width: ogImage?.width || globalData?.ogImage?.width || undefined,
-              height: ogImage?.height || globalData?.ogImage?.height || undefined,
+              width: ogImage?.width || globalData?.ogImage?.width || 512,
+              height: ogImage?.height || globalData?.ogImage?.height || 512,
               alt: ogImage?.alt || globalData?.ogImage?.alternativeText || finalTitle,
             },
           ]
