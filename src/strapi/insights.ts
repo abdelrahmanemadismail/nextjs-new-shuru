@@ -470,7 +470,6 @@ async function fetchArticleBySlug(slug: string, locale: Locale): Promise<StrapiA
   params.append("populate[author][populate][avatar]", "true");
   params.append("populate[categories][fields][0]", "name");
   params.append("populate[categories][fields][1]", "slug");
-  params.append("populate[description]", "true");
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/articles?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
