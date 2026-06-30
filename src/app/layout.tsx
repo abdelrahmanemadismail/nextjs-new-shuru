@@ -11,6 +11,7 @@ import { getMessages, getLocale } from "next-intl/server";
 import { getDirection } from "@/lib/i18n";
 import { defaultLocale, isLocale, siteUrl, type Locale } from "@/lib/i18n";
 import { getGlobalSettings } from "@/strapi/global";
+import { getOptimizedOgImageUrl } from "@/lib/seo";
 
 
 const fontSans = localFont({
@@ -45,6 +46,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const keywords = globalData?.seoKeywords ? globalData.seoKeywords.split(",").map((kw) => kw.trim()) : undefined;
   const ogImage = globalData?.ogImage;
   const ogImageUrl = ogImage?.url ?? undefined;
+  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl);
+  const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
 
   return {
     metadataBase: new URL(siteUrl),
@@ -64,15 +67,20 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       type: "website",
       siteName,
-      images: ogImageUrl
-        ? [{ url: ogImageUrl, width: ogImage?.width, height: ogImage?.height, alt: ogImage?.alternativeText ?? undefined }]
+      images: finalOgImageUrl
+        ? [{
+            url: finalOgImageUrl,
+            width: isOptimized ? 1200 : (ogImage?.width ?? undefined),
+            height: isOptimized ? 630 : (ogImage?.height ?? undefined),
+            alt: ogImage?.alternativeText ?? undefined
+          }]
         : undefined,
     },
     twitter: {
-      card: ogImageUrl ? "summary_large_image" : "summary",
+      card: finalOgImageUrl ? "summary_large_image" : "summary",
       title: siteName,
       description,
-      images: ogImageUrl ? [ogImageUrl] : undefined,
+      images: finalOgImageUrl ? [finalOgImageUrl] : undefined,
     },
   };
 }

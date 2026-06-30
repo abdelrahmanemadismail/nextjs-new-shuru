@@ -19,6 +19,18 @@ export interface BuildMetadataOptions {
   noIndex?: boolean;
 }
 
+export function getOptimizedOgImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (
+    url.includes("web-app-manifest") ||
+    url.endsWith(".svg") ||
+    url.endsWith(".ico")
+  ) {
+    return url;
+  }
+  return `${siteUrl}/api/og?url=${encodeURIComponent(url)}`;
+}
+
 export async function buildMetadata({
   locale,
   path,
@@ -53,6 +65,9 @@ export async function buildMetadata({
     globalData?.ogImage?.url ||
     `${siteUrl}/web-app-manifest-512x512.png`;
 
+  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl);
+  const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
+
   const robots = noIndex ? { index: false, follow: false } : undefined;
 
   return {
@@ -74,22 +89,22 @@ export async function buildMetadata({
       description: finalDescription,
       type,
       siteName,
-      images: ogImageUrl
+      images: finalOgImageUrl
         ? [
             {
-              url: ogImageUrl,
-              width: ogImage?.width || globalData?.ogImage?.width || 512,
-              height: ogImage?.height || globalData?.ogImage?.height || 512,
+              url: finalOgImageUrl,
+              width: isOptimized ? 1200 : (ogImage?.width || globalData?.ogImage?.width || 512),
+              height: isOptimized ? 630 : (ogImage?.height || globalData?.ogImage?.height || 512),
               alt: ogImage?.alt || globalData?.ogImage?.alternativeText || finalTitle,
             },
           ]
         : undefined,
     },
     twitter: {
-      card: ogImageUrl ? "summary_large_image" : "summary",
+      card: finalOgImageUrl ? "summary_large_image" : "summary",
       title: finalTitle,
       description: finalDescription,
-      images: ogImageUrl ? [ogImageUrl] : undefined,
+      images: finalOgImageUrl ? [finalOgImageUrl] : undefined,
     },
     robots,
   };
