@@ -47,14 +47,21 @@ export async function GET(request: NextRequest) {
 
     // Load local brand logo image as base64 (dark horizontal text layout logo for light bg)
     let localLogoBase64: string | null = null;
+    let localIconBase64: string | null = null;
     try {
       const logoPath = path.join(process.cwd(), 'public', 'شعار بدون خلفية-04.png');
       if (fs.existsSync(logoPath)) {
         const logoBuffer = fs.readFileSync(logoPath);
         localLogoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
       }
+      
+      const iconPath = path.join(process.cwd(), 'public', 'web-app-manifest-512x512.png');
+      if (fs.existsSync(iconPath)) {
+        const iconBuffer = fs.readFileSync(iconPath);
+        localIconBase64 = `data:image/png;base64,${iconBuffer.toString('base64')}`;
+      }
     } catch (e) {
-      console.error('Failed to load local brand logo:', e);
+      console.error('Failed to load local brand logo/icon assets:', e);
     }
 
     // Satori doesn't support automatic RTL word layout reordering. We reverse the order of word tokens for Arabic.
@@ -108,6 +115,22 @@ export async function GET(request: NextRequest) {
               background: 'radial-gradient(#8b5cf60d 0%, #8b5cf600 70%)',
             }}
           />
+
+          {/* Faint Brand Icon Watermark in the bottom corner */}
+          {localIconBase64 && (
+            <img
+              src={localIconBase64}
+              alt="Watermark Icon"
+              style={{
+                position: 'absolute',
+                width: '320px',
+                height: '320px',
+                bottom: '40px',
+                opacity: 0.05,
+                ...(isAr ? { left: '40px' } : { right: '40px' }),
+              }}
+            />
+          )}
 
           {/* Inner border overlay - matches oklch(0.8860 0.0069 277.1521) / #e2e8f0 */}
           <div
