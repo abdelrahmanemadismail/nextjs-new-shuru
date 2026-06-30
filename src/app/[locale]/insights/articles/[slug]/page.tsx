@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props) {
     locale,
     path: `/insights/articles/${slug}`,
     title: seo?.meta_title || article.title,
-    description: seo?.meta_description || undefined,
+    description: seo?.meta_description || article.description,
     keywords: seo?.meta_keywords ? seo.meta_keywords.split(",").map((k) => k.trim()) : undefined,
     ogImage: ogImg ? {
       url: ogImg.url,

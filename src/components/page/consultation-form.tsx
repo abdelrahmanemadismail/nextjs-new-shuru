@@ -53,13 +53,16 @@ export function ConsultationForm() {
           toast.success(t("form.success"));
           form.reset();
         } else {
+          console.error("Consultation form submission failed:", result.error);
           toast.error(t("form.error"));
         }
       } catch (error) {
+        console.error("Consultation form error:", error);
         toast.error(t("form.error"));
       }
     });
   }
+
 
   return (
     <Form {...form}>

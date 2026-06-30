@@ -14,6 +14,7 @@ export type StrapiArticle = {
   is_featured?: boolean;
   enable_cover_image?: boolean;
   cover_image?: StrapiMedia;
+  description?: string;
   seo?: StrapiSeo;
   categories?: Array<{
     id: number;
@@ -469,6 +470,7 @@ async function fetchArticleBySlug(slug: string, locale: Locale): Promise<StrapiA
   params.append("populate[author][populate][avatar]", "true");
   params.append("populate[categories][fields][0]", "name");
   params.append("populate[categories][fields][1]", "slug");
+  params.append("populate[description]", "true");
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/articles?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),

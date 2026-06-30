@@ -52,13 +52,16 @@ export function ContactForm() {
           toast.success(t("form.success"));
           form.reset();
         } else {
+          console.error("Contact form submission failed:", result.error);
           toast.error(t("form.error"));
         }
       } catch (error) {
+        console.error("Contact form error:", error);
         toast.error(t("form.error"));
       }
     });
   }
+
 
   return (
     <Form {...form}>

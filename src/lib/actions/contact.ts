@@ -6,18 +6,35 @@ export async function sendContactEmail(data: any) {
   const { fullName, email, phone, company, subject, message } = data;
 
   try {
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = Number(process.env.SMTP_PORT) || 587;
+    const smtpUser = process.env.SMTP_USERNAME || process.env.SMTP_USER || "";
+    let smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS || "";
+    
+    // Strip leading/trailing double quotes if they exist in the environment variables
+    if (smtpPass.startsWith('"') && smtpPass.endsWith('"')) {
+      smtpPass = smtpPass.slice(1, -1);
+    }
+
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_PORT === "465",
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465 || process.env.SMTP_PORT === "465",
       auth: {
-        user: process.env.SMTP_USERNAME || process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD || process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
+    // To prevent SMTP Sender address rejection (like on Hostinger),
+    // the "from" address must be the authenticated SMTP user.
+    const fromAddress = smtpUser || 'info@shuru.sa';
+
     const mailOptions = {
-      from: process.env.SMTP_FROM || process.env.SMTP_USERNAME || process.env.SMTP_USER || 'noreply@shuru.sa',
+      from: `"Shuru Contact Form" <${fromAddress}>`,
       to: process.env.CONTACT_EMAIL_TO || 'info@shuru.sa',
       replyTo: email,
       subject: `New Contact Form Submission: ${subject}`,
@@ -46,6 +63,10 @@ export async function sendContactEmail(data: any) {
     return { success: true };
   } catch (error) {
     console.error("Failed to send email:", error);
-    return { success: false, error: "Failed to send email" };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Failed to send email" 
+    };
   }
 }
+
