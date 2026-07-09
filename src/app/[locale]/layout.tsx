@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/layout/site-header';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { Toaster } from '@/components/ui/sonner';
 import { DynamicBreadcrumb } from '@/components/shared/dynamic-breadcrumb';
+import { BreadcrumbProvider } from '@/components/shared/breadcrumb-context';
 
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -25,12 +26,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   setRequestLocale(locale);
 
   return (
-    <>
+    <BreadcrumbProvider>
       <SiteHeader locale={locale} />
       <DynamicBreadcrumb locale={locale} />
       <main className="flex-1">{children}</main>
       <SiteFooter locale={locale} />
       <Toaster />
-    </>
+    </BreadcrumbProvider>
   );
 }

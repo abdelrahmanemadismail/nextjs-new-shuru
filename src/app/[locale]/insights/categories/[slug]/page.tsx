@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 import { buildMetadata } from "@/lib/seo";
+import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -128,6 +129,7 @@ export default async function CategoryPage(props: Props) {
 
   return (
     <main className="container py-24 mx-auto px-4 max-w-7xl">
+      <BreadcrumbTitleSetter path={`/${locale}/insights/categories/${slug}`} title={category.name} />
       <Link
         href={`/${locale}/insights/categories`}
         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors group"

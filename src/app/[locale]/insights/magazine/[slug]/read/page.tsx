@@ -5,6 +5,7 @@ import { type Locale } from '@/lib/i18n';
 import { getMagazineIssueBySlugCached } from '@/strapi/insights';
 import { MagazineReadClient } from './magazine-read-client';
 import { buildMetadata } from '@/lib/seo';
+import { BreadcrumbTitleSetter } from '@/components/shared/breadcrumb-context';
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -60,11 +61,14 @@ export default async function MagazineReadPage({ params }: Props) {
     : `${issue.title} - Issue ${issue.issue_number || ''}`;
 
   return (
-    <MagazineReadClient
-      pdfUrl={pdfUrl}
-      magazineTitle={magazineTitle}
-      magazineSlug={slug}
-      downloadUrl={pdfUrl}
-    />
+    <>
+      <BreadcrumbTitleSetter path={`/${locale}/insights/magazine/${slug}/read`} title={locale === 'ar' ? 'قراءة' : 'Read'} />
+      <MagazineReadClient
+        pdfUrl={pdfUrl}
+        magazineTitle={magazineTitle}
+        magazineSlug={slug}
+        downloadUrl={pdfUrl}
+      />
+    </>
   );
 }

@@ -8,6 +8,7 @@ import { RichTextBlock } from "@/components/shared/rich-text-block";
 import { getMe } from "@/lib/actions/auth";
 import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { buildMetadata } from "@/lib/seo";
+import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -62,6 +63,7 @@ export default async function MajlisPage({ params }: Props) {
 
   return (
     <div className="flex-1 pb-16 lg:pb-24">
+      <BreadcrumbTitleSetter path={`/${locale}/insights/majlis/${majlis.slug}`} title={majlis.title} />
       {/* Majlis Header */}
       <section className="container mx-auto px-4 py-8 lg:py-16">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">{majlis.title}</h1>

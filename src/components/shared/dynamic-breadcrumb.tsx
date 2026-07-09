@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { useBreadcrumb } from '@/components/shared/breadcrumb-context';
 
 interface DynamicBreadcrumbProps {
   locale: string;
@@ -19,6 +20,7 @@ interface DynamicBreadcrumbProps {
 
 export function DynamicBreadcrumb({ locale }: DynamicBreadcrumbProps) {
   const pathname = usePathname();
+  const { titles } = useBreadcrumb();
   const isRtl = locale === 'ar';
 
   // Remove locale prefix from path, e.g. "/en/insights/categories" -> "insights/categories"
@@ -42,21 +44,33 @@ export function DynamicBreadcrumb({ locale }: DynamicBreadcrumbProps) {
     'insights': { en: 'Insights', ar: 'الرؤى' },
     'categories': { en: 'Categories', ar: 'الفئات' },
     'articles': { en: 'Articles', ar: 'المقالات' },
-    'contact': { en: 'Contact', ar: 'اتصل بنا' },
-    'about': { en: 'About Us', ar: 'من نحن' }
+    'contact': { en: 'Contact Us', ar: 'اتصل بنا' },
+    'about': { en: 'About Us', ar: 'من نحن' },
+    'magazine': { en: 'Magazine', ar: 'المجلة' },
+    'majlis': { en: 'Majlis', ar: 'المجلس' },
+    'news': { en: 'News', ar: 'الأخبار' },
+    'podcasts': { en: 'Podcasts', ar: 'البودكاست' },
+    'subscribe': { en: 'Subscribe', ar: 'الاشتراك' },
+    'consultation': { en: 'Consultation', ar: 'طلب استشارة' },
+    'auth': { en: 'Login', ar: 'تسجيل الدخول' },
+    'login': { en: 'Login', ar: 'تسجيل الدخول' },
+    'signup': { en: 'Sign Up', ar: 'إنشاء حساب' },
+    'profile': { en: 'Profile', ar: 'الملف الشخصي' },
+    'read': { en: 'Read', ar: 'قراءة' }
   };
 
   const getSegmentName = (segment: string) => {
+    const decodedSegment = decodeURIComponent(segment);
     // Check dictionary
-    if (dictionary[segment]) {
-      return dictionary[segment][locale as 'en' | 'ar'] || segment;
+    if (dictionary[decodedSegment]) {
+      return dictionary[decodedSegment][locale as 'en' | 'ar'] || decodedSegment;
     }
     // Handle slugs visually (capitalize and replace hyphens)
-    return segment
+    return decodedSegment
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
-      .substring(0, 30) + (segment.length > 30 ? '...' : '');
+      .substring(0, 30) + (decodedSegment.length > 30 ? '...' : '');
   };
 
   const buildPath = (index: number) => {
@@ -80,7 +94,7 @@ export function DynamicBreadcrumb({ locale }: DynamicBreadcrumbProps) {
           {segments.map((segment, index) => {
             const isLast = index === segments.length - 1;
             const path = buildPath(index);
-            const name = getSegmentName(segment);
+            const name = titles[path] || getSegmentName(segment);
 
             return (
               <React.Fragment key={path}>

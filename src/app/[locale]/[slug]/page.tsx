@@ -6,6 +6,7 @@ import { getPageCached } from "@/strapi/page";
 import { getTestimonialsCached } from "@/strapi/home";
 import { PageContent } from "@/components/page/page-content";
 import { buildMetadata } from "@/lib/seo";
+import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -57,6 +58,7 @@ export default async function DynamicPage({ params }: Props) {
 
   return (
     <main>
+      <BreadcrumbTitleSetter path={`/${locale}/${slug}`} title={page.title} />
       <PageContent page={page} locale={locale} testimonials={testimonials} />
     </main>
   );

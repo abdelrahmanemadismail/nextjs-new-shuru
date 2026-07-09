@@ -13,6 +13,7 @@ import { getMe } from "@/lib/actions/auth";
 import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { Calendar, Eye, Download } from "lucide-react";
 import { buildMetadata } from "@/lib/seo";
+import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -89,28 +90,7 @@ export default async function MagazineIssuePage({ params }: Props) {
 
   return (
     <div className="flex-1 pb-16 lg:pb-24">
-      {/* Breadcrumbs */}
-      <nav className="bg-neutral-50 dark:bg-neutral-900 border-b border-border/40 py-4 mb-8">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center space-x-2 rtl:space-x-reverse text-xs md:text-sm text-muted-foreground font-medium">
-            <Link href={`/${locale}`} className="hover:text-primary transition-colors">
-              {locale === 'ar' ? 'الرئيسية' : 'Home'}
-            </Link>
-            <span className="text-neutral-400">/</span>
-            <Link href={`/${locale}/insights`} className="hover:text-primary transition-colors">
-              {locale === 'ar' ? 'الرؤى' : 'Insights'}
-            </Link>
-            <span className="text-neutral-400">/</span>
-            <Link href={`/${locale}/insights/magazine`} className="hover:text-primary transition-colors">
-              {locale === 'ar' ? 'المجلة' : 'Magazine'}
-            </Link>
-            <span className="text-neutral-400">/</span>
-            <span className="text-foreground font-semibold truncate max-w-[120px] sm:max-w-none">
-              {issueNumberText}
-            </span>
-          </div>
-        </div>
-      </nav>
+      <BreadcrumbTitleSetter path={`/${locale}/insights/magazine/${issue.slug}`} title={issueNumberText} />
 
       {/* Main Details Section */}
       <section className="container mx-auto px-4 py-6 md:py-10">

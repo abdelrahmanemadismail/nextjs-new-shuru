@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { getMe } from "@/lib/actions/auth";
 import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { buildMetadata } from "@/lib/seo";
+import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
 type Props = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -64,6 +65,7 @@ export default async function ArticlePage({ params }: Props) {
   // Pass an empty testimonials array since generic blocks might require it but usually don't if they aren't the testimonial block
   return (
     <div className="flex-1 pb-16 lg:pb-24">
+      <BreadcrumbTitleSetter path={`/${locale}/insights/articles/${article.slug}`} title={article.title} />
       {/* Article Header */}
       <section className="container mx-auto px-4 py-8 lg:py-16">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">{article.title}</h1>
