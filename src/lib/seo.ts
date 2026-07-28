@@ -72,6 +72,15 @@ export async function buildMetadata({
   );
 
   const finalTitle = title ? title : (globalData?.seoTitle || siteName);
+  const defaultSeoTitle = globalData?.seoTitle || siteName;
+  const isDefaultOrFullTitle =
+    !title ||
+    cleanPath === "" ||
+    finalTitle === defaultSeoTitle ||
+    finalTitle === siteName ||
+    (siteName && finalTitle.includes(siteName)) ||
+    (globalData?.seoTitle && finalTitle.includes(globalData.seoTitle));
+
   const finalDescription = description || globalData?.seoDescription || globalData?.siteDescription || "";
 
   const headerData = await getHeaderSettings(locale);
@@ -88,7 +97,7 @@ export async function buildMetadata({
 
   return {
     metadataBase: new URL(siteUrl),
-    title: finalTitle,
+    title: isDefaultOrFullTitle ? { absolute: finalTitle } : finalTitle,
     description: finalDescription,
     keywords: keywords || (globalData?.seoKeywords ? globalData.seoKeywords.split(",").map((kw) => kw.trim()) : undefined),
     alternates: {
