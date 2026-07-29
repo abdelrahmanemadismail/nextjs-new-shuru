@@ -110,10 +110,13 @@ export async function GET(request: NextRequest) {
       console.error('Failed to load local brand logo/icon assets:', e);
     }
 
-    const displayTitle = title;
-    const displayDescription = description;
-    const displayCta1 = cta1;
-    const displayCta2 = cta2;
+    const cleanText = (str: string | null | undefined) =>
+      str ? str.replace(/\s+/g, ' ').trim() : '';
+
+    const displayTitle = cleanText(title);
+    const displayDescription = cleanText(description);
+    const displayCta1 = cleanText(cta1);
+    const displayCta2 = cleanText(cta2);
 
     // Fetch Cairo/Inter fonts
     const fonts = await getFonts();
@@ -188,16 +191,16 @@ export async function GET(request: NextRequest) {
                 width: '100%',
                 height: '100%',
                 padding: '60px 80px',
-                alignItems: isAr ? 'flex-end' : 'flex-start',
+                alignItems: 'flex-start',
               }}
             >
               {/* Header: Logo */}
               <div
                 style={{
                   display: 'flex',
-                  flexDirection: isAr ? 'row-reverse' : 'row',
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  alignSelf: isAr ? 'flex-end' : 'flex-start',
+                  alignSelf: 'flex-start',
                 }}
               >
                 {logoBase64 ? (
@@ -213,7 +216,7 @@ export async function GET(request: NextRequest) {
                   <span
                     style={{
                       fontSize: '28px',
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: '#0f172a',
                     }}
                   >
@@ -227,7 +230,7 @@ export async function GET(request: NextRequest) {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: isAr ? 'flex-end' : 'flex-start',
+                  alignItems: 'flex-start',
                   width: '100%',
                   margin: 'auto 0',
                 }}
@@ -235,7 +238,7 @@ export async function GET(request: NextRequest) {
                 <h1
                   style={{
                     fontSize: '52px',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: '#0f172a',
                     margin: '0 0 16px 0',
                     lineHeight: 1.2,
@@ -267,7 +270,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: isAr ? 'row-reverse' : 'row',
+                      flexDirection: 'row',
                       alignItems: 'center',
                       gap: '16px',
                     }}
@@ -300,7 +303,7 @@ export async function GET(request: NextRequest) {
                           backgroundColor: 'rgba(255, 255, 255, 0.8)',
                           color: '#334155',
                           fontSize: '18px',
-                          fontWeight: 600,
+                          fontWeight: 700,
                           padding: '14px 30px',
                           borderRadius: '9999px',
                         }}
@@ -316,10 +319,10 @@ export async function GET(request: NextRequest) {
               <div
                 style={{
                   display: 'flex',
-                  flexDirection: isAr ? 'row-reverse' : 'row',
+                  flexDirection: 'row',
                   alignItems: 'center',
                   gap: '8px',
-                  alignSelf: isAr ? 'flex-end' : 'flex-start',
+                  alignSelf: 'flex-start',
                 }}
               >
                 <div style={{ width: '16px', height: '2px', backgroundColor: '#0d9488' }} />
@@ -327,7 +330,7 @@ export async function GET(request: NextRequest) {
                   style={{
                     fontSize: '18px',
                     color: '#64748b',
-                    fontWeight: 600,
+                    fontWeight: 700,
                   }}
                 >
                   shuru.sa
@@ -503,17 +506,17 @@ export async function GET(request: NextRequest) {
               width: '100%',
               height: '100%',
               padding: '70px 80px',
-              alignItems: isAr ? 'flex-end' : 'flex-start',
+              alignItems: 'flex-start',
             }}
           >
             {/* Header: Logo */}
             <div
               style={{
                 display: 'flex',
-                flexDirection: isAr ? 'row-reverse' : 'row',
+                flexDirection: 'row',
                 alignItems: 'center',
                 gap: '16px',
-                alignSelf: isAr ? 'flex-end' : 'flex-start',
+                alignSelf: 'flex-start',
               }}
             >
               {logoBase64 ? (
@@ -543,7 +546,7 @@ export async function GET(request: NextRequest) {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: isAr ? 'flex-end' : 'flex-start',
+                alignItems: 'flex-start',
                 width: '100%',
                 margin: 'auto 0',
               }}
@@ -581,10 +584,10 @@ export async function GET(request: NextRequest) {
             <div
               style={{
                 display: 'flex',
-                flexDirection: isAr ? 'row-reverse' : 'row',
+                flexDirection: 'row',
                 alignItems: 'center',
                 gap: '8px',
-                alignSelf: isAr ? 'flex-end' : 'flex-start',
+                alignSelf: 'flex-start',
               }}
             >
               <div style={{ width: '16px', height: '2px', backgroundColor: '#14b8a6' }} />
@@ -592,7 +595,7 @@ export async function GET(request: NextRequest) {
                 style={{
                   fontSize: '18px',
                   color: '#475569',
-                  fontWeight: 500,
+                  fontWeight: 700,
                 }}
               >
                 shuru.sa
