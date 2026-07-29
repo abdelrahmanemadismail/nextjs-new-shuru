@@ -27,12 +27,18 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
   const seo = homeData?.seo;
   const ogImg = seo?.og_image;
+  const heroBlock = homeData?.blocks?.find(
+    (b): b is import('@/strapi/home').StrapiHeroBlock => b.__component === 'home.hero'
+  );
 
   const metadata = await buildMetadata({
     locale,
     path: "/",
-    title: seo?.meta_title || globalData?.seoTitle,
-    description: seo?.meta_description || globalData?.seoDescription,
+    title: seo?.meta_title || heroBlock?.title || globalData?.seoTitle,
+    description: seo?.meta_description || heroBlock?.subtitle || globalData?.seoDescription,
+    ogType: "hero",
+    cta1: heroBlock?.primaryCtaText,
+    cta2: heroBlock?.secondaryCtaText,
     ogImage: ogImg ? {
       url: ogImg.url,
       width: ogImg.width,

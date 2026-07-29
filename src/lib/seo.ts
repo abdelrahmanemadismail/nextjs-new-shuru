@@ -18,6 +18,9 @@ export interface BuildMetadataOptions {
   type?: "website" | "article" | "profile";
   keywords?: string[];
   noIndex?: boolean;
+  ogType?: "hero" | "insight";
+  cta1?: string;
+  cta2?: string;
 }
 
 export function getOptimizedOgImageUrl(
@@ -25,7 +28,10 @@ export function getOptimizedOgImageUrl(
   title?: string,
   description?: string,
   locale?: string,
-  logoUrl?: string | null
+  logoUrl?: string | null,
+  ogType?: "hero" | "insight",
+  cta1?: string,
+  cta2?: string
 ): string | null {
   if (!url) {
     const params = new URLSearchParams();
@@ -33,6 +39,9 @@ export function getOptimizedOgImageUrl(
     if (description) params.set('description', description);
     if (locale) params.set('locale', locale);
     if (logoUrl) params.set('logoUrl', logoUrl);
+    if (ogType) params.set('type', ogType);
+    if (cta1) params.set('cta1', cta1);
+    if (cta2) params.set('cta2', cta2);
     return `${siteUrl}/api/og?${params.toString()}`;
   }
   if (
@@ -54,6 +63,9 @@ export async function buildMetadata({
   type = "website",
   keywords,
   noIndex = false,
+  ogType,
+  cta1,
+  cta2,
 }: BuildMetadataOptions): Promise<Metadata> {
   const globalData = await getGlobalSettings(locale);
   const siteName = globalData?.siteName || "Shuru";
@@ -90,7 +102,18 @@ export async function buildMetadata({
     toAbsoluteUrl(ogImage?.url) ||
     globalData?.ogImage?.url;
 
-  const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl, finalTitle, finalDescription, locale, logoUrl);
+  const computedOgType = ogType || (cleanPath === "" ? "hero" : "insight");
+
+  const finalOgImageUrl = getOptimizedOgImageUrl(
+    ogImageUrl,
+    finalTitle,
+    finalDescription,
+    locale,
+    logoUrl,
+    computedOgType,
+    cta1,
+    cta2
+  );
   const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
 
   const robots = noIndex ? { index: false, follow: false } : undefined;

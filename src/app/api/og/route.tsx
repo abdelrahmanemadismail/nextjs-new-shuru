@@ -35,26 +35,72 @@ async function getFonts(): Promise<{
   };
 }
 
+async function fetchImageAsBase64(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) return null;
+    const arrayBuffer = await res.arrayBuffer();
+    const contentType = res.headers.get('content-type') || 'image/png';
+    const base64 = Buffer.from(arrayBuffer).toString('base64');
+    return `data:${contentType};base64,${base64}`;
+  } catch (err) {
+    console.error('Failed to fetch logo image as base64:', url, err);
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Dynamic Branded Card Mode (using next/og ImageResponse)
-    const title = searchParams.get('title') || 'Shuru';
-    const description = searchParams.get('description') || '';
-    const locale = searchParams.get('locale') || 'ar';
+    const type = searchParams.get('type') || 'insight'; // 'hero' | 'insight'
+    let title = searchParams.get('title') || '';
+    let description = searchParams.get('description') || '';
+    let cta1 = searchParams.get('cta1') || '';
+    let cta2 = searchParams.get('cta2') || '';
+    const locale = (searchParams.get('locale') || 'ar') as 'ar' | 'en';
+    const logoUrl = searchParams.get('logoUrl');
     const isAr = locale === 'ar';
 
-    // Load local brand logo image as base64 (dark horizontal text layout logo for light bg)
-    let localLogoBase64: string | null = null;
+    // If type === 'hero' and key params missing, fetch Strapi home content server-side as fallback
+    if (type === 'hero' && (!title || !cta1)) {
+      try {
+        const { getHomeCached } = await import('@/strapi/home');
+        const homeData = await getHomeCached(locale);
+        const heroBlock = homeData?.blocks?.find(
+          (b): b is import('@/strapi/home').StrapiHeroBlock => b.__component === 'home.hero'
+        );
+        if (heroBlock) {
+          if (!title) title = heroBlock.title;
+          if (!description) description = heroBlock.subtitle || '';
+          if (!cta1) cta1 = heroBlock.primaryCtaText;
+          if (!cta2) cta2 = heroBlock.secondaryCtaText || '';
+        }
+      } catch (e) {
+        console.error('Failed to fetch fallback hero data from Strapi:', e);
+      }
+    }
+
+    if (!title) {
+      title = 'Shuru';
+    }
+
+    // Load Strapi Header Logo or Local Logo fallback
+    let logoBase64: string | null = null;
+    if (logoUrl) {
+      logoBase64 = await fetchImageAsBase64(logoUrl);
+    }
+
     let localIconBase64: string | null = null;
     try {
-      const logoPath = path.join(process.cwd(), 'public', 'شعار بدون خلفية-04.png');
-      if (fs.existsSync(logoPath)) {
-        const logoBuffer = fs.readFileSync(logoPath);
-        localLogoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+      if (!logoBase64) {
+        const logoPath = path.join(process.cwd(), 'public', 'شعار بدون خلفية-04.png');
+        if (fs.existsSync(logoPath)) {
+          const logoBuffer = fs.readFileSync(logoPath);
+          logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        }
       }
-      
+
       const iconPath = path.join(process.cwd(), 'public', 'web-app-manifest-512x512.png');
       if (fs.existsSync(iconPath)) {
         const iconBuffer = fs.readFileSync(iconPath);
@@ -64,7 +110,7 @@ export async function GET(request: NextRequest) {
       console.error('Failed to load local brand logo/icon assets:', e);
     }
 
-    // Satori doesn't support automatic RTL word layout reordering. We reverse the order of word tokens for Arabic.
+    // Satori doesn't support automatic RTL word layout reordering. Reverse word tokens for Arabic text.
     const formatArabicText = (text: string) => {
       if (!text) return '';
       return text.split(' ').reverse().join(' ');
@@ -72,10 +118,262 @@ export async function GET(request: NextRequest) {
 
     const displayTitle = isAr ? formatArabicText(title) : title;
     const displayDescription = isAr ? formatArabicText(description) : description;
+    const displayCta1 = isAr ? formatArabicText(cta1) : cta1;
+    const displayCta2 = isAr ? formatArabicText(cta2) : cta2;
 
     // Fetch Cairo/Inter fonts
     const fonts = await getFonts();
 
+    // Render Hero Section Template
+    if (type === 'hero') {
+      return new ImageResponse(
+        (
+          <div
+            style={{
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              width: '1200px',
+              height: '630px',
+              backgroundColor: '#f8fafc',
+              fontFamily: isAr ? 'Cairo' : 'Inter',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Soft Radial Glow Top-Center */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-200px',
+                left: '250px',
+                width: '700px',
+                height: '700px',
+                borderRadius: '350px',
+                background: 'radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, rgba(20, 184, 166, 0) 70%)',
+              }}
+            />
+
+            {/* Soft Radial Glow Bottom-Corner */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-200px',
+                right: '-150px',
+                width: '700px',
+                height: '700px',
+                borderRadius: '350px',
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, rgba(139, 92, 246, 0) 70%)',
+              }}
+            />
+
+            {/* Subtle Brand Icon Watermark */}
+            {localIconBase64 && (
+              <img
+                src={localIconBase64}
+                alt="Watermark Icon"
+                style={{
+                  position: 'absolute',
+                  width: '380px',
+                  height: '380px',
+                  bottom: '-40px',
+                  ...(isAr ? { left: '-40px' } : { right: '-40px' }),
+                  opacity: 0.04,
+                }}
+              />
+            )}
+
+            {/* Container */}
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                width: '100%',
+                height: '100%',
+                padding: '60px 80px',
+                alignItems: isAr ? 'flex-end' : 'flex-start',
+              }}
+            >
+              {/* Header: Logo */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: isAr ? 'row-reverse' : 'row',
+                  alignItems: 'center',
+                  alignSelf: isAr ? 'flex-end' : 'flex-start',
+                }}
+              >
+                {logoBase64 ? (
+                  <img
+                    src={logoBase64}
+                    alt="Header Logo"
+                    style={{
+                      height: '54px',
+                      objectFit: 'contain',
+                    }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      fontSize: '28px',
+                      fontWeight: 800,
+                      color: '#0f172a',
+                    }}
+                  >
+                    {isAr ? 'شورى' : 'Shuru'}
+                  </span>
+                )}
+              </div>
+
+              {/* Main Content (Title, Subtitle & CTA Buttons) */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: isAr ? 'flex-end' : 'flex-start',
+                  width: '100%',
+                  margin: 'auto 0',
+                }}
+              >
+                <h1
+                  style={{
+                    fontSize: '52px',
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    margin: '0 0 16px 0',
+                    lineHeight: 1.2,
+                    textAlign: isAr ? 'right' : 'left',
+                    maxWidth: '1040px',
+                  }}
+                >
+                  {displayTitle}
+                </h1>
+
+                {description ? (
+                  <p
+                    style={{
+                      fontSize: '22px',
+                      fontWeight: 400,
+                      color: '#475569',
+                      margin: '0 0 32px 0',
+                      lineHeight: 1.5,
+                      maxWidth: '920px',
+                      textAlign: isAr ? 'right' : 'left',
+                    }}
+                  >
+                    {displayDescription}
+                  </p>
+                ) : null}
+
+                {/* CTA Buttons preview */}
+                {(cta1 || cta2) && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: isAr ? 'row-reverse' : 'row',
+                      alignItems: 'center',
+                      gap: '16px',
+                    }}
+                  >
+                    {cta1 ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#0d9488',
+                          color: '#ffffff',
+                          fontSize: '18px',
+                          fontWeight: 700,
+                          padding: '14px 32px',
+                          borderRadius: '9999px',
+                        }}
+                      >
+                        {displayCta1}
+                      </div>
+                    ) : null}
+
+                    {cta2 ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '1px solid #cbd5e1',
+                          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                          color: '#334155',
+                          fontSize: '18px',
+                          fontWeight: 600,
+                          padding: '14px 30px',
+                          borderRadius: '9999px',
+                        }}
+                      >
+                        {displayCta2}
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: isAr ? 'row-reverse' : 'row',
+                  alignItems: 'center',
+                  gap: '8px',
+                  alignSelf: isAr ? 'flex-end' : 'flex-start',
+                }}
+              >
+                <div style={{ width: '16px', height: '2px', backgroundColor: '#0d9488' }} />
+                <span
+                  style={{
+                    fontSize: '18px',
+                    color: '#64748b',
+                    fontWeight: 600,
+                  }}
+                >
+                  shuru.sa
+                </span>
+              </div>
+            </div>
+          </div>
+        ),
+        {
+          width: 1200,
+          height: 630,
+          fonts: [
+            {
+              name: 'Inter',
+              data: fonts.interRegular,
+              weight: 400,
+              style: 'normal',
+            },
+            {
+              name: 'Inter',
+              data: fonts.interBold,
+              weight: 700,
+              style: 'normal',
+            },
+            {
+              name: 'Cairo',
+              data: fonts.cairoRegular,
+              weight: 400,
+              style: 'normal',
+            },
+            {
+              name: 'Cairo',
+              data: fonts.cairoBold,
+              weight: 700,
+              style: 'normal',
+            },
+          ],
+        }
+      );
+    }
+
+    // Render Insights Template
     return new ImageResponse(
       (
         <div
@@ -85,12 +383,12 @@ export async function GET(request: NextRequest) {
             flexDirection: 'column',
             width: '1200px',
             height: '630px',
-            backgroundColor: '#f6f6f6', // Light background oklch(0.9642 0 0) matching globals.css :root
+            backgroundColor: '#f6f6f6',
             fontFamily: isAr ? 'Cairo' : 'Inter',
             overflow: 'hidden',
           }}
         >
-          {/* Top-Right Cyan/Teal Radial Glow - oklch(0.52 0.0946 191.5521) */}
+          {/* Top-Right Cyan/Teal Radial Glow */}
           <div
             style={{
               position: 'absolute',
@@ -116,7 +414,7 @@ export async function GET(request: NextRequest) {
             }}
           />
 
-          {/* Faint Brand Icon Watermark in the bottom corner */}
+          {/* Faint Brand Icon Watermark in bottom corner */}
           {localIconBase64 && (
             <img
               src={localIconBase64}
@@ -132,7 +430,7 @@ export async function GET(request: NextRequest) {
             />
           )}
 
-          {/* Inner border overlay - matches oklch(0.8860 0.0069 277.1521) / #e2e8f0 */}
+          {/* Inner border overlay */}
           <div
             style={{
               position: 'absolute',
@@ -142,7 +440,7 @@ export async function GET(request: NextRequest) {
             }}
           />
 
-          {/* Decorative Horizontal Architectural Line using native SVG to bypass Satori parser */}
+          {/* Decorative Horizontal Architectural Line */}
           <svg
             width="1152px"
             height="1px"
@@ -161,7 +459,7 @@ export async function GET(request: NextRequest) {
             <line x1="0" y1="0" x2="1152" y2="0" stroke="url(#horizontal-fade)" strokeWidth="1" />
           </svg>
 
-          {/* Decorative Vertical Architectural Line using native SVG */}
+          {/* Decorative Vertical Architectural Line */}
           <svg
             width="1px"
             height="582px"
@@ -210,7 +508,7 @@ export async function GET(request: NextRequest) {
               alignItems: isAr ? 'flex-end' : 'flex-start',
             }}
           >
-            {/* Header: Logo and site name */}
+            {/* Header: Logo */}
             <div
               style={{
                 display: 'flex',
@@ -220,9 +518,9 @@ export async function GET(request: NextRequest) {
                 alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
-              {localLogoBase64 ? (
+              {logoBase64 ? (
                 <img
-                  src={localLogoBase64}
+                  src={logoBase64}
                   alt="Logo"
                   style={{
                     height: '56px',
@@ -230,38 +528,15 @@ export async function GET(request: NextRequest) {
                   }}
                 />
               ) : (
-                <div
+                <span
                   style={{
-                    display: 'flex',
-                    flexDirection: isAr ? 'row-reverse' : 'row',
-                    alignItems: 'center',
-                    gap: '12px',
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    color: '#0d111d',
                   }}
                 >
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '16px',
-                      backgroundColor: '#0ea5e9',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <div style={{ width: '12px', height: '12px', borderRadius: '6px', backgroundColor: '#ffffff' }} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      letterSpacing: isAr ? '0px' : '1px',
-                    }}
-                  >
-                    {isAr ? 'شورى' : 'Shuru'}
-                  </span>
-                </div>
+                  {isAr ? 'شورى' : 'Shuru'}
+                </span>
               )}
             </div>
 
@@ -279,7 +554,7 @@ export async function GET(request: NextRequest) {
                 style={{
                   fontSize: '56px',
                   fontWeight: 700,
-                  color: '#0d111d', // Deep dark navy matching globals.css foreground
+                  color: '#0d111d',
                   margin: '0 0 20px 0',
                   lineHeight: 1.25,
                   textAlign: isAr ? 'right' : 'left',
@@ -292,7 +567,7 @@ export async function GET(request: NextRequest) {
                   style={{
                     fontSize: '24px',
                     fontWeight: 400,
-                    color: '#334155', // Muted slate color for high readability in light theme
+                    color: '#334155',
                     margin: '0',
                     lineHeight: 1.5,
                     maxWidth: '900px',
@@ -318,7 +593,7 @@ export async function GET(request: NextRequest) {
               <span
                 style={{
                   fontSize: '18px',
-                  color: '#475569', // Dark grey footer text
+                  color: '#475569',
                   fontWeight: 500,
                 }}
               >
