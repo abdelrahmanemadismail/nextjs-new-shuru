@@ -110,16 +110,10 @@ export async function GET(request: NextRequest) {
       console.error('Failed to load local brand logo/icon assets:', e);
     }
 
-    // Satori doesn't support automatic RTL word layout reordering. Reverse word tokens for Arabic text.
-    const formatArabicText = (text: string) => {
-      if (!text) return '';
-      return text.split(' ').reverse().join(' ');
-    };
-
-    const displayTitle = isAr ? formatArabicText(title) : title;
-    const displayDescription = isAr ? formatArabicText(description) : description;
-    const displayCta1 = isAr ? formatArabicText(cta1) : cta1;
-    const displayCta2 = isAr ? formatArabicText(cta2) : cta2;
+    const displayTitle = title;
+    const displayDescription = description;
+    const displayCta1 = cta1;
+    const displayCta2 = cta2;
 
     // Fetch Cairo/Inter fonts
     const fonts = await getFonts();
@@ -129,6 +123,7 @@ export async function GET(request: NextRequest) {
       return new ImageResponse(
         (
           <div
+            dir={isAr ? 'rtl' : 'ltr'}
             style={{
               position: 'relative',
               display: 'flex',
@@ -137,6 +132,7 @@ export async function GET(request: NextRequest) {
               height: '630px',
               backgroundColor: '#f8fafc',
               fontFamily: isAr ? 'Cairo' : 'Inter',
+              direction: isAr ? 'rtl' : 'ltr',
               overflow: 'hidden',
             }}
           >
@@ -377,6 +373,7 @@ export async function GET(request: NextRequest) {
     return new ImageResponse(
       (
         <div
+          dir={isAr ? 'rtl' : 'ltr'}
           style={{
             position: 'relative',
             display: 'flex',
@@ -385,6 +382,7 @@ export async function GET(request: NextRequest) {
             height: '630px',
             backgroundColor: '#f6f6f6',
             fontFamily: isAr ? 'Cairo' : 'Inter',
+            direction: isAr ? 'rtl' : 'ltr',
             overflow: 'hidden',
           }}
         >
