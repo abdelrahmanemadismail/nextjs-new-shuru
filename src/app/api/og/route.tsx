@@ -110,14 +110,15 @@ export async function GET(request: NextRequest) {
       console.error('Failed to load local brand logo/icon assets:', e);
     }
 
-    const cleanText = (str: string | null | undefined) => {
+    const sanitizeText = (str: string | null | undefined) => {
       if (!str) return '';
-      const cleaned = str.replace(/\s+/g, ' ').trim();
-      // Replace regular space with 1/4 em space (\u2005) for Arabic locale in Satori/ImageResponse.
-      // Standard space (\u0020) causes Satori's Bidi engine to inject excessive word spacing gaps,
-      // while non-breaking space (\u00A0) prevents multi-line text wrapping and causes overflow outside the canvas.
-      // \u2005 provides ideal fixed-width spacing AND supports proper multi-line text wrapping without overflow.
-      return isAr ? cleaned.replace(/ /g, '\u2005') : cleaned;
+      let cleaned = str.replace(/\s+/g, ' ').trim();
+      if (isAr) {
+        cleaned = cleaned.replace(/\.{2,}/g, ' ');
+        cleaned = cleaned.replace(/[\.\,\;\:\،\؛]/g, ' ');
+        return cleaned.replace(/\s+/g, ' ').trim();
+      }
+      return cleaned;
     };
 
     const renderFormattedText = (
@@ -131,28 +132,13 @@ export async function GET(request: NextRequest) {
       isHeading = false
     ) => {
       if (!text) return null;
-      const formatted = cleanText(text);
+      const clean = sanitizeText(text);
+      if (!clean) return null;
 
       if (!isAr) {
-        if (isHeading) {
-          return (
-            <h1
-              style={{
-                fontSize: `${fontSize}px`,
-                fontWeight,
-                color,
-                margin,
-                lineHeight,
-                maxWidth: `${maxWidth}px`,
-                textAlign: 'left',
-              }}
-            >
-              {formatted}
-            </h1>
-          );
-        }
+        const ElementTag = isHeading ? 'h1' : 'p';
         return (
-          <p
+          <ElementTag
             style={{
               fontSize: `${fontSize}px`,
               fontWeight,
@@ -163,84 +149,54 @@ export async function GET(request: NextRequest) {
               textAlign: 'left',
             }}
           >
-            {formatted}
-          </p>
+            {clean}
+          </ElementTag>
         );
       }
 
-      const sentences = text
-        .split(/(?<=\.|\!\?|\:\s|;\s|\.\.\.)\s+/)
-        .map((s) => s.trim())
-        .filter(Boolean);
-
-      if (sentences.length <= 1) {
-        if (isHeading) {
-          return (
-            <h1
-              style={{
-                fontSize: `${fontSize}px`,
-                fontWeight,
-                color,
-                margin,
-                lineHeight,
-                maxWidth: `${maxWidth}px`,
-                textAlign: 'right',
-              }}
-            >
-              {formatted}
-            </h1>
-          );
-        }
-        return (
-          <p
-            style={{
-              fontSize: `${fontSize}px`,
-              fontWeight,
-              color,
-              margin,
-              lineHeight,
-              maxWidth: `${maxWidth}px`,
-              textAlign: 'right',
-            }}
-          >
-            {formatted}
-          </p>
-        );
-      }
+      // Flex-wrap row-reverse word container for Satori Arabic rendering.
+      // Yoga Flexbox natively positions word flex items right-to-left and wraps lines dynamically across canvas width.
+      const words = clean.split(' ');
 
       return (
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
+            flexDirection: 'row-reverse',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
             maxWidth: `${maxWidth}px`,
             margin,
-            gap: '4px',
+            columnGap: `${Math.max(2, Math.round(fontSize * 0.1))}px`,
+            rowGap: `${Math.max(2, Math.round(fontSize * 0.12))}px`,
           }}
         >
-          {sentences.map((sentence, idx) => (
-            <span
-              key={idx}
-              style={{
-                fontSize: `${fontSize}px`,
-                fontWeight,
-                color,
-                lineHeight: 1.5,
-                textAlign: 'right',
-              }}
-            >
-              {cleanText(sentence)}
-            </span>
-          ))}
+          {words.map((w, idx) => {
+            const WordTag = isHeading ? 'h1' : 'span';
+            return (
+              <WordTag
+                key={idx}
+                style={{
+                  fontSize: `${fontSize}px`,
+                  fontWeight,
+                  color,
+                  lineHeight: 1.1,
+                  margin: 0,
+                }}
+              >
+                {w}
+              </WordTag>
+            );
+          })}
         </div>
       );
     };
 
-    const displayTitle = cleanText(title);
-    const displayDescription = cleanText(description);
-    const displayCta1 = cleanText(cta1);
-    const displayCta2 = cleanText(cta2);
+    const displayTitle = sanitizeText(title);
+    const displayDescription = sanitizeText(description);
+    const displayCta1 = sanitizeText(cta1);
+    const displayCta2 = sanitizeText(cta2);
 
     // Fetch Cairo/Inter fonts
     const fonts = await getFonts();
@@ -357,8 +313,8 @@ export async function GET(request: NextRequest) {
                   margin: 'auto 0',
                 }}
               >
-                {renderFormattedText(title, 48, 700, '#0f172a', 1040, '0 0 16px 0', 1.25, true)}
-                {renderFormattedText(description, 18, 400, '#475569', 960, '0 0 28px 0', 1.5)}
+                {renderFormattedText(title, 52, 700, '#0f172a', 960, '0 0 20px 0', 1.25, true)}
+                {renderFormattedText(description, 20, 400, '#475569', 960, '0 0 32px 0', 1.6)}
 
                 {/* CTA Buttons preview */}
                 {(cta1 || cta2) && (
@@ -644,8 +600,8 @@ export async function GET(request: NextRequest) {
                 margin: 'auto 0',
               }}
             >
-              {renderFormattedText(title, 52, 700, '#0d111d', 1040, '0 0 20px 0', 1.25, true)}
-              {renderFormattedText(description, 20, 400, '#334155', 920, '0', 1.5)}
+              {renderFormattedText(title, 52, 700, '#0d111d', 960, '0 0 20px 0', 1.25, true)}
+              {renderFormattedText(description, 20, 400, '#334155', 920, '0', 1.6)}
             </div>
 
             {/* Footer */}
