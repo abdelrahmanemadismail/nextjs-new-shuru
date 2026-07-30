@@ -113,9 +113,11 @@ export async function GET(request: NextRequest) {
     const cleanText = (str: string | null | undefined) => {
       if (!str) return '';
       const cleaned = str.replace(/\s+/g, ' ').trim();
-      // Replace regular space with non-breaking space (\u00A0) for Arabic locale
-      // to resolve Satori/ImageResponse issue where standard spaces produce unnaturally wide gaps between words
-      return isAr ? cleaned.replace(/ /g, '\u00A0') : cleaned;
+      // Replace regular space with 1/4 em space (\u2005) for Arabic locale in Satori/ImageResponse.
+      // Standard space (\u0020) causes Satori's Bidi engine to inject excessive word spacing gaps,
+      // while non-breaking space (\u00A0) prevents multi-line text wrapping and causes overflow outside the canvas.
+      // \u2005 provides ideal fixed-width spacing AND supports proper multi-line text wrapping without overflow.
+      return isAr ? cleaned.replace(/ /g, '\u2005') : cleaned;
     };
 
     const displayTitle = cleanText(title);
