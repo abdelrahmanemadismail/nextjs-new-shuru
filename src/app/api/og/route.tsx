@@ -120,6 +120,123 @@ export async function GET(request: NextRequest) {
       return isAr ? cleaned.replace(/ /g, '\u2005') : cleaned;
     };
 
+    const renderFormattedText = (
+      text: string | null | undefined,
+      fontSize: number,
+      fontWeight: number,
+      color: string,
+      maxWidth: number,
+      margin: string,
+      lineHeight = 1.3,
+      isHeading = false
+    ) => {
+      if (!text) return null;
+      const formatted = cleanText(text);
+
+      if (!isAr) {
+        if (isHeading) {
+          return (
+            <h1
+              style={{
+                fontSize: `${fontSize}px`,
+                fontWeight,
+                color,
+                margin,
+                lineHeight,
+                maxWidth: `${maxWidth}px`,
+                textAlign: 'left',
+              }}
+            >
+              {formatted}
+            </h1>
+          );
+        }
+        return (
+          <p
+            style={{
+              fontSize: `${fontSize}px`,
+              fontWeight,
+              color,
+              margin,
+              lineHeight,
+              maxWidth: `${maxWidth}px`,
+              textAlign: 'left',
+            }}
+          >
+            {formatted}
+          </p>
+        );
+      }
+
+      const sentences = text
+        .split(/(?<=\.|\!\?|\:\s|;\s|\.\.\.)\s+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (sentences.length <= 1) {
+        if (isHeading) {
+          return (
+            <h1
+              style={{
+                fontSize: `${fontSize}px`,
+                fontWeight,
+                color,
+                margin,
+                lineHeight,
+                maxWidth: `${maxWidth}px`,
+                textAlign: 'right',
+              }}
+            >
+              {formatted}
+            </h1>
+          );
+        }
+        return (
+          <p
+            style={{
+              fontSize: `${fontSize}px`,
+              fontWeight,
+              color,
+              margin,
+              lineHeight,
+              maxWidth: `${maxWidth}px`,
+              textAlign: 'right',
+            }}
+          >
+            {formatted}
+          </p>
+        );
+      }
+
+      return (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            maxWidth: `${maxWidth}px`,
+            margin,
+            gap: '4px',
+          }}
+        >
+          {sentences.map((sentence, idx) => (
+            <span
+              key={idx}
+              style={{
+                fontSize: `${fontSize}px`,
+                fontWeight,
+                color,
+                lineHeight: 1.5,
+                textAlign: 'right',
+              }}
+            >
+              {cleanText(sentence)}
+            </span>
+          ))}
+        </div>
+      );
+    };
+
     const displayTitle = cleanText(title);
     const displayDescription = cleanText(description);
     const displayCta1 = cleanText(cta1);
@@ -240,35 +357,8 @@ export async function GET(request: NextRequest) {
                   margin: 'auto 0',
                 }}
               >
-                <h1
-                  style={{
-                    fontSize: '52px',
-                    fontWeight: 700,
-                    color: '#0f172a',
-                    margin: '0 0 16px 0',
-                    lineHeight: 1.2,
-                    textAlign: isAr ? 'right' : 'left',
-                    maxWidth: '1040px',
-                  }}
-                >
-                  {displayTitle}
-                </h1>
-
-                {description ? (
-                  <p
-                    style={{
-                      fontSize: '22px',
-                      fontWeight: 400,
-                      color: '#475569',
-                      margin: '0 0 32px 0',
-                      lineHeight: 1.5,
-                      maxWidth: '920px',
-                      textAlign: isAr ? 'right' : 'left',
-                    }}
-                  >
-                    {displayDescription}
-                  </p>
-                ) : null}
+                {renderFormattedText(title, 48, 700, '#0f172a', 1040, '0 0 16px 0', 1.25, true)}
+                {renderFormattedText(description, 18, 400, '#475569', 960, '0 0 28px 0', 1.5)}
 
                 {/* CTA Buttons preview */}
                 {(cta1 || cta2) && (
@@ -554,33 +644,8 @@ export async function GET(request: NextRequest) {
                 margin: 'auto 0',
               }}
             >
-              <h1
-                style={{
-                  fontSize: '56px',
-                  fontWeight: 700,
-                  color: '#0d111d',
-                  margin: '0 0 20px 0',
-                  lineHeight: 1.25,
-                  textAlign: isAr ? 'right' : 'left',
-                }}
-              >
-                {displayTitle}
-              </h1>
-              {description ? (
-                <p
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 400,
-                    color: '#334155',
-                    margin: '0',
-                    lineHeight: 1.5,
-                    maxWidth: '900px',
-                    textAlign: isAr ? 'right' : 'left',
-                  }}
-                >
-                  {displayDescription}
-                </p>
-              ) : null}
+              {renderFormattedText(title, 52, 700, '#0d111d', 1040, '0 0 20px 0', 1.25, true)}
+              {renderFormattedText(description, 20, 400, '#334155', 920, '0', 1.5)}
             </div>
 
             {/* Footer */}
