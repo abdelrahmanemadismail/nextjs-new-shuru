@@ -110,8 +110,13 @@ export async function GET(request: NextRequest) {
       console.error('Failed to load local brand logo/icon assets:', e);
     }
 
-    const cleanText = (str: string | null | undefined) =>
-      str ? str.replace(/\s+/g, ' ').trim() : '';
+    const cleanText = (str: string | null | undefined) => {
+      if (!str) return '';
+      const cleaned = str.replace(/\s+/g, ' ').trim();
+      // Replace regular space with non-breaking space (\u00A0) for Arabic locale
+      // to resolve Satori/ImageResponse issue where standard spaces produce unnaturally wide gaps between words
+      return isAr ? cleaned.replace(/ /g, '\u00A0') : cleaned;
+    };
 
     const displayTitle = cleanText(title);
     const displayDescription = cleanText(description);
