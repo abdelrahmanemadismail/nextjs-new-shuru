@@ -133,7 +133,6 @@ export async function GET(request: NextRequest) {
       return new ImageResponse(
         (
           <div
-            dir={isAr ? 'rtl' : 'ltr'}
             style={{
               position: 'relative',
               display: 'flex',
@@ -142,7 +141,6 @@ export async function GET(request: NextRequest) {
               height: '630px',
               backgroundColor: '#f8fafc',
               fontFamily: isAr ? 'Cairo' : 'Inter',
-              direction: isAr ? 'rtl' : 'ltr',
               overflow: 'hidden',
             }}
           >
@@ -383,7 +381,6 @@ export async function GET(request: NextRequest) {
     return new ImageResponse(
       (
         <div
-          dir={isAr ? 'rtl' : 'ltr'}
           style={{
             position: 'relative',
             display: 'flex',
@@ -392,7 +389,6 @@ export async function GET(request: NextRequest) {
             height: '630px',
             backgroundColor: '#f6f6f6',
             fontFamily: isAr ? 'Cairo' : 'Inter',
-            direction: isAr ? 'rtl' : 'ltr',
             overflow: 'hidden',
           }}
         >
