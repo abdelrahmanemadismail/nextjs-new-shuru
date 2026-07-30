@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
                 width: '100%',
                 height: '100%',
                 padding: '60px 80px',
-                alignItems: 'flex-start',
+                alignItems: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               {/* Header: Logo */}
@@ -205,7 +205,7 @@ export async function GET(request: NextRequest) {
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  alignSelf: 'flex-start',
+                  alignSelf: isAr ? 'flex-end' : 'flex-start',
                 }}
               >
                 {logoBase64 ? (
@@ -235,7 +235,7 @@ export async function GET(request: NextRequest) {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'flex-start',
+                  alignItems: isAr ? 'flex-end' : 'flex-start',
                   width: '100%',
                   margin: 'auto 0',
                 }}
@@ -275,7 +275,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: isAr ? 'row-reverse' : 'row',
                       alignItems: 'center',
                       gap: '16px',
                     }}
@@ -324,10 +324,10 @@ export async function GET(request: NextRequest) {
               <div
                 style={{
                   display: 'flex',
-                  flexDirection: 'row',
+                  flexDirection: isAr ? 'row-reverse' : 'row',
                   alignItems: 'center',
                   gap: '8px',
-                  alignSelf: 'flex-start',
+                  alignSelf: isAr ? 'flex-end' : 'flex-start',
                 }}
               >
                 <div style={{ width: '16px', height: '2px', backgroundColor: '#0d9488' }} />
@@ -511,7 +511,7 @@ export async function GET(request: NextRequest) {
               width: '100%',
               height: '100%',
               padding: '70px 80px',
-              alignItems: 'flex-start',
+              alignItems: isAr ? 'flex-end' : 'flex-start',
             }}
           >
             {/* Header: Logo */}
@@ -521,7 +521,7 @@ export async function GET(request: NextRequest) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: '16px',
-                alignSelf: 'flex-start',
+                alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               {logoBase64 ? (
@@ -551,7 +551,7 @@ export async function GET(request: NextRequest) {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'flex-start',
+                alignItems: isAr ? 'flex-end' : 'flex-start',
                 width: '100%',
                 margin: 'auto 0',
               }}
@@ -589,10 +589,10 @@ export async function GET(request: NextRequest) {
             <div
               style={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: isAr ? 'row-reverse' : 'row',
                 alignItems: 'center',
                 gap: '8px',
-                alignSelf: 'flex-start',
+                alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               <div style={{ width: '16px', height: '2px', backgroundColor: '#14b8a6' }} />
