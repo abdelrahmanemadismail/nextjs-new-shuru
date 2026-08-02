@@ -56,16 +56,14 @@ async function getFonts(): Promise<{
   }
   if (!cairoRegular) {
     cairoRegular = await fetchFontBuffer([
-      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-400-normal.ttf',
       'https://cdn.jsdelivr.net/fontsource/fonts/tajawal@latest/arabic-400-normal.ttf',
-      'https://cdn.jsdelivr.net/fontsource/fonts/cairo@latest/arabic-400-normal.ttf',
+      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-400-normal.ttf',
     ]);
   }
   if (!cairoBold) {
     cairoBold = await fetchFontBuffer([
-      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-700-normal.ttf',
       'https://cdn.jsdelivr.net/fontsource/fonts/tajawal@latest/arabic-700-normal.ttf',
-      'https://cdn.jsdelivr.net/fontsource/fonts/cairo@latest/arabic-700-normal.ttf',
+      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-700-normal.ttf',
     ]);
   }
   return {
@@ -244,14 +242,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 4. Load Cairo/Almarai & Inter fonts
+    // 4. Load Satori-safe fonts (Tajawal & Inter)
     const fontData = await getFonts();
     const fonts = [
+      { name: 'Tajawal', data: fontData.cairoRegular, weight: 400 as const, style: 'normal' as const },
+      { name: 'Tajawal', data: fontData.cairoBold, weight: 700 as const, style: 'normal' as const },
       { name: 'Cairo', data: fontData.cairoRegular, weight: 400 as const, style: 'normal' as const },
       { name: 'Cairo', data: fontData.cairoBold, weight: 700 as const, style: 'normal' as const },
       { name: 'Inter', data: fontData.interRegular, weight: 400 as const, style: 'normal' as const },
       { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
     ];
+
+    const fontFamilyStack = isAr ? 'Tajawal, Inter' : 'Inter, Tajawal';
 
     const cacheHeaders = {
       'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
@@ -269,7 +271,7 @@ export async function GET(request: NextRequest) {
               width: '1200px',
               height: '630px',
               backgroundColor: '#f8fafc',
-              fontFamily: isAr ? 'Cairo' : 'Inter',
+              fontFamily: fontFamilyStack,
               overflow: 'hidden',
             }}
           >
@@ -322,7 +324,7 @@ export async function GET(request: NextRequest) {
                       fontSize: '28px',
                       fontWeight: 700,
                       color: '#0f172a',
-                      fontFamily: isAr ? 'Cairo' : 'Inter',
+                      fontFamily: fontFamilyStack,
                     }}
                   >
                     {isAr ? fixArabicText('شورى SHURU') : 'SHURU'}
@@ -349,7 +351,7 @@ export async function GET(request: NextRequest) {
                     lineHeight: 1.3,
                     maxWidth: '960px',
                     textAlign: isAr ? 'right' : 'left',
-                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                    fontFamily: fontFamilyStack,
                   }}
                 >
                   {displayTitle}
@@ -364,7 +366,7 @@ export async function GET(request: NextRequest) {
                       lineHeight: 1.4,
                       maxWidth: '960px',
                       textAlign: isAr ? 'right' : 'left',
-                      fontFamily: isAr ? 'Cairo' : 'Inter',
+                      fontFamily: fontFamilyStack,
                     }}
                   >
                     {displayDescription}
@@ -390,7 +392,7 @@ export async function GET(request: NextRequest) {
                           fontWeight: 700,
                           padding: '14px 32px',
                           borderRadius: '9999px',
-                          fontFamily: isAr ? 'Cairo' : 'Inter',
+                          fontFamily: fontFamilyStack,
                         }}
                       >
                         {displayCta1}
@@ -406,7 +408,7 @@ export async function GET(request: NextRequest) {
                           fontWeight: 700,
                           padding: '14px 30px',
                           borderRadius: '9999px',
-                          fontFamily: isAr ? 'Cairo' : 'Inter',
+                          fontFamily: fontFamilyStack,
                         }}
                       >
                         {displayCta2}
@@ -432,7 +434,7 @@ export async function GET(request: NextRequest) {
                     fontSize: '18px',
                     color: '#64748b',
                     fontWeight: 700,
-                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                    fontFamily: fontFamilyStack,
                   }}
                 >
                   shuru.sa
@@ -456,7 +458,7 @@ export async function GET(request: NextRequest) {
             width: '1200px',
             height: '630px',
             backgroundColor: '#f6f6f6',
-            fontFamily: isAr ? 'Cairo' : 'Inter',
+            fontFamily: fontFamilyStack,
             overflow: 'hidden',
           }}
         >
@@ -497,7 +499,7 @@ export async function GET(request: NextRequest) {
                     fontSize: '28px',
                     fontWeight: 700,
                     color: '#0d111d',
-                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                    fontFamily: fontFamilyStack,
                   }}
                 >
                   {isAr ? fixArabicText('شورى SHURU') : 'SHURU'}
@@ -525,7 +527,7 @@ export async function GET(request: NextRequest) {
                     padding: '8px 18px',
                     borderRadius: '9999px',
                     margin: '0 0 20px 0',
-                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                    fontFamily: fontFamilyStack,
                   }}
                 >
                   {displayCategory}
@@ -540,7 +542,7 @@ export async function GET(request: NextRequest) {
                   lineHeight: 1.2,
                   maxWidth: '960px',
                   textAlign: isAr ? 'right' : 'left',
-                  fontFamily: isAr ? 'Cairo' : 'Inter',
+                  fontFamily: fontFamilyStack,
                 }}
               >
                 {displayTitle}
@@ -555,7 +557,7 @@ export async function GET(request: NextRequest) {
                     lineHeight: 1.4,
                     maxWidth: '960px',
                     textAlign: isAr ? 'right' : 'left',
-                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                    fontFamily: fontFamilyStack,
                   }}
                 >
                   {displayDescription}
@@ -579,7 +581,7 @@ export async function GET(request: NextRequest) {
                   fontSize: '18px',
                   color: '#475569',
                   fontWeight: 700,
-                  fontFamily: isAr ? 'Cairo' : 'Inter',
+                  fontFamily: fontFamilyStack,
                 }}
               >
                 shuru.sa
