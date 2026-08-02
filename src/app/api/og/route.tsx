@@ -24,6 +24,20 @@ let interBold: ArrayBuffer | null = null;
 let cairoRegular: ArrayBuffer | null = null;
 let cairoBold: ArrayBuffer | null = null;
 
+async function fetchFontBuffer(urls: string[]): Promise<ArrayBuffer> {
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: 'force-cache' });
+      if (res.ok) {
+        return await res.arrayBuffer();
+      }
+    } catch (e) {
+      console.warn(`Failed to fetch font from ${url}:`, e);
+    }
+  }
+  throw new Error(`Failed to fetch font from all candidate URLs: ${urls.join(', ')}`);
+}
+
 async function getFonts(): Promise<{
   interRegular: ArrayBuffer;
   interBold: ArrayBuffer;
@@ -31,16 +45,28 @@ async function getFonts(): Promise<{
   cairoBold: ArrayBuffer;
 }> {
   if (!interRegular) {
-    interRegular = await fetch('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf').then(res => res.arrayBuffer());
+    interRegular = await fetchFontBuffer([
+      'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf',
+    ]);
   }
   if (!interBold) {
-    interBold = await fetch('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf').then(res => res.arrayBuffer());
+    interBold = await fetchFontBuffer([
+      'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf',
+    ]);
   }
   if (!cairoRegular) {
-    cairoRegular = await fetch('https://cdn.jsdelivr.net/fontsource/fonts/cairo@latest/arabic-400-normal.ttf').then(res => res.arrayBuffer());
+    cairoRegular = await fetchFontBuffer([
+      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-400-normal.ttf',
+      'https://cdn.jsdelivr.net/fontsource/fonts/tajawal@latest/arabic-400-normal.ttf',
+      'https://cdn.jsdelivr.net/fontsource/fonts/cairo@latest/arabic-400-normal.ttf',
+    ]);
   }
   if (!cairoBold) {
-    cairoBold = await fetch('https://cdn.jsdelivr.net/fontsource/fonts/cairo@latest/arabic-700-normal.ttf').then(res => res.arrayBuffer());
+    cairoBold = await fetchFontBuffer([
+      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-700-normal.ttf',
+      'https://cdn.jsdelivr.net/fontsource/fonts/tajawal@latest/arabic-700-normal.ttf',
+      'https://cdn.jsdelivr.net/fontsource/fonts/cairo@latest/arabic-700-normal.ttf',
+    ]);
   }
   return {
     interRegular: interRegular!,
@@ -218,7 +244,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 4. Load Cairo & Inter fonts
+    // 4. Load Cairo/Almarai & Inter fonts
     const fontData = await getFonts();
     const fonts = [
       { name: 'Cairo', data: fontData.cairoRegular, weight: 400 as const, style: 'normal' as const },
