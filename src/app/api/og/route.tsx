@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { type Locale } from '@/lib/i18n';
 import { extractMediaUrl, toAbsoluteUrl } from '@/lib/strapi';
+import { fixArabicText } from '@/lib/arabic';
 import { getHeaderSettings } from '@/strapi/header';
 import { getHomeCached } from '@/strapi/home';
 import { getPageCached } from '@/strapi/page';
@@ -180,6 +181,13 @@ export async function GET(request: NextRequest) {
       title = isAr ? 'شروع – رحلة نحو التميز' : 'SHURU – The journey toward excellence';
     }
 
+    // Process Arabic text with Reshaper + BiDi reordering for Satori rendering
+    const displayTitle = isAr ? fixArabicText(title) : title;
+    const displayDescription = isAr ? fixArabicText(description) : description;
+    const displayCategory = isAr ? fixArabicText(category) : category;
+    const displayCta1 = isAr ? fixArabicText(cta1) : cta1;
+    const displayCta2 = isAr ? fixArabicText(cta2) : cta2;
+
     // 3. Resolve site logo (from Strapi header settings or local fallback)
     let logoBase64: string | null = null;
     if (customLogoUrl) {
@@ -236,7 +244,6 @@ export async function GET(request: NextRequest) {
               height: '630px',
               backgroundColor: '#f8fafc',
               fontFamily: isAr ? 'Cairo' : 'Inter',
-              direction: isAr ? 'rtl' : 'ltr',
               overflow: 'hidden',
             }}
           >
@@ -262,7 +269,7 @@ export async function GET(request: NextRequest) {
                 width: '100%',
                 height: '100%',
                 padding: '60px 80px',
-                alignItems: isAr ? 'flex-start' : 'flex-start',
+                alignItems: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               {/* Header Logo */}
@@ -271,6 +278,7 @@ export async function GET(request: NextRequest) {
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
+                  alignSelf: isAr ? 'flex-end' : 'flex-start',
                 }}
               >
                 {logoBase64 ? (
@@ -291,7 +299,7 @@ export async function GET(request: NextRequest) {
                       fontFamily: isAr ? 'Cairo' : 'Inter',
                     }}
                   >
-                    {isAr ? 'شورى SHURU' : 'SHURU'}
+                    {isAr ? fixArabicText('شورى SHURU') : 'SHURU'}
                   </span>
                 )}
               </div>
@@ -301,7 +309,7 @@ export async function GET(request: NextRequest) {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: isAr ? 'flex-start' : 'flex-start',
+                  alignItems: isAr ? 'flex-end' : 'flex-start',
                   width: '100%',
                   margin: 'auto 0',
                 }}
@@ -312,15 +320,15 @@ export async function GET(request: NextRequest) {
                     fontWeight: 700,
                     color: '#0f172a',
                     margin: '0 0 20px 0',
-                    lineHeight: 1.25,
+                    lineHeight: 1.3,
                     maxWidth: '960px',
                     textAlign: isAr ? 'right' : 'left',
                     fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
-                  {title}
+                  {displayTitle}
                 </h1>
-                {description ? (
+                {displayDescription ? (
                   <p
                     style={{
                       fontSize: '20px',
@@ -333,12 +341,12 @@ export async function GET(request: NextRequest) {
                       fontFamily: isAr ? 'Cairo' : 'Inter',
                     }}
                   >
-                    {description}
+                    {displayDescription}
                   </p>
                 ) : null}
 
                 {/* CTAs */}
-                {(cta1 || cta2) && (
+                {(displayCta1 || displayCta2) && (
                   <div
                     style={{
                       display: 'flex',
@@ -347,7 +355,7 @@ export async function GET(request: NextRequest) {
                       gap: '16px',
                     }}
                   >
-                    {cta1 ? (
+                    {displayCta1 ? (
                       <div
                         style={{
                           backgroundColor: '#0d9488',
@@ -359,10 +367,10 @@ export async function GET(request: NextRequest) {
                           fontFamily: isAr ? 'Cairo' : 'Inter',
                         }}
                       >
-                        {cta1}
+                        {displayCta1}
                       </div>
                     ) : null}
-                    {cta2 ? (
+                    {displayCta2 ? (
                       <div
                         style={{
                           border: '1px solid #cbd5e1',
@@ -375,7 +383,7 @@ export async function GET(request: NextRequest) {
                           fontFamily: isAr ? 'Cairo' : 'Inter',
                         }}
                       >
-                        {cta2}
+                        {displayCta2}
                       </div>
                     ) : null}
                   </div>
@@ -389,6 +397,7 @@ export async function GET(request: NextRequest) {
                   flexDirection: isAr ? 'row-reverse' : 'row',
                   alignItems: 'center',
                   gap: '8px',
+                  alignSelf: isAr ? 'flex-end' : 'flex-start',
                 }}
               >
                 <div style={{ width: '16px', height: '2px', backgroundColor: '#0d9488' }} />
@@ -422,7 +431,6 @@ export async function GET(request: NextRequest) {
             height: '630px',
             backgroundColor: '#f6f6f6',
             fontFamily: isAr ? 'Cairo' : 'Inter',
-            direction: isAr ? 'rtl' : 'ltr',
             overflow: 'hidden',
           }}
         >
@@ -435,7 +443,7 @@ export async function GET(request: NextRequest) {
               width: '100%',
               height: '100%',
               padding: '60px 80px',
-              alignItems: isAr ? 'flex-start' : 'flex-start',
+              alignItems: isAr ? 'flex-end' : 'flex-start',
             }}
           >
             {/* Header */}
@@ -445,6 +453,7 @@ export async function GET(request: NextRequest) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: '16px',
+                alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               {logoBase64 ? (
@@ -465,7 +474,7 @@ export async function GET(request: NextRequest) {
                     fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
-                  {isAr ? 'شورى SHURU' : 'SHURU'}
+                  {isAr ? fixArabicText('شورى SHURU') : 'SHURU'}
                 </span>
               )}
             </div>
@@ -475,12 +484,12 @@ export async function GET(request: NextRequest) {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: isAr ? 'flex-start' : 'flex-start',
+                alignItems: isAr ? 'flex-end' : 'flex-start',
                 width: '100%',
                 margin: 'auto 0',
               }}
             >
-              {category && (
+              {displayCategory && (
                 <div
                   style={{
                     backgroundColor: 'rgba(13, 148, 136, 0.1)',
@@ -493,7 +502,7 @@ export async function GET(request: NextRequest) {
                     fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
-                  {category}
+                  {displayCategory}
                 </div>
               )}
               <h1
@@ -508,9 +517,9 @@ export async function GET(request: NextRequest) {
                   fontFamily: isAr ? 'Cairo' : 'Inter',
                 }}
               >
-                {title}
+                {displayTitle}
               </h1>
-              {description ? (
+              {displayDescription ? (
                 <p
                   style={{
                     fontSize: '22px',
@@ -523,7 +532,7 @@ export async function GET(request: NextRequest) {
                     fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
-                  {description}
+                  {displayDescription}
                 </p>
               ) : null}
             </div>
@@ -535,6 +544,7 @@ export async function GET(request: NextRequest) {
                 flexDirection: isAr ? 'row-reverse' : 'row',
                 alignItems: 'center',
                 gap: '8px',
+                alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               <div style={{ width: '16px', height: '2px', backgroundColor: '#14b8a6' }} />
