@@ -2,10 +2,22 @@ import { NextRequest } from 'next/server';
 import { ImageResponse } from 'next/og';
 import fs from 'fs';
 import path from 'path';
+import { type Locale } from '@/lib/i18n';
+import { extractMediaUrl, toAbsoluteUrl } from '@/lib/strapi';
+import { getHeaderSettings } from '@/strapi/header';
+import { getHomeCached } from '@/strapi/home';
+import { getPageCached } from '@/strapi/page';
+import {
+  getArticleBySlugCached,
+  getNewsItemBySlugCached,
+  getPodcastBySlugCached,
+  getMagazineIssueBySlugCached,
+  getMajlisBySlugCached,
+} from '@/strapi/insights';
 
 export const runtime = 'nodejs';
 
-// Cache fonts in memory to avoid fetching them on every request
+// Font memory cache
 let interRegular: ArrayBuffer | null = null;
 let interBold: ArrayBuffer | null = null;
 let cairoRegular: ArrayBuffer | null = null;
@@ -51,32 +63,46 @@ async function fetchImageAsBase64(url: string): Promise<string | null> {
   }
 }
 
-function sanitizeText(str: string | null | undefined) {
-  if (!str) return '';
-  let cleaned = str.replace(/\s+/g, ' ').trim();
-  cleaned = cleaned.replace(/\.{2,}/g, ' ');
-  cleaned = cleaned.replace(/[\.\,\;\:\،\؛]/g, ' ');
-  return cleaned.replace(/\s+/g, ' ').trim();
+async function fetchRawImageResponse(url: string): Promise<Response | null> {
+  try {
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) return null;
+    const arrayBuffer = await res.arrayBuffer();
+    const contentType = res.headers.get('content-type') || 'image/jpeg';
+
+    return new Response(arrayBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
+      },
+    });
+  } catch (err) {
+    console.error('Failed to fetch raw cover image from Strapi:', url, err);
+    return null;
+  }
 }
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const type = searchParams.get('type') || 'insight'; // 'hero' | 'insight'
+    const type = searchParams.get('type') || 'insight';
+    const slug = searchParams.get('slug') || '';
+    const locale = (searchParams.get('locale') || 'ar') as Locale;
+    const isAr = locale === 'ar';
+
     let title = searchParams.get('title') || '';
     let description = searchParams.get('description') || '';
     let cta1 = searchParams.get('cta1') || '';
     let cta2 = searchParams.get('cta2') || '';
-    const category = searchParams.get('category') || '';
-    const locale = (searchParams.get('locale') || 'ar') as 'ar' | 'en';
-    const logoUrl = searchParams.get('logoUrl');
-    const isAr = locale === 'ar';
+    let category = searchParams.get('category') || '';
+    let customLogoUrl = searchParams.get('logoUrl');
+    let rawCoverUrl: string | null = null;
 
-    // If type === 'hero' and key params missing, fetch Strapi home content server-side as fallback
-    if (type === 'hero' && (!title || !cta1)) {
+    // 1. Fetch data from Strapi based on type and slug
+    if (type === 'hero') {
       try {
-        const { getHomeCached } = await import('@/strapi/home');
         const homeData = await getHomeCached(locale);
         const heroBlock = homeData?.blocks?.find(
           (b): b is import('@/strapi/home').StrapiHeroBlock => b.__component === 'home.hero'
@@ -88,18 +114,88 @@ export async function GET(request: NextRequest) {
           if (!cta2) cta2 = heroBlock.secondaryCtaText || '';
         }
       } catch (e) {
-        console.error('Failed to fetch fallback hero data from Strapi:', e);
+        console.error('Failed to fetch hero data from Strapi:', e);
+      }
+    } else if (slug) {
+      try {
+        if (type === 'article') {
+          const article = await getArticleBySlugCached(slug, locale);
+          if (article) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(article.cover_image) || extractMediaUrl(article.seo?.og_image));
+            if (!title) title = article.seo?.meta_title || article.title;
+            if (!description) description = article.seo?.meta_description || article.description || '';
+            if (!category && article.categories && article.categories.length > 0) {
+              category = article.categories[0].name;
+            }
+          }
+        } else if (type === 'news') {
+          const news = await getNewsItemBySlugCached(slug, locale);
+          if (news) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(news.cover_image) || extractMediaUrl(news.seo?.og_image));
+            if (!title) title = news.seo?.meta_title || news.title;
+            if (!description) description = news.seo?.meta_description || news.description || '';
+          }
+        } else if (type === 'podcast') {
+          const podcast = await getPodcastBySlugCached(slug, locale);
+          if (podcast) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(podcast.cover_image) || extractMediaUrl(podcast.seo?.og_image));
+            if (!title) title = podcast.seo?.meta_title || podcast.title;
+            if (!description) description = podcast.seo?.meta_description || podcast.description || '';
+          }
+        } else if (type === 'magazine') {
+          const issue = await getMagazineIssueBySlugCached(slug, locale);
+          if (issue) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(issue.cover_image) || extractMediaUrl(issue.seo?.og_image));
+            if (!title) title = issue.seo?.meta_title || issue.title;
+            if (!description) description = issue.seo?.meta_description || issue.description || '';
+          }
+        } else if (type === 'majlis') {
+          const majlis = await getMajlisBySlugCached(slug, locale);
+          if (majlis) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(majlis.cover_image) || extractMediaUrl(majlis.seo?.og_image));
+            if (!title) title = majlis.seo?.meta_title || majlis.title;
+            if (!description) description = majlis.seo?.meta_description || majlis.description || '';
+          }
+        } else if (type === 'page') {
+          const page = await getPageCached(slug, locale);
+          if (page) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(page.seo?.og_image));
+            if (!title) title = page.seo?.meta_title || page.title;
+            if (!description) description = page.seo?.meta_description || '';
+          }
+        }
+      } catch (err) {
+        console.error(`Failed to fetch Strapi entity (${type}/${slug}):`, err);
       }
     }
 
+    // 2. If Strapi returned a raw cover image, stream it directly
+    if (rawCoverUrl) {
+      const rawResponse = await fetchRawImageResponse(rawCoverUrl);
+      if (rawResponse) return rawResponse;
+    }
+
+    // Fallback default title if still missing
     if (!title) {
       title = isAr ? 'شروع – رحلة نحو التميز' : 'SHURU – The journey toward excellence';
     }
 
-    // Load Strapi Header Logo or Local Logo fallback
+    // 3. Resolve site logo (from Strapi header settings or local fallback)
     let logoBase64: string | null = null;
-    if (logoUrl) {
-      logoBase64 = await fetchImageAsBase64(logoUrl);
+    if (customLogoUrl) {
+      logoBase64 = await fetchImageAsBase64(customLogoUrl);
+    }
+
+    if (!logoBase64) {
+      try {
+        const headerSettings = await getHeaderSettings(locale);
+        const strapiLogo = headerSettings?.darkLogoUrl || headerSettings?.lightLogoUrl;
+        if (strapiLogo) {
+          logoBase64 = await fetchImageAsBase64(strapiLogo);
+        }
+      } catch (e) {
+        console.error('Failed to load header logo from Strapi:', e);
+      }
     }
 
     if (!logoBase64) {
@@ -114,7 +210,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Fetch Cairo & Inter fonts
+    // 4. Load Cairo & Inter fonts
     const fontData = await getFonts();
     const fonts = [
       { name: 'Cairo', data: fontData.cairoRegular, weight: 400 as const, style: 'normal' as const },
@@ -123,84 +219,11 @@ export async function GET(request: NextRequest) {
       { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
     ];
 
-    const renderFormattedText = (
-      text: string | null | undefined,
-      fontSize: number,
-      fontWeight: number,
-      color: string,
-      maxWidth: number,
-      marginBottom: number,
-      isHeading = false
-    ) => {
-      if (!text) return null;
-      const rawCleaned = text.replace(/\s+/g, ' ').trim();
-      if (!rawCleaned) return null;
-
-      if (!isAr) {
-        const ElementTag = isHeading ? 'h1' : 'p';
-        return (
-          <ElementTag
-            style={{
-              fontSize: `${fontSize}px`,
-              fontWeight,
-              color,
-              margin: `0 0 ${marginBottom}px 0`,
-              lineHeight: 1.3,
-              maxWidth: `${maxWidth}px`,
-              textAlign: 'left',
-              fontFamily: 'Inter',
-            }}
-          >
-            {rawCleaned}
-          </ElementTag>
-        );
-      }
-
-      const sanitizedAr = sanitizeText(rawCleaned);
-      const words = sanitizedAr.split(' ').filter(Boolean);
-
-      return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row-reverse',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            maxWidth: `${maxWidth}px`,
-            margin: `0 0 ${marginBottom}px 0`,
-            columnGap: `${Math.max(2, Math.round(fontSize * 0.08))}px`,
-            rowGap: `${Math.max(2, Math.round(fontSize * 0.12))}px`,
-          }}
-        >
-          {words.map((w, idx) => {
-            const WordTag = isHeading ? 'h1' : 'span';
-            return (
-              <WordTag
-                key={idx}
-                style={{
-                  fontSize: `${fontSize}px`,
-                  fontWeight,
-                  color,
-                  lineHeight: 1.1,
-                  margin: 0,
-                  fontFamily: 'Cairo',
-                }}
-              >
-                {w}
-              </WordTag>
-            );
-          })}
-        </div>
-      );
+    const cacheHeaders = {
+      'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
     };
 
-    const displayTitle = title;
-    const displayDescription = description;
-    const displayCta1 = sanitizeText(cta1);
-    const displayCta2 = sanitizeText(cta2);
-
-    // Hero Template
+    // Hero Template Card
     if (type === 'hero') {
       return new ImageResponse(
         (
@@ -213,10 +236,11 @@ export async function GET(request: NextRequest) {
               height: '630px',
               backgroundColor: '#f8fafc',
               fontFamily: isAr ? 'Cairo' : 'Inter',
+              direction: isAr ? 'rtl' : 'ltr',
               overflow: 'hidden',
             }}
           >
-            {/* Soft Glow */}
+            {/* Soft Ambient Glow */}
             <div
               style={{
                 position: 'absolute',
@@ -225,7 +249,7 @@ export async function GET(request: NextRequest) {
                 width: '500px',
                 height: '500px',
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, rgba(20, 184, 166, 0) 70%)',
+                background: 'radial-gradient(circle, rgba(20, 184, 166, 0.14) 0%, rgba(20, 184, 166, 0) 70%)',
               }}
             />
 
@@ -238,16 +262,15 @@ export async function GET(request: NextRequest) {
                 width: '100%',
                 height: '100%',
                 padding: '60px 80px',
-                alignItems: isAr ? 'flex-end' : 'flex-start',
+                alignItems: isAr ? 'flex-start' : 'flex-start',
               }}
             >
-              {/* Logo Header */}
+              {/* Header Logo */}
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  alignSelf: isAr ? 'flex-end' : 'flex-start',
                 }}
               >
                 {logoBase64 ? (
@@ -273,21 +296,49 @@ export async function GET(request: NextRequest) {
                 )}
               </div>
 
-              {/* Body Content */}
+              {/* Main Content Body */}
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: isAr ? 'flex-end' : 'flex-start',
+                  alignItems: isAr ? 'flex-start' : 'flex-start',
                   width: '100%',
                   margin: 'auto 0',
                 }}
               >
-                {renderFormattedText(displayTitle, 48, 700, '#0f172a', 960, 20, true)}
-                {renderFormattedText(displayDescription, 20, 400, '#475569', 960, 32, false)}
+                <h1
+                  style={{
+                    fontSize: '48px',
+                    fontWeight: 700,
+                    color: '#0f172a',
+                    margin: '0 0 20px 0',
+                    lineHeight: 1.25,
+                    maxWidth: '960px',
+                    textAlign: isAr ? 'right' : 'left',
+                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                  }}
+                >
+                  {title}
+                </h1>
+                {description ? (
+                  <p
+                    style={{
+                      fontSize: '20px',
+                      fontWeight: 400,
+                      color: '#475569',
+                      margin: '0 0 32px 0',
+                      lineHeight: 1.4,
+                      maxWidth: '960px',
+                      textAlign: isAr ? 'right' : 'left',
+                      fontFamily: isAr ? 'Cairo' : 'Inter',
+                    }}
+                  >
+                    {description}
+                  </p>
+                ) : null}
 
-                {/* CTA Buttons */}
-                {(displayCta1 || displayCta2) && (
+                {/* CTAs */}
+                {(cta1 || cta2) && (
                   <div
                     style={{
                       display: 'flex',
@@ -296,7 +347,7 @@ export async function GET(request: NextRequest) {
                       gap: '16px',
                     }}
                   >
-                    {displayCta1 ? (
+                    {cta1 ? (
                       <div
                         style={{
                           backgroundColor: '#0d9488',
@@ -308,10 +359,10 @@ export async function GET(request: NextRequest) {
                           fontFamily: isAr ? 'Cairo' : 'Inter',
                         }}
                       >
-                        {displayCta1}
+                        {cta1}
                       </div>
                     ) : null}
-                    {displayCta2 ? (
+                    {cta2 ? (
                       <div
                         style={{
                           border: '1px solid #cbd5e1',
@@ -324,7 +375,7 @@ export async function GET(request: NextRequest) {
                           fontFamily: isAr ? 'Cairo' : 'Inter',
                         }}
                       >
-                        {displayCta2}
+                        {cta2}
                       </div>
                     ) : null}
                   </div>
@@ -338,7 +389,6 @@ export async function GET(request: NextRequest) {
                   flexDirection: isAr ? 'row-reverse' : 'row',
                   alignItems: 'center',
                   gap: '8px',
-                  alignSelf: isAr ? 'flex-end' : 'flex-start',
                 }}
               >
                 <div style={{ width: '16px', height: '2px', backgroundColor: '#0d9488' }} />
@@ -356,11 +406,11 @@ export async function GET(request: NextRequest) {
             </div>
           </div>
         ),
-        { width: 1200, height: 630, fonts }
+        { width: 1200, height: 630, fonts, headers: cacheHeaders }
       );
     }
 
-    // Insight Template
+    // Default & Insight Card Template
     return new ImageResponse(
       (
         <div
@@ -372,6 +422,7 @@ export async function GET(request: NextRequest) {
             height: '630px',
             backgroundColor: '#f6f6f6',
             fontFamily: isAr ? 'Cairo' : 'Inter',
+            direction: isAr ? 'rtl' : 'ltr',
             overflow: 'hidden',
           }}
         >
@@ -384,7 +435,7 @@ export async function GET(request: NextRequest) {
               width: '100%',
               height: '100%',
               padding: '60px 80px',
-              alignItems: isAr ? 'flex-end' : 'flex-start',
+              alignItems: isAr ? 'flex-start' : 'flex-start',
             }}
           >
             {/* Header */}
@@ -394,7 +445,6 @@ export async function GET(request: NextRequest) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: '16px',
-                alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               {logoBase64 ? (
@@ -420,12 +470,12 @@ export async function GET(request: NextRequest) {
               )}
             </div>
 
-            {/* Body: Category, Title and Description */}
+            {/* Body */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: isAr ? 'flex-end' : 'flex-start',
+                alignItems: isAr ? 'flex-start' : 'flex-start',
                 width: '100%',
                 margin: 'auto 0',
               }}
@@ -446,8 +496,36 @@ export async function GET(request: NextRequest) {
                   {category}
                 </div>
               )}
-              {renderFormattedText(displayTitle, 52, 700, '#0d111d', 960, 20, true)}
-              {renderFormattedText(displayDescription, 22, 400, '#334155', 960, 0, false)}
+              <h1
+                style={{
+                  fontSize: '52px',
+                  fontWeight: 700,
+                  color: '#0d111d',
+                  margin: '0 0 20px 0',
+                  lineHeight: 1.2,
+                  maxWidth: '960px',
+                  textAlign: isAr ? 'right' : 'left',
+                  fontFamily: isAr ? 'Cairo' : 'Inter',
+                }}
+              >
+                {title}
+              </h1>
+              {description ? (
+                <p
+                  style={{
+                    fontSize: '22px',
+                    fontWeight: 400,
+                    color: '#334155',
+                    margin: 0,
+                    lineHeight: 1.4,
+                    maxWidth: '960px',
+                    textAlign: isAr ? 'right' : 'left',
+                    fontFamily: isAr ? 'Cairo' : 'Inter',
+                  }}
+                >
+                  {description}
+                </p>
+              ) : null}
             </div>
 
             {/* Footer */}
@@ -457,7 +535,6 @@ export async function GET(request: NextRequest) {
                 flexDirection: isAr ? 'row-reverse' : 'row',
                 alignItems: 'center',
                 gap: '8px',
-                alignSelf: isAr ? 'flex-end' : 'flex-start',
               }}
             >
               <div style={{ width: '16px', height: '2px', backgroundColor: '#14b8a6' }} />
@@ -475,7 +552,7 @@ export async function GET(request: NextRequest) {
           </div>
         </div>
       ),
-      { width: 1200, height: 630, fonts }
+      { width: 1200, height: 630, fonts, headers: cacheHeaders }
     );
   } catch (error) {
     console.error('OG Image Generation Error:', error);

@@ -18,7 +18,8 @@ export interface BuildMetadataOptions {
   type?: "website" | "article" | "profile";
   keywords?: string[];
   noIndex?: boolean;
-  ogType?: "hero" | "insight";
+  ogType?: "hero" | "insight" | "article" | "news" | "podcast" | "magazine" | "majlis" | "page" | string;
+  slug?: string;
   cta1?: string;
   cta2?: string;
 }
@@ -29,9 +30,10 @@ export function getOptimizedOgImageUrl(
   description?: string,
   locale?: string,
   logoUrl?: string | null,
-  ogType?: "hero" | "insight",
+  ogType?: string,
   cta1?: string,
-  cta2?: string
+  cta2?: string,
+  slug?: string
 ): string | null {
   if (!url) {
     const params = new URLSearchParams();
@@ -40,6 +42,7 @@ export function getOptimizedOgImageUrl(
     if (locale) params.set('locale', locale);
     if (logoUrl) params.set('logoUrl', logoUrl);
     if (ogType) params.set('type', ogType);
+    if (slug) params.set('slug', slug);
     if (cta1) params.set('cta1', cta1);
     if (cta2) params.set('cta2', cta2);
     return `${siteUrl}/api/og?${params.toString()}`;
@@ -64,6 +67,7 @@ export async function buildMetadata({
   keywords,
   noIndex = false,
   ogType,
+  slug,
   cta1,
   cta2,
 }: BuildMetadataOptions): Promise<Metadata> {
@@ -112,7 +116,8 @@ export async function buildMetadata({
     logoUrl,
     computedOgType,
     cta1,
-    cta2
+    cta2,
+    slug
   );
   const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
 
