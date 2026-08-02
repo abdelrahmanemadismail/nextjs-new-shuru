@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!title) {
-      title = 'Shuru';
+      title = isAr ? 'شروع – رحلة نحو التميز' : 'SHURU – The journey toward excellence';
     }
 
     // Load Strapi Header Logo or Local Logo fallback
@@ -116,15 +116,12 @@ export async function GET(request: NextRequest) {
 
     // Fetch Cairo & Inter fonts
     const fontData = await getFonts();
-    const fonts = isAr
-      ? [
-          { name: 'Cairo', data: fontData.cairoRegular, weight: 400 as const, style: 'normal' as const },
-          { name: 'Cairo', data: fontData.cairoBold, weight: 700 as const, style: 'normal' as const },
-        ]
-      : [
-          { name: 'Inter', data: fontData.interRegular, weight: 400 as const, style: 'normal' as const },
-          { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
-        ];
+    const fonts = [
+      { name: 'Cairo', data: fontData.cairoRegular, weight: 400 as const, style: 'normal' as const },
+      { name: 'Cairo', data: fontData.cairoBold, weight: 700 as const, style: 'normal' as const },
+      { name: 'Inter', data: fontData.interRegular, weight: 400 as const, style: 'normal' as const },
+      { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
+    ];
 
     const renderFormattedText = (
       text: string | null | undefined,
@@ -136,8 +133,8 @@ export async function GET(request: NextRequest) {
       isHeading = false
     ) => {
       if (!text) return null;
-      const clean = sanitizeText(text);
-      if (!clean) return null;
+      const rawCleaned = text.replace(/\s+/g, ' ').trim();
+      if (!rawCleaned) return null;
 
       if (!isAr) {
         const ElementTag = isHeading ? 'h1' : 'p';
@@ -151,14 +148,16 @@ export async function GET(request: NextRequest) {
               lineHeight: 1.3,
               maxWidth: `${maxWidth}px`,
               textAlign: 'left',
+              fontFamily: 'Inter',
             }}
           >
-            {clean}
+            {rawCleaned}
           </ElementTag>
         );
       }
 
-      const words = clean.split(' ');
+      const sanitizedAr = sanitizeText(rawCleaned);
+      const words = sanitizedAr.split(' ').filter(Boolean);
 
       return (
         <div
@@ -185,6 +184,7 @@ export async function GET(request: NextRequest) {
                   color,
                   lineHeight: 1.1,
                   margin: 0,
+                  fontFamily: 'Cairo',
                 }}
               >
                 {w}
@@ -265,6 +265,7 @@ export async function GET(request: NextRequest) {
                       fontSize: '28px',
                       fontWeight: 700,
                       color: '#0f172a',
+                      fontFamily: isAr ? 'Cairo' : 'Inter',
                     }}
                   >
                     {isAr ? 'شورى SHURU' : 'SHURU'}
@@ -304,6 +305,7 @@ export async function GET(request: NextRequest) {
                           fontWeight: 700,
                           padding: '14px 32px',
                           borderRadius: '9999px',
+                          fontFamily: isAr ? 'Cairo' : 'Inter',
                         }}
                       >
                         {displayCta1}
@@ -319,6 +321,7 @@ export async function GET(request: NextRequest) {
                           fontWeight: 700,
                           padding: '14px 30px',
                           borderRadius: '9999px',
+                          fontFamily: isAr ? 'Cairo' : 'Inter',
                         }}
                       >
                         {displayCta2}
@@ -344,6 +347,7 @@ export async function GET(request: NextRequest) {
                     fontSize: '18px',
                     color: '#64748b',
                     fontWeight: 700,
+                    fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
                   shuru.sa
@@ -408,6 +412,7 @@ export async function GET(request: NextRequest) {
                     fontSize: '28px',
                     fontWeight: 700,
                     color: '#0d111d',
+                    fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
                   {isAr ? 'شورى SHURU' : 'SHURU'}
@@ -435,6 +440,7 @@ export async function GET(request: NextRequest) {
                     padding: '8px 18px',
                     borderRadius: '9999px',
                     margin: '0 0 20px 0',
+                    fontFamily: isAr ? 'Cairo' : 'Inter',
                   }}
                 >
                   {category}
@@ -460,6 +466,7 @@ export async function GET(request: NextRequest) {
                   fontSize: '18px',
                   color: '#475569',
                   fontWeight: 700,
+                  fontFamily: isAr ? 'Cairo' : 'Inter',
                 }}
               >
                 shuru.sa
