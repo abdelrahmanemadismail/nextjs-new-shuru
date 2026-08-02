@@ -4,9 +4,9 @@ import factory from 'bidi-js';
 const bidi = factory();
 
 /**
- * Reshapes Arabic text (connecting letters) and applies BiDi reordering
- * so that Satori (@vercel/og) renders natural, correctly-connected Arabic script
- * without word spacing bugs, broken letters, or reversed word order.
+ * Reshapes Arabic text (connecting letters into presentation forms)
+ * and applies BiDi reordering so Satori (@vercel/og) renders natural,
+ * correctly connected, right-to-left Arabic text with normal word spacing.
  */
 export function fixArabicText(text: string | null | undefined): string {
   if (!text) return '';
@@ -20,9 +20,13 @@ export function fixArabicText(text: string | null | undefined): string {
   }
 
   try {
-    // 1. Reshape Arabic letters to connected presentation forms
-    const reshaped = ArabicReshaper.convertArabic(cleaned);
-    // 2. Perform BiDi reordering for visual RTL order
+    const shaper = ArabicReshaper?.ArabicShaper || ArabicReshaper;
+    const convertFn = typeof shaper?.convertArabic === 'function' ? shaper.convertArabic : (ArabicReshaper as any).convertArabic;
+    if (typeof convertFn !== 'function') {
+      return cleaned;
+    }
+
+    const reshaped = convertFn(cleaned);
     const embedding = bidi.getEmbeddingLevels(reshaped);
     const reordered = bidi.getReorderedString(reshaped, embedding);
     return reordered;

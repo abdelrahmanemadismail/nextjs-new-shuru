@@ -1,6 +1,13 @@
 declare module 'arabic-persian-reshaper' {
   const ArabicReshaper: {
-    convertArabic(text: string): string;
+    ArabicShaper: {
+      convertArabic(text: string): string;
+      convertArabicBack(text: string): string;
+    };
+    PersianShaper: {
+      convertArabic(text: string): string;
+      convertArabicBack(text: string): string;
+    };
   };
   export default ArabicReshaper;
 }
