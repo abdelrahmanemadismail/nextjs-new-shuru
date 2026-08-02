@@ -24,18 +24,13 @@ let interBold: ArrayBuffer | null = null;
 let tajawalRegular: ArrayBuffer | null = null;
 let tajawalBold: ArrayBuffer | null = null;
 
-async function fetchFontBuffer(urls: string[]): Promise<ArrayBuffer> {
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, { cache: 'force-cache' });
-      if (res.ok) {
-        return await res.arrayBuffer();
-      }
-    } catch (e) {
-      console.warn(`Failed to fetch font from ${url}:`, e);
-    }
+function loadLocalFont(filename: string): ArrayBuffer {
+  const fontPath = path.join(process.cwd(), 'public', 'fonts', filename);
+  if (!fs.existsSync(fontPath)) {
+    throw new Error(`Local font file not found at path: ${fontPath}`);
   }
-  throw new Error(`Failed to fetch font from all candidate URLs: ${urls.join(', ')}`);
+  const buffer = fs.readFileSync(fontPath);
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 }
 
 async function getFonts(): Promise<{
@@ -45,26 +40,16 @@ async function getFonts(): Promise<{
   tajawalBold: ArrayBuffer;
 }> {
   if (!interRegular) {
-    interRegular = await fetchFontBuffer([
-      'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf',
-    ]);
+    interRegular = loadLocalFont('Inter-Regular.ttf');
   }
   if (!interBold) {
-    interBold = await fetchFontBuffer([
-      'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf',
-    ]);
+    interBold = loadLocalFont('Inter-Bold.ttf');
   }
   if (!tajawalRegular) {
-    tajawalRegular = await fetchFontBuffer([
-      'https://cdn.jsdelivr.net/fontsource/fonts/tajawal@latest/arabic-400-normal.ttf',
-      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-400-normal.ttf',
-    ]);
+    tajawalRegular = loadLocalFont('Tajawal-Regular.ttf');
   }
   if (!tajawalBold) {
-    tajawalBold = await fetchFontBuffer([
-      'https://cdn.jsdelivr.net/fontsource/fonts/tajawal@latest/arabic-700-normal.ttf',
-      'https://cdn.jsdelivr.net/fontsource/fonts/almarai@latest/arabic-700-normal.ttf',
-    ]);
+    tajawalBold = loadLocalFont('Tajawal-Bold.ttf');
   }
   return {
     interRegular: interRegular!,
@@ -242,7 +227,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 4. Load Satori-safe fonts (Tajawal & Inter)
+    // 4. Load local Satori-safe fonts from public/fonts/
     const fontData = await getFonts();
     const fonts = [
       { name: 'Tajawal', data: fontData.tajawalRegular, weight: 400 as const, style: 'normal' as const },
@@ -251,7 +236,6 @@ export async function GET(request: NextRequest) {
       { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
     ];
 
-    // Satori matches exact font family name strings. Never use comma-separated font stacks in Satori styles.
     const activeFont = isAr ? 'Tajawal' : 'Inter';
 
     const cacheHeaders = {
