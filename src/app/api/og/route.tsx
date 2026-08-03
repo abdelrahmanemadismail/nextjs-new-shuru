@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
-import { ImageResponse } from 'next/og';
 import fs from 'fs';
 import path from 'path';
+import { createCanvas, GlobalFonts, loadImage, Canvas, SKRSContext2D } from '@napi-rs/canvas';
 import { type Locale } from '@/lib/i18n';
 import { extractMediaUrl, toAbsoluteUrl } from '@/lib/strapi';
 import { fixArabicText, sanitizeTextForOg } from '@/lib/arabic';
@@ -18,57 +18,42 @@ import {
 
 export const runtime = 'nodejs';
 
-// Font memory cache
-let interRegular: ArrayBuffer | null = null;
-let interBold: ArrayBuffer | null = null;
-let tajawalRegular: ArrayBuffer | null = null;
-let tajawalBold: ArrayBuffer | null = null;
+// Font registration flag
+let fontsRegistered = false;
 
-function loadLocalFont(filename: string): ArrayBuffer {
-  const fontPath = path.join(process.cwd(), 'public', 'fonts', filename);
-  if (!fs.existsSync(fontPath)) {
-    throw new Error(`Local font file not found at path: ${fontPath}`);
+function ensureFontsRegistered() {
+  if (fontsRegistered) return;
+  const fontsDir = path.join(process.cwd(), 'public', 'fonts');
+
+  const tajawalReg = path.join(fontsDir, 'Tajawal-Regular.ttf');
+  const tajawalBold = path.join(fontsDir, 'Tajawal-Bold.ttf');
+  const interReg = path.join(fontsDir, 'Inter-Regular.ttf');
+  const interBold = path.join(fontsDir, 'Inter-Bold.ttf');
+
+  if (fs.existsSync(tajawalReg)) {
+    GlobalFonts.registerFromPath(tajawalReg, 'Tajawal');
   }
-  const buffer = fs.readFileSync(fontPath);
-  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+  if (fs.existsSync(tajawalBold)) {
+    GlobalFonts.registerFromPath(tajawalBold, 'TajawalBold');
+  }
+  if (fs.existsSync(interReg)) {
+    GlobalFonts.registerFromPath(interReg, 'Inter');
+  }
+  if (fs.existsSync(interBold)) {
+    GlobalFonts.registerFromPath(interBold, 'InterBold');
+  }
+
+  fontsRegistered = true;
 }
 
-async function getFonts(): Promise<{
-  interRegular: ArrayBuffer;
-  interBold: ArrayBuffer;
-  tajawalRegular: ArrayBuffer;
-  tajawalBold: ArrayBuffer;
-}> {
-  if (!interRegular) {
-    interRegular = loadLocalFont('Inter-Regular.ttf');
-  }
-  if (!interBold) {
-    interBold = loadLocalFont('Inter-Bold.ttf');
-  }
-  if (!tajawalRegular) {
-    tajawalRegular = loadLocalFont('Tajawal-Regular.ttf');
-  }
-  if (!tajawalBold) {
-    tajawalBold = loadLocalFont('Tajawal-Bold.ttf');
-  }
-  return {
-    interRegular: interRegular.slice(0),
-    interBold: interBold.slice(0),
-    tajawalRegular: tajawalRegular.slice(0),
-    tajawalBold: tajawalBold.slice(0),
-  };
-}
-
-async function fetchImageAsBase64(url: string): Promise<string | null> {
+async function fetchImageAsBuffer(url: string): Promise<Buffer | null> {
   try {
     const res = await fetch(url, { cache: 'force-cache' });
     if (!res.ok) return null;
     const arrayBuffer = await res.arrayBuffer();
-    const contentType = res.headers.get('content-type') || 'image/png';
-    const base64 = Buffer.from(arrayBuffer).toString('base64');
-    return `data:${contentType};base64,${base64}`;
+    return Buffer.from(arrayBuffer);
   } catch (err) {
-    console.error('Failed to fetch logo image as base64:', url, err);
+    console.error('Failed to fetch image buffer for OG generation:', url, err);
     return null;
   }
 }
@@ -91,6 +76,68 @@ async function fetchRawImageResponse(url: string): Promise<Response | null> {
     console.error('Failed to fetch raw cover image from Strapi:', url, err);
     return null;
   }
+}
+
+function drawRoundedRect(
+  ctx: SKRSContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  ctx.beginPath();
+  if (typeof ctx.roundRect === 'function') {
+    ctx.roundRect(x, y, w, h, r);
+  } else {
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+  }
+  ctx.closePath();
+}
+
+function wrapText(
+  ctx: SKRSContext2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number = 3
+): string[] {
+  if (!text) return [];
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const metrics = ctx.measureText(testLine);
+
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+
+      if (lines.length === maxLines - 1) {
+        const remaining = words.slice(i).join(' ');
+        let lastLine = remaining;
+        while (ctx.measureText(lastLine + '...').width > maxWidth && lastLine.length > 0) {
+          lastLine = lastLine.substring(0, lastLine.length - 1);
+        }
+        lines.push(lastLine ? `${lastLine.trim()}...` : '...');
+        return lines;
+      }
+    } else {
+      currentLine = testLine;
+    }
+  }
+
+  if (currentLine && lines.length < maxLines) {
+    lines.push(currentLine);
+  }
+
+  return lines;
 }
 
 export async function GET(request: NextRequest) {
@@ -190,434 +237,348 @@ export async function GET(request: NextRequest) {
       title = isAr ? 'شروع – رحلة نحو التميز' : 'SHURU – The journey toward excellence';
     }
 
-    // Process Arabic text with Reshaper + BiDi reordering, and sanitize non-Arabic text for Satori rendering
+    // Sanitize text strings for rendering
     const displayTitle = isAr ? fixArabicText(title) : sanitizeTextForOg(title);
     const displayDescription = isAr ? fixArabicText(description) : sanitizeTextForOg(description);
     const displayCategory = isAr ? fixArabicText(category) : sanitizeTextForOg(category);
     const displayCta1 = isAr ? fixArabicText(cta1) : sanitizeTextForOg(cta1);
     const displayCta2 = isAr ? fixArabicText(cta2) : sanitizeTextForOg(cta2);
 
-    // 3. Resolve site logo (from Strapi header settings or local fallback)
-    let logoBase64: string | null = null;
+    // 3. Register fonts with Skia/HarfBuzz
+    ensureFontsRegistered();
+
+    // 4. Resolve logo image buffer
+    let logoBuffer: Buffer | null = null;
     if (customLogoUrl) {
-      logoBase64 = await fetchImageAsBase64(customLogoUrl);
+      logoBuffer = await fetchImageAsBuffer(customLogoUrl);
     }
 
-    if (!logoBase64) {
+    if (!logoBuffer) {
       try {
         const headerSettings = await getHeaderSettings(locale);
         const strapiLogo = headerSettings?.darkLogoUrl || headerSettings?.lightLogoUrl;
         if (strapiLogo) {
-          logoBase64 = await fetchImageAsBase64(strapiLogo);
+          logoBuffer = await fetchImageAsBuffer(strapiLogo);
         }
       } catch (e) {
         console.error('Failed to load header logo from Strapi:', e);
       }
     }
 
-    if (!logoBase64) {
+    if (!logoBuffer) {
       try {
         const logoPath = path.join(process.cwd(), 'public', 'شعار بدون خلفية-04.png');
         if (fs.existsSync(logoPath)) {
-          const logoBuffer = fs.readFileSync(logoPath);
-          logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+          logoBuffer = fs.readFileSync(logoPath);
         }
       } catch (e) {
         console.error('Failed to load local brand logo:', e);
       }
     }
 
-    // 4. Load local Satori-safe fonts from public/fonts/
-    const fontData = await getFonts();
-    const fonts = [
-      { name: 'Tajawal', data: fontData.tajawalRegular, weight: 400 as const, style: 'normal' as const },
-      { name: 'Tajawal', data: fontData.tajawalBold, weight: 700 as const, style: 'normal' as const },
-      { name: 'Inter', data: fontData.interRegular, weight: 400 as const, style: 'normal' as const },
-      { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
-    ];
+    // 5. Create Canvas (1200 x 630)
+    const canvas = createCanvas(1200, 630);
+    const ctx = canvas.getContext('2d');
 
-    const activeFont = isAr ? 'Tajawal' : 'Inter';
+    const primaryFont = isAr ? 'Tajawal, sans-serif' : 'Inter, sans-serif';
+    const boldFont = isAr ? 'TajawalBold, Tajawal, sans-serif' : 'InterBold, Inter, sans-serif';
 
-    const cacheHeaders = {
-      'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
-    };
-
-    // Hero Template Card
+    // HERO CARD RENDER
     if (type === 'hero') {
-      return new ImageResponse(
-        (
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              width: '1200px',
-              height: '630px',
-              backgroundColor: '#f8fafc',
-              fontFamily: activeFont,
-              overflow: 'hidden',
-            }}
-          >
-            {/* Soft Ambient Glow */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '-120px',
-                ...(isAr ? { right: '-120px' } : { left: '-120px' }),
-                width: '500px',
-                height: '500px',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(20, 184, 166, 0.14) 0%, rgba(20, 184, 166, 0) 70%)',
-              }}
-            />
+      // Fill Background
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 1200, 630);
 
-            <div
-              style={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                width: '100%',
-                height: '100%',
-                padding: '60px 80px',
-                alignItems: isAr ? 'flex-end' : 'flex-start',
-              }}
-            >
-              {/* Header Logo */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  alignSelf: isAr ? 'flex-end' : 'flex-start',
-                }}
-              >
-                {logoBase64 ? (
-                  <img
-                    src={logoBase64}
-                    alt="Logo"
-                    style={{
-                      height: '56px',
-                      objectFit: 'contain',
-                    }}
-                  />
-                ) : (
-                  <span
-                    style={{
-                      fontSize: '28px',
-                      fontWeight: 700,
-                      color: '#0f172a',
-                      fontFamily: activeFont,
-                    }}
-                  >
-                    {isAr ? fixArabicText('شورى SHURU') : 'SHURU'}
-                  </span>
-                )}
-              </div>
+      // Soft Ambient Radial Glow
+      const glowX = isAr ? 1200 : 0;
+      const glowY = 0;
+      const gradient = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 500);
+      gradient.addColorStop(0, 'rgba(20, 184, 166, 0.14)');
+      gradient.addColorStop(0.7, 'rgba(20, 184, 166, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(glowX, glowY, 500, 0, Math.PI * 2);
+      ctx.fill();
 
-              {/* Main Content Body */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: isAr ? 'flex-end' : 'flex-start',
-                  width: '100%',
-                  margin: 'auto 0',
-                }}
-              >
-                <h1
-                  style={{
-                    fontSize: '48px',
-                    fontWeight: 700,
-                    color: '#0f172a',
-                    margin: '0 0 20px 0',
-                    lineHeight: 1.3,
-                    maxWidth: '960px',
-                    textAlign: isAr ? 'right' : 'left',
-                    fontFamily: activeFont,
-                  }}
-                >
-                  {displayTitle}
-                </h1>
-                {displayDescription ? (
-                  <p
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 400,
-                      color: '#475569',
-                      margin: '0 0 32px 0',
-                      lineHeight: 1.4,
-                      maxWidth: '960px',
-                      textAlign: isAr ? 'right' : 'left',
-                      fontFamily: activeFont,
-                    }}
-                  >
-                    {displayDescription}
-                  </p>
-                ) : null}
+      // Header Logo
+      let logoLoadedImage = null;
+      if (logoBuffer) {
+        try {
+          logoLoadedImage = await loadImage(logoBuffer);
+        } catch (e) {
+          console.error('Failed to parse logo image buffer for canvas:', e);
+        }
+      }
 
-                {/* CTAs */}
-                {(displayCta1 || displayCta2) && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: isAr ? 'row-reverse' : 'row',
-                      alignItems: 'center',
-                      gap: '16px',
-                    }}
-                  >
-                    {displayCta1 ? (
-                      <div
-                        style={{
-                          backgroundColor: '#0d9488',
-                          color: '#ffffff',
-                          fontSize: '18px',
-                          fontWeight: 700,
-                          padding: '14px 32px',
-                          borderRadius: '9999px',
-                          fontFamily: activeFont,
-                        }}
-                      >
-                        {displayCta1}
-                      </div>
-                    ) : null}
-                    {displayCta2 ? (
-                      <div
-                        style={{
-                          border: '1px solid #cbd5e1',
-                          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                          color: '#334155',
-                          fontSize: '18px',
-                          fontWeight: 700,
-                          padding: '14px 30px',
-                          borderRadius: '9999px',
-                          fontFamily: activeFont,
-                        }}
-                      >
-                        {displayCta2}
-                      </div>
-                    ) : null}
-                  </div>
-                )}
-              </div>
+      const topY = 60;
+      const marginX = 80;
 
-              {/* Footer */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: isAr ? 'row-reverse' : 'row',
-                  alignItems: 'center',
-                  gap: '8px',
-                  alignSelf: isAr ? 'flex-end' : 'flex-start',
-                }}
-              >
-                <div style={{ width: '16px', height: '2px', backgroundColor: '#0d9488' }} />
-                <span
-                  style={{
-                    fontSize: '18px',
-                    color: '#64748b',
-                    fontWeight: 700,
-                    fontFamily: activeFont,
-                  }}
-                >
-                  shuru.sa
-                </span>
-              </div>
-            </div>
-          </div>
-        ),
-        { width: 1200, height: 630, fonts, headers: cacheHeaders }
-      );
+      if (logoLoadedImage) {
+        const logoHeight = 56;
+        const aspect = logoLoadedImage.width / logoLoadedImage.height;
+        const logoWidth = logoHeight * aspect;
+        const logoX = isAr ? 1200 - marginX - logoWidth : marginX;
+        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
+      } else {
+        ctx.font = `bold 28px ${boldFont}`;
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = isAr ? 'right' : 'left';
+        ctx.fillText(isAr ? 'شروع SHURU' : 'SHURU', isAr ? 1200 - marginX : marginX, topY + 36);
+      }
+
+      // Title & Description
+      const contentMaxW = 960;
+      ctx.textAlign = isAr ? 'right' : 'left';
+
+      ctx.font = `bold 48px ${boldFont}`;
+      const titleLines = wrapText(ctx, displayTitle, contentMaxW, 2);
+
+      ctx.font = `400 20px ${primaryFont}`;
+      const descLines = displayDescription ? wrapText(ctx, displayDescription, contentMaxW, 2) : [];
+
+      // Vertical positioning calculation
+      const titleLineHeight = 60;
+      const descLineHeight = 30;
+      const ctaHeight = (displayCta1 || displayCta2) ? 50 : 0;
+      const contentBlockHeight =
+        titleLines.length * titleLineHeight +
+        (descLines.length > 0 ? descLines.length * descLineHeight + 20 : 0) +
+        (ctaHeight > 0 ? ctaHeight + 30 : 0);
+
+      const startY = 160 + Math.max(0, (350 - contentBlockHeight) / 2);
+      const textX = isAr ? 1200 - marginX : marginX;
+
+      let currentY = startY;
+
+      // Draw Title
+      ctx.font = `bold 48px ${boldFont}`;
+      ctx.fillStyle = '#0f172a';
+      for (const line of titleLines) {
+        ctx.fillText(line, textX, currentY);
+        currentY += titleLineHeight;
+      }
+
+      // Draw Description
+      if (descLines.length > 0) {
+        currentY += 8;
+        ctx.font = `400 20px ${primaryFont}`;
+        ctx.fillStyle = '#475569';
+        for (const line of descLines) {
+          ctx.fillText(line, textX, currentY);
+          currentY += descLineHeight;
+        }
+      }
+
+      // Draw CTAs
+      if (displayCta1 || displayCta2) {
+        currentY += 20;
+        let buttonX = isAr ? 1200 - marginX : marginX;
+
+        if (displayCta1) {
+          ctx.font = `bold 18px ${boldFont}`;
+          const cta1Metrics = ctx.measureText(displayCta1);
+          const btnW = cta1Metrics.width + 64;
+          const btnH = 48;
+          const rectX = isAr ? buttonX - btnW : buttonX;
+
+          ctx.fillStyle = '#0d9488';
+          drawRoundedRect(ctx, rectX, currentY, btnW, btnH, 24);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.fillText(displayCta1, rectX + btnW / 2, currentY + 30);
+
+          if (isAr) {
+            buttonX -= btnW + 16;
+          } else {
+            buttonX += btnW + 16;
+          }
+        }
+
+        if (displayCta2) {
+          ctx.font = `bold 18px ${boldFont}`;
+          const cta2Metrics = ctx.measureText(displayCta2);
+          const btnW = cta2Metrics.width + 60;
+          const btnH = 48;
+          const rectX = isAr ? buttonX - btnW : buttonX;
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          drawRoundedRect(ctx, rectX, currentY, btnW, btnH, 24);
+          ctx.fill();
+
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 1;
+          drawRoundedRect(ctx, rectX, currentY, btnW, btnH, 24);
+          ctx.stroke();
+
+          ctx.fillStyle = '#334155';
+          ctx.textAlign = 'center';
+          ctx.fillText(displayCta2, rectX + btnW / 2, currentY + 30);
+        }
+      }
+
+      // Footer
+      const footerY = 570;
+      const barW = 16;
+      const barH = 2;
+
+      ctx.fillStyle = '#0d9488';
+      if (isAr) {
+        ctx.fillRect(1200 - marginX - barW, footerY - 10, barW, barH);
+        ctx.font = `bold 18px ${boldFont}`;
+        ctx.fillStyle = '#64748b';
+        ctx.textAlign = 'right';
+        ctx.fillText('shuru.sa', 1200 - marginX - barW - 12, footerY);
+      } else {
+        ctx.fillRect(marginX, footerY - 10, barW, barH);
+        ctx.font = `bold 18px ${boldFont}`;
+        ctx.fillStyle = '#64748b';
+        ctx.textAlign = 'left';
+        ctx.fillText('shuru.sa', marginX + barW + 12, footerY);
+      }
+    } else {
+      // INSIGHT / ARTICLE / DEFAULT CARD RENDER
+      ctx.fillStyle = '#f6f6f6';
+      ctx.fillRect(0, 0, 1200, 630);
+
+      // Header Logo
+      let logoLoadedImage = null;
+      if (logoBuffer) {
+        try {
+          logoLoadedImage = await loadImage(logoBuffer);
+        } catch (e) {
+          console.error('Failed to parse logo image buffer for canvas:', e);
+        }
+      }
+
+      const topY = 60;
+      const marginX = 80;
+
+      if (logoLoadedImage) {
+        const logoHeight = 56;
+        const aspect = logoLoadedImage.width / logoLoadedImage.height;
+        const logoWidth = logoHeight * aspect;
+        const logoX = isAr ? 1200 - marginX - logoWidth : marginX;
+        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
+      } else {
+        ctx.font = `bold 28px ${boldFont}`;
+        ctx.fillStyle = '#0d111d';
+        ctx.textAlign = isAr ? 'right' : 'left';
+        ctx.fillText(isAr ? 'SHURU' : 'SHURU', isAr ? 1200 - marginX : marginX, topY + 36);
+      }
+
+      // Main Content Block
+      const contentMaxW = 960;
+      const textX = isAr ? 1200 - marginX : marginX;
+      ctx.textAlign = isAr ? 'right' : 'left';
+
+      let currentY = 160;
+
+      // Category Pill
+      if (displayCategory) {
+        ctx.font = `bold 16px ${boldFont}`;
+        const catMetrics = ctx.measureText(displayCategory);
+        const pillW = catMetrics.width + 36;
+        const pillH = 36;
+        const pillX = isAr ? textX - pillW : textX;
+
+        ctx.fillStyle = 'rgba(13, 148, 136, 0.1)';
+        drawRoundedRect(ctx, pillX, currentY, pillW, pillH, 18);
+        ctx.fill();
+
+        ctx.fillStyle = '#0d9488';
+        ctx.textAlign = 'center';
+        ctx.fillText(displayCategory, pillX + pillW / 2, currentY + 23);
+
+        currentY += pillH + 24;
+        ctx.textAlign = isAr ? 'right' : 'left';
+      }
+
+      // Title
+      ctx.font = `bold 52px ${boldFont}`;
+      const titleLines = wrapText(ctx, displayTitle, contentMaxW, 3);
+      const titleLineHeight = 64;
+
+      ctx.fillStyle = '#0d111d';
+      for (const line of titleLines) {
+        ctx.fillText(line, textX, currentY + 40);
+        currentY += titleLineHeight;
+      }
+
+      // Description
+      if (displayDescription) {
+        currentY += 12;
+        ctx.font = `400 22px ${primaryFont}`;
+        const descLines = wrapText(ctx, displayDescription, contentMaxW, 2);
+        const descLineHeight = 32;
+
+        ctx.fillStyle = '#334155';
+        for (const line of descLines) {
+          ctx.fillText(line, textX, currentY + 20);
+          currentY += descLineHeight;
+        }
+      }
+
+      // Footer
+      const footerY = 570;
+      const barW = 16;
+      const barH = 2;
+
+      ctx.fillStyle = '#14b8a6';
+      if (isAr) {
+        ctx.fillRect(1200 - marginX - barW, footerY - 10, barW, barH);
+        ctx.font = `bold 18px ${boldFont}`;
+        ctx.fillStyle = '#475569';
+        ctx.textAlign = 'right';
+        ctx.fillText('shuru.sa', 1200 - marginX - barW - 12, footerY);
+      } else {
+        ctx.fillRect(marginX, footerY - 10, barW, barH);
+        ctx.font = `bold 18px ${boldFont}`;
+        ctx.fillStyle = '#475569';
+        ctx.textAlign = 'left';
+        ctx.fillText('shuru.sa', marginX + barW + 12, footerY);
+      }
     }
 
-    // Default & Insight Card Template
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '1200px',
-            height: '630px',
-            backgroundColor: '#f6f6f6',
-            fontFamily: activeFont,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              width: '100%',
-              height: '100%',
-              padding: '60px 80px',
-              alignItems: isAr ? 'flex-end' : 'flex-start',
-            }}
-          >
-            {/* Header */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: '16px',
-                alignSelf: isAr ? 'flex-end' : 'flex-start',
-              }}
-            >
-              {logoBase64 ? (
-                <img
-                  src={logoBase64}
-                  alt="Logo"
-                  style={{
-                    height: '56px',
-                    objectFit: 'contain',
-                  }}
-                />
-              ) : (
-                <span
-                  style={{
-                    fontSize: '28px',
-                    fontWeight: 700,
-                    color: '#0d111d',
-                    fontFamily: activeFont,
-                  }}
-                >
-                  {isAr ? fixArabicText('SHURU') : 'SHURU'}
-                </span>
-              )}
-            </div>
-
-            {/* Body */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: isAr ? 'flex-end' : 'flex-start',
-                width: '100%',
-                margin: 'auto 0',
-              }}
-            >
-              {displayCategory && (
-                <div
-                  style={{
-                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                    color: '#0d9488',
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    padding: '8px 18px',
-                    borderRadius: '9999px',
-                    margin: '0 0 20px 0',
-                    fontFamily: activeFont,
-                  }}
-                >
-                  {displayCategory}
-                </div>
-              )}
-              <h1
-                style={{
-                  fontSize: '52px',
-                  fontWeight: 700,
-                  color: '#0d111d',
-                  margin: '0 0 20px 0',
-                  lineHeight: 1.2,
-                  maxWidth: '960px',
-                  textAlign: isAr ? 'right' : 'left',
-                  fontFamily: activeFont,
-                }}
-              >
-                {displayTitle}
-              </h1>
-              {displayDescription ? (
-                <p
-                  style={{
-                    fontSize: '22px',
-                    fontWeight: 400,
-                    color: '#334155',
-                    margin: 0,
-                    lineHeight: 1.4,
-                    maxWidth: '960px',
-                    textAlign: isAr ? 'right' : 'left',
-                    fontFamily: activeFont,
-                  }}
-                >
-                  {displayDescription}
-                </p>
-              ) : null}
-            </div>
-
-            {/* Footer */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: isAr ? 'row-reverse' : 'row',
-                alignItems: 'center',
-                gap: '8px',
-                alignSelf: isAr ? 'flex-end' : 'flex-start',
-              }}
-            >
-              <div style={{ width: '16px', height: '2px', backgroundColor: '#14b8a6' }} />
-              <span
-                style={{
-                  fontSize: '18px',
-                  color: '#475569',
-                  fontWeight: 700,
-                  fontFamily: activeFont,
-                }}
-              >
-                shuru.sa
-              </span>
-            </div>
-          </div>
-        </div>
-      ),
-      { width: 1200, height: 630, fonts, headers: cacheHeaders }
-    );
+    const pngBuffer = canvas.toBuffer('image/png');
+    return new Response(new Uint8Array(pngBuffer), {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
+      },
+    });
   } catch (error) {
     console.error('OG Image Generation Error:', error);
     try {
-      // Clean Brand Fallback Card on layout/piping error
-      const fontData = await getFonts();
-      return new ImageResponse(
-        (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '1200px',
-              height: '630px',
-              backgroundColor: '#0d111d',
-              color: '#ffffff',
-              fontFamily: 'Inter',
-            }}
-          >
-            <h1 style={{ fontSize: '64px', fontWeight: 700, margin: '0 0 16px 0', color: '#14b8a6' }}>
-              SHURU
-            </h1>
-            <p style={{ fontSize: '24px', color: '#94a3b8', margin: 0 }}>
-              shuru.sa
-            </p>
-          </div>
-        ),
-        {
-          width: 1200,
-          height: 630,
-          fonts: [
-            { name: 'Inter', data: fontData.interRegular, weight: 400 as const, style: 'normal' as const },
-            { name: 'Inter', data: fontData.interBold, weight: 700 as const, style: 'normal' as const },
-          ],
-          headers: {
-            'Cache-Control': 'public, max-age=3600, stale-while-revalidate=600',
-          },
-        }
-      );
+      ensureFontsRegistered();
+      const canvas = createCanvas(1200, 630);
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0d111d';
+      ctx.fillRect(0, 0, 1200, 630);
+
+      ctx.font = 'bold 64px InterBold, Inter, sans-serif';
+      ctx.fillStyle = '#14b8a6';
+      ctx.textAlign = 'center';
+      ctx.fillText('SHURU', 600, 300);
+
+      ctx.font = '400 24px Inter, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('shuru.sa', 600, 350);
+
+      const fallbackBuffer = canvas.toBuffer('image/png');
+      return new Response(new Uint8Array(fallbackBuffer), {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=600',
+        },
+      });
     } catch (fallbackErr) {
       console.error('Fallback OG Image Generation Error:', fallbackErr);
-      return new Response(`Failed to generate OG image`, { status: 500 });
+      return new Response('Failed to generate OG image', { status: 500 });
     }
   }
 }
