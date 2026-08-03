@@ -3,7 +3,7 @@
 import nodemailer from "nodemailer";
 
 export async function sendContactEmail(data: any) {
-  const { fullName, email, phone, company, subject, message } = data;
+  const { fullName, email, phone, company, subject, message, entityType, challenge, desiredService, preferredDate } = data;
 
   try {
     const smtpHost = process.env.SMTP_HOST;
@@ -29,33 +29,41 @@ export async function sendContactEmail(data: any) {
       },
     });
 
-    // To prevent SMTP Sender address rejection (like on Hostinger),
-    // the "from" address must be the authenticated SMTP user.
     const fromAddress = smtpUser || 'info@shuru.sa';
 
     const mailOptions = {
-      from: `"Shuru Contact Form" <${fromAddress}>`,
+      from: `"Shuru Diagnostic Request" <${fromAddress}>`,
       to: process.env.CONTACT_EMAIL_TO || 'info@shuru.sa',
       replyTo: email,
-      subject: `New Contact Form Submission: ${subject}`,
+      subject: `New Diagnostic Session Booking: ${subject || fullName}`,
       text: `
+        Diagnostic Session Request Details:
+        ----------------------------------
         Name: ${fullName}
         Email: ${email}
         Phone: ${phone || "N/A"}
-        Company: ${company || "N/A"}
+        Company / Organization: ${company || "N/A"}
+        Entity Type: ${entityType || "N/A"}
+        Primary Challenge: ${challenge || "N/A"}
+        Desired Service: ${desiredService || "N/A"}
+        Preferred Appointment Date/Time: ${preferredDate || "N/A"}
 
-        Message:
-        ${message}
+        Additional Details:
+        ${message || "N/A"}
       `,
       html: `
-        <h3>New Contact Form Submission</h3>
+        <h3>New Diagnostic Session Request</h3>
         <p><strong>Name:</strong> ${fullName}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone || "N/A"}</p>
-        <p><strong>Company:</strong> ${company || "N/A"}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <h4>Message:</h4>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <p><strong>Organization:</strong> ${company || "N/A"}</p>
+        <p><strong>Entity Type:</strong> ${entityType || "N/A"}</p>
+        <p><strong>Primary Challenge:</strong> ${challenge || "N/A"}</p>
+        <p><strong>Desired Service:</strong> ${desiredService || "N/A"}</p>
+        <p><strong>Preferred Appointment:</strong> ${preferredDate || "N/A"}</p>
+        <hr>
+        <h4>Notes / Message:</h4>
+        <p>${(message || "N/A").replace(/\n/g, '<br>')}</p>
       `,
     };
 

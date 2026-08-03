@@ -262,7 +262,7 @@ export async function GET(request: NextRequest) {
 
     // Fallback default title if still missing
     if (!title) {
-      title = isAr ? 'شروع – رحلة نحو التميز' : 'SHURU – The journey toward excellence';
+      title = isAr ? 'شروع – شريك التنفيذ الذكي والتحول التشغيلي' : 'SHURU – Smart Execution & Operational Transformation';
     }
 
     // Sanitize text strings for rendering
@@ -295,9 +295,12 @@ export async function GET(request: NextRequest) {
 
     if (!logoBuffer) {
       try {
-        const logoPath = path.join(process.cwd(), 'public', 'شعار بدون خلفية-04.png');
-        if (fs.existsSync(logoPath)) {
-          logoBuffer = fs.readFileSync(logoPath);
+        const logoPathPrimary = path.join(process.cwd(), 'public', 'شعار بدون خلفية-01.png');
+        const logoPathSecondary = path.join(process.cwd(), 'public', 'شعار بدون خلفية-04.png');
+        if (fs.existsSync(logoPathPrimary)) {
+          logoBuffer = fs.readFileSync(logoPathPrimary);
+        } else if (fs.existsSync(logoPathSecondary)) {
+          logoBuffer = fs.readFileSync(logoPathSecondary);
         }
       } catch (e) {
         console.error('Failed to load local brand logo:', e);

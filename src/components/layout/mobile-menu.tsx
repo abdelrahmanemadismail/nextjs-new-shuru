@@ -223,12 +223,14 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
           <Link href={`/${locale}/auth/login`} onClick={onClose} className="block">
             <Button variant="outline" className="w-full justify-center">
               <LogIn className="me-2 h-4 w-4" />
-              Login
+              {locale === "ar" ? "تسجيل الدخول" : "Login"}
             </Button>
           </Link>
 
           <Link href={`/${locale}/subscribe`} onClick={onClose} className="block">
-            <Button className="w-full justify-center">Subscribe now</Button>
+            <Button className="w-full justify-center">
+              {locale === "ar" ? "اشترك الآن" : "Subscribe now"}
+            </Button>
           </Link>
         </div>
       </aside>

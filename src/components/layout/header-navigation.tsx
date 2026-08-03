@@ -54,9 +54,9 @@ const toLocaleAwareUrl = (url: string, locale: Locale) => {
 const getLinkProps = (openInNewTab: boolean) =>
   openInNewTab
     ? {
-        target: "_blank" as const,
-        rel: "noopener noreferrer" as const,
-      }
+      target: "_blank" as const,
+      rel: "noopener noreferrer" as const,
+    }
     : {};
 
 export function HeaderNavigation({

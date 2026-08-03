@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const keywords = globalData?.seoKeywords ? globalData.seoKeywords.split(",").map((kw) => kw.trim()) : undefined;
   const ogImage = globalData?.ogImage;
   const ogImageUrl = ogImage?.url ?? undefined;
-  const logoUrl = headerData?.darkLogoUrl || headerData?.lightLogoUrl;
+  const logoUrl = headerData?.lightLogoUrl || headerData?.darkLogoUrl;
   const finalOgImageUrl = getOptimizedOgImageUrl(ogImageUrl, siteName, description, locale, logoUrl);
   const isOptimized = finalOgImageUrl && finalOgImageUrl.includes("/api/og");
 
@@ -67,6 +67,17 @@ export async function generateMetadata(): Promise<Metadata> {
     publisher: siteName,
     category: "business",
     classification: "Business & Professional",
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon0.svg", type: "image/svg+xml" },
+        { url: "/icon1.png", type: "image/png" }
+      ],
+      apple: [
+        { url: "/apple-icon.png", sizes: "180x180", type: "image/png" }
+      ]
+    },
+    manifest: "/manifest.json",
     openGraph: {
       title: siteName,
       description,

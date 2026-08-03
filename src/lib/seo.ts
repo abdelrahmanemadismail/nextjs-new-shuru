@@ -100,7 +100,7 @@ export async function buildMetadata({
   const finalDescription = description || globalData?.seoDescription || globalData?.siteDescription || "";
 
   const headerData = await getHeaderSettings(locale);
-  const logoUrl = headerData?.darkLogoUrl || headerData?.lightLogoUrl;
+  const logoUrl = headerData?.lightLogoUrl || headerData?.darkLogoUrl;
 
   const computedOgType = ogType || (cleanPath === "" ? "hero" : "insight");
 
