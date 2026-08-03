@@ -2,6 +2,7 @@ import {NextConfig} from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@napi-rs/canvas'],
   compress: true,
   poweredByHeader: false,
   images: {
