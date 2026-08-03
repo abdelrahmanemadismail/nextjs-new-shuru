@@ -25,22 +25,25 @@ function ensureFontsRegistered() {
   if (fontsRegistered) return;
   const fontsDir = path.join(process.cwd(), 'public', 'fonts');
 
-  const tajawalReg = path.join(fontsDir, 'Tajawal-Regular.ttf');
-  const tajawalBold = path.join(fontsDir, 'Tajawal-Bold.ttf');
-  const interReg = path.join(fontsDir, 'Inter-Regular.ttf');
-  const interBold = path.join(fontsDir, 'Inter-Bold.ttf');
+  const fontFiles = [
+    { file: 'Bahij_TheSansArabic-Plain.woff2', name: 'BahijTheSans' },
+    { file: 'Bahij_TheSansArabic-Bold.woff2', name: 'BahijTheSansBold' },
+    { file: 'Bahij_TheSansArabic-SemiBold.woff2', name: 'BahijTheSansSemiBold' },
+    { file: 'Tajawal-Regular.ttf', name: 'Tajawal' },
+    { file: 'Tajawal-Bold.ttf', name: 'TajawalBold' },
+    { file: 'Inter-Regular.ttf', name: 'Inter' },
+    { file: 'Inter-Bold.ttf', name: 'InterBold' },
+  ];
 
-  if (fs.existsSync(tajawalReg)) {
-    GlobalFonts.registerFromPath(tajawalReg, 'Tajawal');
-  }
-  if (fs.existsSync(tajawalBold)) {
-    GlobalFonts.registerFromPath(tajawalBold, 'TajawalBold');
-  }
-  if (fs.existsSync(interReg)) {
-    GlobalFonts.registerFromPath(interReg, 'Inter');
-  }
-  if (fs.existsSync(interBold)) {
-    GlobalFonts.registerFromPath(interBold, 'InterBold');
+  for (const font of fontFiles) {
+    const fontPath = path.join(fontsDir, font.file);
+    if (fs.existsSync(fontPath)) {
+      try {
+        GlobalFonts.registerFromPath(fontPath, font.name);
+      } catch (e) {
+        console.error(`Failed to register font ${font.name} from ${font.file}:`, e);
+      }
+    }
   }
 
   fontsRegistered = true;
@@ -99,45 +102,63 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
+function fixRtlPunctuation(line: string): string {
+  if (!line) return '';
+  let trimmed = line.trim();
+  if (/[\.\!\?\:\,\-]$/.test(trimmed) && !trimmed.endsWith('\u200F')) {
+    return trimmed + '\u200F';
+  }
+  return trimmed;
+}
+
 function wrapText(
   ctx: SKRSContext2D,
   text: string,
   maxWidth: number,
-  maxLines: number = 3
+  maxLines: number = 4,
+  isRtl: boolean = true
 ): string[] {
   if (!text) return [];
-  const words = text.split(/\s+/);
+
+  const rawParagraphs = text.split(/\r?\n/);
   const lines: string[] = [];
-  let currentLine = '';
 
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const metrics = ctx.measureText(testLine);
+  for (const paragraph of rawParagraphs) {
+    const trimmedPara = paragraph.trim();
+    if (!trimmedPara) continue;
 
-    if (metrics.width > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
+    const words = trimmedPara.split(/\s+/);
+    let currentLine = '';
 
-      if (lines.length === maxLines - 1) {
-        const remaining = words.slice(i).join(' ');
-        let lastLine = remaining;
-        while (ctx.measureText(lastLine + '...').width > maxWidth && lastLine.length > 0) {
-          lastLine = lastLine.substring(0, lastLine.length - 1);
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+
+      if (metrics.width > maxWidth && currentLine) {
+        const formattedLine = isRtl ? fixRtlPunctuation(currentLine) : currentLine.trim();
+        lines.push(formattedLine);
+        currentLine = word;
+
+        if (lines.length >= maxLines) {
+          return lines.filter((l) => l.length > 0);
         }
-        lines.push(lastLine ? `${lastLine.trim()}...` : '...');
-        return lines;
+      } else {
+        currentLine = testLine;
       }
-    } else {
-      currentLine = testLine;
+    }
+
+    if (currentLine && lines.length < maxLines) {
+      const formattedLine = isRtl ? fixRtlPunctuation(currentLine) : currentLine.trim();
+      lines.push(formattedLine);
+    }
+
+    if (lines.length >= maxLines) {
+      break;
     }
   }
 
-  if (currentLine && lines.length < maxLines) {
-    lines.push(currentLine);
-  }
-
-  return lines;
+  return lines.filter((l) => l.length > 0);
 }
 
 export async function GET(request: NextRequest) {
@@ -263,7 +284,7 @@ export async function GET(request: NextRequest) {
     if (!logoBuffer) {
       try {
         const headerSettings = await getHeaderSettings(locale);
-        const strapiLogo = headerSettings?.darkLogoUrl || headerSettings?.lightLogoUrl;
+        const strapiLogo = headerSettings?.lightLogoUrl || headerSettings?.darkLogoUrl;
         if (strapiLogo) {
           logoBuffer = await fetchImageAsBuffer(strapiLogo);
         }
@@ -283,31 +304,42 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    let watermarkIconBuffer: Buffer | null = null;
+    try {
+      const iconPath = path.join(process.cwd(), 'public', 'web-app-manifest-512x512.png');
+      if (fs.existsSync(iconPath)) {
+        watermarkIconBuffer = fs.readFileSync(iconPath);
+      }
+    } catch (e) {
+      console.error('Failed to load watermark icon buffer:', e);
+    }
+
     // 5. Create Canvas (1200 x 630)
     const canvas = createCanvas(1200, 630);
     const ctx = canvas.getContext('2d');
 
-    const primaryFont = isAr ? 'Tajawal, sans-serif' : 'Inter, sans-serif';
-    const boldFont = isAr ? 'TajawalBold, Tajawal, sans-serif' : 'InterBold, Inter, sans-serif';
+    const primaryFont = isAr ? 'BahijTheSans, Tajawal, Inter, sans-serif' : 'Inter, sans-serif';
+    const boldFont = isAr ? 'BahijTheSansBold, BahijTheSans, TajawalBold, Tajawal, InterBold, Inter, sans-serif' : 'InterBold, Inter, sans-serif';
 
-    // HERO CARD RENDER
+    // HERO CARD RENDER (Centered Layout matching website Hero)
     if (type === 'hero') {
       // Fill Background
       ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 1200, 630);
 
-      // Soft Ambient Radial Glow
-      const glowX = isAr ? 1200 : 0;
+      // Top-Center Soft Ambient Glow (matching website Hero top gradient)
+      const glowX = 600;
       const glowY = 0;
-      const gradient = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 500);
-      gradient.addColorStop(0, 'rgba(20, 184, 166, 0.14)');
-      gradient.addColorStop(0.7, 'rgba(20, 184, 166, 0)');
+      const gradient = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 650);
+      gradient.addColorStop(0, 'rgba(13, 148, 136, 0.15)');
+      gradient.addColorStop(0.6, 'rgba(13, 148, 136, 0.04)');
+      gradient.addColorStop(1, 'rgba(13, 148, 136, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.arc(glowX, glowY, 500, 0, Math.PI * 2);
+      ctx.arc(glowX, glowY, 650, 0, Math.PI * 2);
       ctx.fill();
 
-      // Header Logo
+      // Header Logo (Top-Center)
       let logoLoadedImage = null;
       if (logoBuffer) {
         try {
@@ -317,139 +349,160 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const topY = 60;
-      const marginX = 80;
-
-      if (logoLoadedImage) {
-        const logoHeight = 56;
-        const aspect = logoLoadedImage.width / logoLoadedImage.height;
-        const logoWidth = logoHeight * aspect;
-        const logoX = isAr ? 1200 - marginX - logoWidth : marginX;
-        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
-      } else {
-        ctx.font = `bold 28px ${boldFont}`;
-        ctx.fillStyle = '#0f172a';
-        ctx.textAlign = isAr ? 'right' : 'left';
-        ctx.fillText(isAr ? 'شروع SHURU' : 'SHURU', isAr ? 1200 - marginX : marginX, topY + 36);
+      // Background Watermark Icon (using web-app-manifest-512x512.png)
+      let watermarkImage = null;
+      if (watermarkIconBuffer) {
+        try {
+          watermarkImage = await loadImage(watermarkIconBuffer);
+        } catch (e) {}
+      }
+      if (!watermarkImage && logoLoadedImage) {
+        watermarkImage = logoLoadedImage;
       }
 
-      // Title & Description
-      const contentMaxW = 960;
-      ctx.textAlign = isAr ? 'right' : 'left';
+      if (watermarkImage) {
+        ctx.save();
+        ctx.globalAlpha = 0.07;
+        const wmSize = 420;
+        const wmX = (1200 - wmSize) / 2;
+        const wmY = (630 - wmSize) / 2 + 15;
+        ctx.drawImage(watermarkImage, wmX, wmY, wmSize, wmSize);
+        ctx.restore();
+      }
 
-      ctx.font = `bold 48px ${boldFont}`;
-      const titleLines = wrapText(ctx, displayTitle, contentMaxW, 2);
+      const topY = 32;
 
-      ctx.font = `400 20px ${primaryFont}`;
-      const descLines = displayDescription ? wrapText(ctx, displayDescription, contentMaxW, 2) : [];
+      if (logoLoadedImage) {
+        const logoHeight = 110;
+        const aspect = logoLoadedImage.width / logoLoadedImage.height;
+        const logoWidth = Math.min(logoHeight * aspect, 560);
+        const logoX = (1200 - logoWidth) / 2;
+        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
+      } else {
+        ctx.font = `bold 42px ${boldFont}`;
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.fillText(isAr ? 'شروع SHURU' : 'SHURU', 600, topY + 54);
+      }
 
-      // Vertical positioning calculation
-      const titleLineHeight = 60;
-      const descLineHeight = 30;
-      const ctaHeight = (displayCta1 || displayCta2) ? 50 : 0;
+      // Title & Description (Centered under logo with generous breathing room)
+      const contentMaxW = 1000;
+      ctx.textAlign = 'center';
+
+      ctx.font = `bold 52px ${boldFont}`;
+      const titleLines = wrapText(ctx, displayTitle, contentMaxW, 2, isAr);
+
+      ctx.font = `400 24px ${primaryFont}`;
+      const descLines = displayDescription ? wrapText(ctx, displayDescription, contentMaxW, 4, isAr) : [];
+
+      const titleLineHeight = 68;
+      const descLineHeight = 36;
+      const ctaHeight = (displayCta1 || displayCta2) ? 52 : 0;
       const contentBlockHeight =
         titleLines.length * titleLineHeight +
         (descLines.length > 0 ? descLines.length * descLineHeight + 20 : 0) +
-        (ctaHeight > 0 ? ctaHeight + 30 : 0);
+        (ctaHeight > 0 ? ctaHeight + 32 : 0);
 
-      const startY = 160 + Math.max(0, (350 - contentBlockHeight) / 2);
-      const textX = isAr ? 1200 - marginX : marginX;
-
+      const startY = 185 + Math.max(0, (320 - contentBlockHeight) / 2);
       let currentY = startY;
 
-      // Draw Title
-      ctx.font = `bold 48px ${boldFont}`;
+      // Draw Centered Title
+      ctx.font = `bold 52px ${boldFont}`;
       ctx.fillStyle = '#0f172a';
       for (const line of titleLines) {
-        ctx.fillText(line, textX, currentY);
+        ctx.fillText(line, 600, currentY);
         currentY += titleLineHeight;
       }
 
-      // Draw Description
+      // Draw Centered Description
       if (descLines.length > 0) {
         currentY += 8;
-        ctx.font = `400 20px ${primaryFont}`;
-        ctx.fillStyle = '#475569';
+        ctx.font = `400 24px ${primaryFont}`;
+        ctx.fillStyle = '#64748b';
         for (const line of descLines) {
-          ctx.fillText(line, textX, currentY);
+          ctx.fillText(line, 600, currentY);
           currentY += descLineHeight;
         }
       }
 
-      // Draw CTAs
+      // Draw Centered CTAs
       if (displayCta1 || displayCta2) {
-        currentY += 20;
-        let buttonX = isAr ? 1200 - marginX : marginX;
+        currentY += 24;
+
+        ctx.font = `500 19px ${primaryFont}`;
+        const cta1W = displayCta1 ? ctx.measureText(displayCta1).width + 68 : 0;
+        const cta2W = displayCta2 ? ctx.measureText(displayCta2).width + 64 : 0;
+        const btnH = 52;
+        const spacing = 16;
+        const totalW = cta1W + (cta1W && cta2W ? spacing : 0) + cta2W;
+
+        let startBtnX = isAr ? 600 + totalW / 2 : 600 - totalW / 2;
 
         if (displayCta1) {
-          ctx.font = `bold 18px ${boldFont}`;
-          const cta1Metrics = ctx.measureText(displayCta1);
-          const btnW = cta1Metrics.width + 64;
-          const btnH = 48;
-          const rectX = isAr ? buttonX - btnW : buttonX;
+          const rectX = isAr ? startBtnX - cta1W : startBtnX;
 
           ctx.fillStyle = '#0d9488';
-          drawRoundedRect(ctx, rectX, currentY, btnW, btnH, 24);
+          drawRoundedRect(ctx, rectX, currentY, cta1W, btnH, 26);
           ctx.fill();
 
           ctx.fillStyle = '#ffffff';
           ctx.textAlign = 'center';
-          ctx.fillText(displayCta1, rectX + btnW / 2, currentY + 30);
+          ctx.fillText(displayCta1, rectX + cta1W / 2, currentY + 33);
 
           if (isAr) {
-            buttonX -= btnW + 16;
+            startBtnX -= cta1W + spacing;
           } else {
-            buttonX += btnW + 16;
+            startBtnX += cta1W + spacing;
           }
         }
 
         if (displayCta2) {
-          ctx.font = `bold 18px ${boldFont}`;
-          const cta2Metrics = ctx.measureText(displayCta2);
-          const btnW = cta2Metrics.width + 60;
-          const btnH = 48;
-          const rectX = isAr ? buttonX - btnW : buttonX;
+          const rectX = isAr ? startBtnX - cta2W : startBtnX;
 
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          drawRoundedRect(ctx, rectX, currentY, btnW, btnH, 24);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          drawRoundedRect(ctx, rectX, currentY, cta2W, btnH, 26);
           ctx.fill();
 
           ctx.strokeStyle = '#cbd5e1';
-          ctx.lineWidth = 1;
-          drawRoundedRect(ctx, rectX, currentY, btnW, btnH, 24);
+          ctx.lineWidth = 1.5;
+          drawRoundedRect(ctx, rectX, currentY, cta2W, btnH, 26);
           ctx.stroke();
 
-          ctx.fillStyle = '#334155';
+          ctx.fillStyle = '#0f172a';
           ctx.textAlign = 'center';
-          ctx.fillText(displayCta2, rectX + btnW / 2, currentY + 30);
+          ctx.fillText(displayCta2, rectX + cta2W / 2, currentY + 33);
         }
       }
 
-      // Footer
-      const footerY = 570;
-      const barW = 16;
+      // Footer Centered
+      const footerY = 580;
+      const barW = 24;
       const barH = 2;
 
       ctx.fillStyle = '#0d9488';
-      if (isAr) {
-        ctx.fillRect(1200 - marginX - barW, footerY - 10, barW, barH);
-        ctx.font = `bold 18px ${boldFont}`;
-        ctx.fillStyle = '#64748b';
-        ctx.textAlign = 'right';
-        ctx.fillText('shuru.sa', 1200 - marginX - barW - 12, footerY);
-      } else {
-        ctx.fillRect(marginX, footerY - 10, barW, barH);
-        ctx.font = `bold 18px ${boldFont}`;
-        ctx.fillStyle = '#64748b';
-        ctx.textAlign = 'left';
-        ctx.fillText('shuru.sa', marginX + barW + 12, footerY);
-      }
+      ctx.fillRect(600 - barW / 2, footerY - 14, barW, barH);
+      ctx.font = `bold 18px InterBold, Inter, sans-serif`;
+      ctx.fillStyle = '#64748b';
+      ctx.textAlign = 'center';
+      ctx.fillText('shuru.sa', 600, footerY + 10);
     } else {
-      // INSIGHT / ARTICLE / DEFAULT CARD RENDER
-      ctx.fillStyle = '#f6f6f6';
+      // INSIGHT / ARTICLE / DEFAULT CARD RENDER (Centered Layout)
+      ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 1200, 630);
 
-      // Header Logo
+      // Top-Center Ambient Glow
+      const glowX = 600;
+      const glowY = 0;
+      const gradient = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 650);
+      gradient.addColorStop(0, 'rgba(13, 148, 136, 0.12)');
+      gradient.addColorStop(0.6, 'rgba(13, 148, 136, 0.03)');
+      gradient.addColorStop(1, 'rgba(13, 148, 136, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(glowX, glowY, 650, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Header Logo (Top-Center)
       let logoLoadedImage = null;
       if (logoBuffer) {
         try {
@@ -459,93 +512,108 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const topY = 60;
-      const marginX = 80;
-
-      if (logoLoadedImage) {
-        const logoHeight = 56;
-        const aspect = logoLoadedImage.width / logoLoadedImage.height;
-        const logoWidth = logoHeight * aspect;
-        const logoX = isAr ? 1200 - marginX - logoWidth : marginX;
-        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
-      } else {
-        ctx.font = `bold 28px ${boldFont}`;
-        ctx.fillStyle = '#0d111d';
-        ctx.textAlign = isAr ? 'right' : 'left';
-        ctx.fillText(isAr ? 'SHURU' : 'SHURU', isAr ? 1200 - marginX : marginX, topY + 36);
+      // Background Watermark Icon (using web-app-manifest-512x512.png)
+      let watermarkImage = null;
+      if (watermarkIconBuffer) {
+        try {
+          watermarkImage = await loadImage(watermarkIconBuffer);
+        } catch (e) {}
+      }
+      if (!watermarkImage && logoLoadedImage) {
+        watermarkImage = logoLoadedImage;
       }
 
-      // Main Content Block
-      const contentMaxW = 960;
-      const textX = isAr ? 1200 - marginX : marginX;
-      ctx.textAlign = isAr ? 'right' : 'left';
+      if (watermarkImage) {
+        ctx.save();
+        ctx.globalAlpha = 0.07;
+        const wmSize = 420;
+        const wmX = (1200 - wmSize) / 2;
+        const wmY = (630 - wmSize) / 2 + 15;
+        ctx.drawImage(watermarkImage, wmX, wmY, wmSize, wmSize);
+        ctx.restore();
+      }
 
-      let currentY = 160;
+      const topY = 32;
 
-      // Category Pill
+      if (logoLoadedImage) {
+        const logoHeight = 110;
+        const aspect = logoLoadedImage.width / logoLoadedImage.height;
+        const logoWidth = Math.min(logoHeight * aspect, 560);
+        const logoX = (1200 - logoWidth) / 2;
+        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
+      } else {
+        ctx.font = `bold 42px ${boldFont}`;
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.fillText(isAr ? 'SHURU' : 'SHURU', 600, topY + 54);
+      }
+
+      // Main Content Block Centered
+      const contentMaxW = 1000;
+      ctx.textAlign = 'center';
+
+      let currentY = 175;
+
+      // Category Pill Centered
       if (displayCategory) {
-        ctx.font = `bold 16px ${boldFont}`;
+        ctx.font = `bold 18px ${boldFont}`;
         const catMetrics = ctx.measureText(displayCategory);
-        const pillW = catMetrics.width + 36;
-        const pillH = 36;
-        const pillX = isAr ? textX - pillW : textX;
+        const pillW = catMetrics.width + 44;
+        const pillH = 40;
+        const pillX = 600 - pillW / 2;
 
         ctx.fillStyle = 'rgba(13, 148, 136, 0.1)';
-        drawRoundedRect(ctx, pillX, currentY, pillW, pillH, 18);
+        drawRoundedRect(ctx, pillX, currentY, pillW, pillH, 20);
         ctx.fill();
+
+        ctx.strokeStyle = 'rgba(13, 148, 136, 0.25)';
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, pillX, currentY, pillW, pillH, 20);
+        ctx.stroke();
 
         ctx.fillStyle = '#0d9488';
         ctx.textAlign = 'center';
-        ctx.fillText(displayCategory, pillX + pillW / 2, currentY + 23);
+        ctx.fillText(displayCategory, 600, currentY + 26);
 
         currentY += pillH + 24;
-        ctx.textAlign = isAr ? 'right' : 'left';
       }
 
-      // Title
-      ctx.font = `bold 52px ${boldFont}`;
-      const titleLines = wrapText(ctx, displayTitle, contentMaxW, 3);
-      const titleLineHeight = 64;
+      // Title Centered
+      ctx.font = `bold 56px ${boldFont}`;
+      const titleLines = wrapText(ctx, displayTitle, contentMaxW, 3, isAr);
+      const titleLineHeight = 70;
 
-      ctx.fillStyle = '#0d111d';
+      ctx.fillStyle = '#0f172a';
       for (const line of titleLines) {
-        ctx.fillText(line, textX, currentY + 40);
+        ctx.fillText(line, 600, currentY + 44);
         currentY += titleLineHeight;
       }
 
-      // Description
+      // Description Centered
       if (displayDescription) {
         currentY += 12;
-        ctx.font = `400 22px ${primaryFont}`;
-        const descLines = wrapText(ctx, displayDescription, contentMaxW, 2);
-        const descLineHeight = 32;
+        ctx.font = `400 24px ${primaryFont}`;
+        const descLines = wrapText(ctx, displayDescription, contentMaxW, 4, isAr);
+        const descLineHeight = 36;
 
-        ctx.fillStyle = '#334155';
+        ctx.fillStyle = '#64748b';
         for (const line of descLines) {
-          ctx.fillText(line, textX, currentY + 20);
+          ctx.fillText(line, 600, currentY + 20);
           currentY += descLineHeight;
         }
       }
 
-      // Footer
-      const footerY = 570;
-      const barW = 16;
+      // Footer Centered
+      const footerY = 575;
+      const barW = 24;
       const barH = 2;
 
-      ctx.fillStyle = '#14b8a6';
-      if (isAr) {
-        ctx.fillRect(1200 - marginX - barW, footerY - 10, barW, barH);
-        ctx.font = `bold 18px ${boldFont}`;
-        ctx.fillStyle = '#475569';
-        ctx.textAlign = 'right';
-        ctx.fillText('shuru.sa', 1200 - marginX - barW - 12, footerY);
-      } else {
-        ctx.fillRect(marginX, footerY - 10, barW, barH);
-        ctx.font = `bold 18px ${boldFont}`;
-        ctx.fillStyle = '#475569';
-        ctx.textAlign = 'left';
-        ctx.fillText('shuru.sa', marginX + barW + 12, footerY);
-      }
+      ctx.fillStyle = '#0d9488';
+      ctx.fillRect(600 - barW / 2, footerY - 14, barW, barH);
+      ctx.font = `bold 18px InterBold, Inter, sans-serif`;
+      ctx.fillStyle = '#64748b';
+      ctx.textAlign = 'center';
+      ctx.fillText('shuru.sa', 600, footerY + 10);
     }
 
     const pngBuffer = canvas.toBuffer('image/png');
