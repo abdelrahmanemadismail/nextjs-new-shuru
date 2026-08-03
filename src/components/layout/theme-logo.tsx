@@ -26,7 +26,7 @@ export function ThemeLogo({
   height = 120,
   priority = false,
   sizes,
-  quality = 75,
+  quality = 100,
 }: ThemeLogoProps) {
   // If neither logo is available, render a text fallback.
   if (!lightLogoUrl && !darkLogoUrl) {

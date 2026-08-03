@@ -320,6 +320,8 @@ export async function GET(request: NextRequest) {
     // 5. Create Canvas (1200 x 630)
     const canvas = createCanvas(1200, 630);
     const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     const primaryFont = isAr ? 'BahijTheSans, Tajawal, Inter, sans-serif' : 'Inter, sans-serif';
     const boldFont = isAr ? 'BahijTheSansBold, BahijTheSans, TajawalBold, Tajawal, InterBold, Inter, sans-serif' : 'InterBold, Inter, sans-serif';
@@ -365,22 +367,39 @@ export async function GET(request: NextRequest) {
 
       if (watermarkImage) {
         ctx.save();
-        ctx.globalAlpha = 0.07;
-        const wmSize = 420;
-        const wmX = (1200 - wmSize) / 2;
-        const wmY = (630 - wmSize) / 2 + 15;
-        ctx.drawImage(watermarkImage, wmX, wmY, wmSize, wmSize);
+        ctx.globalAlpha = 0.05;
+        const maxWm = 360;
+        const wmAspect = watermarkImage.width / watermarkImage.height;
+        let wmW = maxWm;
+        let wmH = maxWm / wmAspect;
+        if (wmH > maxWm) {
+          wmH = maxWm;
+          wmW = wmH * wmAspect;
+        }
+        const wmX = (1200 - wmW) / 2;
+        const wmY = (630 - wmH) / 2 + 15;
+        ctx.drawImage(watermarkImage, wmX, wmY, wmW, wmH);
         ctx.restore();
       }
 
       const topY = 32;
 
       if (logoLoadedImage) {
-        const logoHeight = 110;
         const aspect = logoLoadedImage.width / logoLoadedImage.height;
-        const logoWidth = Math.min(logoHeight * aspect, 560);
+        const maxH = 95;
+        const maxW = 480;
+
+        let logoHeight = maxH;
+        let logoWidth = logoHeight * aspect;
+
+        if (logoWidth > maxW) {
+          logoWidth = maxW;
+          logoHeight = logoWidth / aspect;
+        }
+
         const logoX = (1200 - logoWidth) / 2;
-        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
+        const logoY = topY + (maxH - logoHeight) / 2;
+        ctx.drawImage(logoLoadedImage, logoX, logoY, logoWidth, logoHeight);
       } else {
         ctx.font = `bold 42px ${boldFont}`;
         ctx.fillStyle = '#0f172a';
@@ -528,22 +547,39 @@ export async function GET(request: NextRequest) {
 
       if (watermarkImage) {
         ctx.save();
-        ctx.globalAlpha = 0.07;
-        const wmSize = 420;
-        const wmX = (1200 - wmSize) / 2;
-        const wmY = (630 - wmSize) / 2 + 15;
-        ctx.drawImage(watermarkImage, wmX, wmY, wmSize, wmSize);
+        ctx.globalAlpha = 0.05;
+        const maxWm = 360;
+        const wmAspect = watermarkImage.width / watermarkImage.height;
+        let wmW = maxWm;
+        let wmH = maxWm / wmAspect;
+        if (wmH > maxWm) {
+          wmH = maxWm;
+          wmW = wmH * wmAspect;
+        }
+        const wmX = (1200 - wmW) / 2;
+        const wmY = (630 - wmH) / 2 + 15;
+        ctx.drawImage(watermarkImage, wmX, wmY, wmW, wmH);
         ctx.restore();
       }
 
       const topY = 32;
 
       if (logoLoadedImage) {
-        const logoHeight = 110;
         const aspect = logoLoadedImage.width / logoLoadedImage.height;
-        const logoWidth = Math.min(logoHeight * aspect, 560);
+        const maxH = 95;
+        const maxW = 480;
+
+        let logoHeight = maxH;
+        let logoWidth = logoHeight * aspect;
+
+        if (logoWidth > maxW) {
+          logoWidth = maxW;
+          logoHeight = logoWidth / aspect;
+        }
+
         const logoX = (1200 - logoWidth) / 2;
-        ctx.drawImage(logoLoadedImage, logoX, topY, logoWidth, logoHeight);
+        const logoY = topY + (maxH - logoHeight) / 2;
+        ctx.drawImage(logoLoadedImage, logoX, logoY, logoWidth, logoHeight);
       } else {
         ctx.font = `bold 42px ${boldFont}`;
         ctx.fillStyle = '#0f172a';

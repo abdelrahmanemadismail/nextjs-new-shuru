@@ -202,10 +202,10 @@ export function HeaderNavigation({
                 alt={logoAlt}
                 className="h-11 w-auto object-contain sm:h-14 lg:h-20 max-w-[160px] sm:max-w-[260px] lg:max-w-[400px]"
                 priority={true}
-                width={640}
-                height={410}
-                sizes="(max-width: 640px) 80px, (max-width: 1024px) 100px, 142px"
-                quality={85}
+                width={800}
+                height={250}
+                sizes="(max-width: 640px) 240px, (max-width: 1024px) 400px, 600px"
+                quality={100}
               />
             </Link>
           </div>

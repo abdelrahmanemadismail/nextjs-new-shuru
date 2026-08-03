@@ -87,9 +87,9 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
             alt="Footer Logo"
             className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
             width={640}
-            height={410}
-            sizes="120px"
-            quality={85}
+            height={200}
+            sizes="(max-width: 768px) 240px, 360px"
+            quality={100}
           />
           {description && (
             <p className="text-sm text-muted-foreground leading-relaxed">
