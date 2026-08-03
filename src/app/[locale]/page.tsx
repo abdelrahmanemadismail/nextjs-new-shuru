@@ -39,12 +39,6 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
     ogType: "hero",
     cta1: heroBlock?.primaryCtaText,
     cta2: heroBlock?.secondaryCtaText,
-    ogImage: ogImg ? {
-      url: ogImg.url,
-      width: ogImg.width,
-      height: ogImg.height,
-      alt: ogImg.alternativeText,
-    } : undefined,
   });
 
   return {

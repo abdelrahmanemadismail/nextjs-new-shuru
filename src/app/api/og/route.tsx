@@ -165,13 +165,13 @@ export async function GET(request: NextRequest) {
           (b): b is import('@/strapi/home').StrapiHeroBlock => b.__component === 'home.hero'
         );
         if (heroBlock) {
-          rawCoverUrl = toAbsoluteUrl(
-            extractMediaUrl(heroBlock.image) || extractMediaUrl(homeData?.seo?.og_image)
-          );
           title = heroBlock.title || title;
           description = heroBlock.subtitle || description;
           cta1 = heroBlock.primaryCtaText || cta1;
           cta2 = heroBlock.secondaryCtaText || cta2;
+          if (heroBlock.image) {
+            rawCoverUrl = toAbsoluteUrl(extractMediaUrl(heroBlock.image));
+          }
         } else if (homeData?.seo?.og_image) {
           rawCoverUrl = toAbsoluteUrl(extractMediaUrl(homeData.seo.og_image));
           if (!title && homeData.seo.meta_title) title = homeData.seo.meta_title;

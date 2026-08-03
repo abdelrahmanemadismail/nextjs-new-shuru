@@ -102,11 +102,11 @@ export async function buildMetadata({
   const headerData = await getHeaderSettings(locale);
   const logoUrl = headerData?.darkLogoUrl || headerData?.lightLogoUrl;
 
-  const ogImageUrl =
-    toAbsoluteUrl(ogImage?.url) ||
-    globalData?.ogImage?.url;
-
   const computedOgType = ogType || (cleanPath === "" ? "hero" : "insight");
+
+  const ogImageUrl = computedOgType === "hero"
+    ? toAbsoluteUrl(ogImage?.url)
+    : (toAbsoluteUrl(ogImage?.url) || globalData?.ogImage?.url);
 
   const finalOgImageUrl = getOptimizedOgImageUrl(
     ogImageUrl,
