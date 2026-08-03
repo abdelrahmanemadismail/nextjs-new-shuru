@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { type Locale } from '@/lib/i18n';
 import { extractMediaUrl, toAbsoluteUrl } from '@/lib/strapi';
-import { fixArabicText } from '@/lib/arabic';
+import { fixArabicText, sanitizeTextForOg } from '@/lib/arabic';
 import { getHeaderSettings } from '@/strapi/header';
 import { getHomeCached } from '@/strapi/home';
 import { getPageCached } from '@/strapi/page';
@@ -52,10 +52,10 @@ async function getFonts(): Promise<{
     tajawalBold = loadLocalFont('Tajawal-Bold.ttf');
   }
   return {
-    interRegular: interRegular!,
-    interBold: interBold!,
-    tajawalRegular: tajawalRegular!,
-    tajawalBold: tajawalBold!,
+    interRegular: interRegular.slice(0),
+    interBold: interBold.slice(0),
+    tajawalRegular: tajawalRegular.slice(0),
+    tajawalBold: tajawalBold.slice(0),
   };
 }
 
@@ -190,12 +190,12 @@ export async function GET(request: NextRequest) {
       title = isAr ? 'شروع – رحلة نحو التميز' : 'SHURU – The journey toward excellence';
     }
 
-    // Process Arabic text with Reshaper + BiDi reordering for Satori rendering
-    const displayTitle = isAr ? fixArabicText(title) : title;
-    const displayDescription = isAr ? fixArabicText(description) : description;
-    const displayCategory = isAr ? fixArabicText(category) : category;
-    const displayCta1 = isAr ? fixArabicText(cta1) : cta1;
-    const displayCta2 = isAr ? fixArabicText(cta2) : cta2;
+    // Process Arabic text with Reshaper + BiDi reordering, and sanitize non-Arabic text for Satori rendering
+    const displayTitle = isAr ? fixArabicText(title) : sanitizeTextForOg(title);
+    const displayDescription = isAr ? fixArabicText(description) : sanitizeTextForOg(description);
+    const displayCategory = isAr ? fixArabicText(category) : sanitizeTextForOg(category);
+    const displayCta1 = isAr ? fixArabicText(cta1) : sanitizeTextForOg(cta1);
+    const displayCta2 = isAr ? fixArabicText(cta2) : sanitizeTextForOg(cta2);
 
     // 3. Resolve site logo (from Strapi header settings or local fallback)
     let logoBase64: string | null = null;
@@ -485,7 +485,7 @@ export async function GET(request: NextRequest) {
                     fontFamily: activeFont,
                   }}
                 >
-                  {isAr ? fixArabicText('شورى SHURU') : 'SHURU'}
+                  {isAr ? fixArabicText('SHURU') : 'SHURU'}
                 </span>
               )}
             </div>
