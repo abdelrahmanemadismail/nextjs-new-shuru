@@ -165,10 +165,17 @@ export async function GET(request: NextRequest) {
           (b): b is import('@/strapi/home').StrapiHeroBlock => b.__component === 'home.hero'
         );
         if (heroBlock) {
-          if (!title) title = heroBlock.title;
-          if (!description) description = heroBlock.subtitle || '';
-          if (!cta1) cta1 = heroBlock.primaryCtaText;
-          if (!cta2) cta2 = heroBlock.secondaryCtaText || '';
+          rawCoverUrl = toAbsoluteUrl(
+            extractMediaUrl(heroBlock.image) || extractMediaUrl(homeData?.seo?.og_image)
+          );
+          title = heroBlock.title || title;
+          description = heroBlock.subtitle || description;
+          cta1 = heroBlock.primaryCtaText || cta1;
+          cta2 = heroBlock.secondaryCtaText || cta2;
+        } else if (homeData?.seo?.og_image) {
+          rawCoverUrl = toAbsoluteUrl(extractMediaUrl(homeData.seo.og_image));
+          if (!title && homeData.seo.meta_title) title = homeData.seo.meta_title;
+          if (!description && homeData.seo.meta_description) description = homeData.seo.meta_description;
         }
       } catch (e) {
         console.error('Failed to fetch hero data from Strapi:', e);
