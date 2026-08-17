@@ -11,6 +11,9 @@ const OverviewSection = dynamic(() =>
 const ValueSection = dynamic(() =>
   import("@/components/home/value-section").then((mod) => mod.ValueSection)
 );
+const TrustSection = dynamic(() =>
+  import("@/components/home/trust-section").then((mod) => mod.TrustSection)
+);
 const TestimonialsSection = dynamic(() =>
   import("@/components/home/testimonials-section").then((mod) => mod.TestimonialsSection)
 );
@@ -50,6 +53,9 @@ export function BlockRenderer({ block, locale, testimonials }: { block: StrapiPa
     case "home.value":
       return <ValueSection value={block} />;
 
+    case "home.trust-section":
+      return <TrustSection block={block as any} />;
+
     case "home.testimonials-section":
       return <TestimonialsSection section={block} testimonials={testimonials} />;
 
@@ -68,8 +74,13 @@ export function BlockRenderer({ block, locale, testimonials }: { block: StrapiPa
     case "shared.timeline-section":
       return (
         <TimelineSection
+          badge={block.badge}
           title={block.title}
+          introText={block.introText}
           steps={block.steps}
+          ctaText={block.ctaText}
+          ctaLink={block.ctaLink}
+          locale={locale}
         />
       );
 

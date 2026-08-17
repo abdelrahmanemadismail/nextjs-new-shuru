@@ -53,29 +53,55 @@ export type StrapiHomePayload = {
   data?: StrapiHomeEntry | null;
 };
 
+export type StrapiHeroMetric = {
+  id: number;
+  label: string;
+  value: string;
+  subtext?: string;
+  progressPercent?: number;
+};
+
+export type StrapiHeroAudience = {
+  id: number;
+  label: string;
+  iconName?: string;
+};
+
 export type StrapiHeroBlock = {
   __component: 'home.hero';
   id: number;
+  badgeText?: string;
   title: string;
   subtitle?: string;
   primaryCtaText: string;
   primaryCtaLink: string;
   secondaryCtaText?: string;
   secondaryCtaLink?: string;
+  targetAudiences?: StrapiHeroAudience[];
+  showShowcase?: boolean;
+  showcaseTitle?: string;
+  showcaseSubtitle?: string;
+  showcaseBadge?: string;
+  metrics?: StrapiHeroMetric[];
   image?: StrapiMedia;
+};
+
+export type StrapiOverviewCard = {
+  id: number;
+  title: string;
+  description: string;
+  iconName?: string;
+  badge?: string;
+  cardCtaText?: string;
 };
 
 export type StrapiOverviewBlock = {
   __component: 'home.overview';
   id: number;
+  badge?: string;
   title: string;
   introText?: string;
-  cards: {
-    id: number;
-    title: string;
-    description: string;
-    iconName?: string;
-  }[];
+  cards: StrapiOverviewCard[];
   ctaText?: string;
   ctaLink?: string;
 };
@@ -93,6 +119,23 @@ export type StrapiValueBlock = {
   }[];
   ctaText?: string;
   ctaLink?: string;
+};
+
+export type StrapiTrustItem = {
+  id: number;
+  icon?: string;
+  title: string;
+  description: string;
+  tag?: string;
+};
+
+export type StrapiTrustSectionBlock = {
+  __component: 'home.trust-section';
+  id: number;
+  badge?: string;
+  title: string;
+  introText?: string;
+  items: StrapiTrustItem[];
 };
 
 export type StrapiTestimonialsSectionBlock = {
@@ -119,6 +162,7 @@ export type StrapiHomeBlock =
   | StrapiHeroBlock
   | StrapiOverviewBlock
   | StrapiValueBlock
+  | StrapiTrustSectionBlock
   | StrapiTestimonialsSectionBlock
   | StrapiCtaFooterBlock
   | { __component: 'shared.challenges-section'; [key: string]: any }

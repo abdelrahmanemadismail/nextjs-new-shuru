@@ -1,52 +1,154 @@
-import type { StrapiTimelineStep } from "@/strapi/page";
+import Link from 'next/link';
+import {
+  Search,
+  Compass,
+  Rocket,
+  GraduationCap,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Layers,
+  Workflow,
+  Target,
+  Activity,
+  Zap,
+} from 'lucide-react';
+import type { StrapiTimelineStep } from '@/strapi/page';
+import { locales, type Locale } from '@/lib/i18n';
 
-interface TimelineSectionProps {
-  title: string;
-  steps: StrapiTimelineStep[];
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Search,
+  Compass,
+  Rocket,
+  GraduationCap,
+  Chart: Activity,
+  Blueprint: Compass,
+  Implementation: Rocket,
+  Empowerment: GraduationCap,
+  Target,
+  Activity,
+  Zap,
+  Workflow,
+  Layers,
+};
+
+function getStepIcon(name?: string) {
+  if (!name) return Sparkles;
+  return iconMap[name] || Sparkles;
 }
 
-export function TimelineSection({ title, steps }: TimelineSectionProps) {
+const localePathPattern = new RegExp(`^/(${locales.join("|")})(/|$)`);
+const isExternalUrl = (url: string) =>
+  url.startsWith("http://") ||
+  url.startsWith("https://") ||
+  url.startsWith("mailto:") ||
+  url.startsWith("tel:");
+
+function toLocaleAwareUrl(url: string, locale: string) {
+  if (!url || isExternalUrl(url) || url.startsWith("#")) return url;
+  if (!url.startsWith("/")) return `/${locale}/${url}`;
+  if (localePathPattern.test(url)) return url;
+  return url === "/" ? `/${locale}` : `/${locale}${url}`;
+}
+
+interface TimelineSectionProps {
+  badge?: string;
+  title: string;
+  introText?: string;
+  steps: StrapiTimelineStep[];
+  ctaText?: string;
+  ctaLink?: string;
+  locale?: Locale;
+}
+
+export function TimelineSection({
+  badge,
+  title,
+  introText,
+  steps = [],
+  ctaText,
+  ctaLink,
+  locale = 'ar',
+}: TimelineSectionProps) {
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4 md:px-6">
-        <div
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{title}</h2>
+    <section className="py-16 sm:py-24 bg-background border-t border-border/40 relative overflow-hidden">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center mb-12 sm:mb-16">
+          {badge && (
+            <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+              {badge}
+            </span>
+          )}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mt-4">
+            {title}
+          </h2>
+          {introText && (
+            <p className="mt-4 text-base sm:text-lg text-muted-foreground whitespace-pre-line">
+              {introText}
+            </p>
+          )}
         </div>
 
-        <div className="max-w-4xl mx-auto relative">
-          {/* Vertical line through steps */}
-          <div className="absolute left-[20px] md:left-1/2 md:-ml-px top-0 bottom-0 w-px bg-border hidden md:block" />
+        {/* Timeline Steps Grid */}
+        {steps.length > 0 && (
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 ${
+              steps.length === 3
+                ? 'lg:grid-cols-3'
+                : steps.length >= 4
+                ? 'lg:grid-cols-4'
+                : 'lg:grid-cols-2'
+            } gap-6 relative`}
+          >
+            {steps.map((step, index) => {
+              const Icon = getStepIcon(step.icon);
+              const stepNumber = step.number || `0${index + 1}`;
+              return (
+                <div
+                  key={step.id || index}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-3xl font-black text-primary/30 group-hover:text-primary transition-colors">
+                        {stepNumber}
+                      </span>
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                    </div>
 
-          <div className="space-y-12 md:space-y-24">
-            {steps.map((step, idx) => (
-              <div
-                key={step.id}
-                className={`relative flex flex-col md:flex-row gap-8 items-center ${
-                  idx % 2 === 0 ? "md:flex-row-reverse" : ""
-                }`}
-              >
-                {/* Step Content */}
-                <div className={`md:w-1/2 flex flex-col ${idx % 2 === 0 ? "md:items-start md:text-left text-start" : "md:items-end md:text-right text-start"} w-full`}>
-                  <div className="bg-card p-6 md:p-8 rounded-2xl shadow-sm border border-border/50 hover:shadow-lg transition-shadow duration-300 w-full relative group">
-                    <span className="text-4xl md:text-6xl font-black text-primary/10 absolute -top-4 -right-2 md:group-hover:-top-6 transition-all duration-300">
-                      0{idx + 1}
-                    </span>
-                    <h3 className="text-xl md:text-2xl font-bold mb-3 relative z-10">{step.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed relative z-10">{step.description}</p>
+                    <h3 className="text-lg font-bold text-foreground mb-2">{step.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-4">
+                      {step.description}
+                    </p>
                   </div>
-                </div>
 
-                {/* Center Node */}
-                <div className="hidden md:flex absolute left-1/2 -ml-[24px] w-12 h-12 bg-background border-4 border-primary rounded-full items-center justify-center shadow-sm z-10">
-                   <span className="text-primary font-bold text-lg">{idx + 1}</span>
+                  {step.deliverable && (
+                    <div className="mt-4 pt-3 border-t border-border/50">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/5 px-2.5 py-1 rounded-lg w-full">
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{step.deliverable}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        )}
+
+        {ctaText && ctaLink && (
+          <div className="mt-12 text-center">
+            <Link
+              href={toLocaleAwareUrl(ctaLink, locale)}
+              className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+            >
+              <span>{ctaText}</span>
+              <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

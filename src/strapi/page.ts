@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { type Locale } from "@/lib/i18n";
 import { extractMediaUrl, getStrapiBaseUrl, getStrapiRequestHeaders, toAbsoluteUrl, type StrapiSeo } from "@/lib/strapi";
-import type { StrapiHeroBlock, StrapiOverviewBlock, StrapiValueBlock, StrapiCtaFooterBlock, StrapiTestimonialsSectionBlock } from "./home";
+import type { StrapiHeroBlock, StrapiOverviewBlock, StrapiValueBlock, StrapiCtaFooterBlock, StrapiTestimonialsSectionBlock, StrapiTrustSectionBlock } from "./home";
 
 export type StrapiChallengeCard = {
   id: number;
@@ -20,16 +20,22 @@ export type StrapiChallengesSectionBlock = {
 
 export type StrapiTimelineStep = {
   id: number;
+  number?: string;
   title: string;
   description: string;
+  deliverable?: string;
   icon?: string;
 };
 
 export type StrapiTimelineSectionBlock = {
   __component: 'shared.timeline-section';
   id: number;
+  badge?: string;
   title: string;
+  introText?: string;
   steps: StrapiTimelineStep[];
+  ctaText?: string;
+  ctaLink?: string;
 };
 
 export type StrapiQuoteSectionBlock = {
@@ -68,6 +74,7 @@ export type StrapiPageBlock =
   | StrapiHeroBlock
   | StrapiOverviewBlock
   | StrapiValueBlock
+  | StrapiTrustSectionBlock
   | StrapiCtaFooterBlock
   | StrapiTestimonialsSectionBlock
   | StrapiChallengesSectionBlock
