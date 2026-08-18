@@ -52,7 +52,35 @@ interface UploadedFileState {
   base64?: string;
 }
 
-export function RequestInfoForm() {
+export interface RequestInfoFormProps {
+  workflowBadge?: string;
+  workflowTitle?: string;
+  workflowStep1Number?: string;
+  workflowStep1Title?: string;
+  workflowStep1Desc?: string;
+  workflowStep2Number?: string;
+  workflowStep2Title?: string;
+  workflowStep2Desc?: string;
+  workflowStep3Number?: string;
+  workflowStep3Title?: string;
+  workflowStep3Desc?: string;
+  consentText?: string;
+}
+
+export function RequestInfoForm({
+  workflowBadge,
+  workflowTitle,
+  workflowStep1Number,
+  workflowStep1Title,
+  workflowStep1Desc,
+  workflowStep2Number,
+  workflowStep2Title,
+  workflowStep2Desc,
+  workflowStep3Number,
+  workflowStep3Title,
+  workflowStep3Desc,
+  consentText,
+}: RequestInfoFormProps = {}) {
   const t = useTranslations("requestInfo");
   const [isPending, startTransition] = useTransition();
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -1001,6 +1029,74 @@ export function RequestInfoForm() {
           </div>
         </form>
       </Form>
+
+      {/* SECTION: 3. ماذا يحدث بعد الإرسال؟ */}
+      <div className="rounded-3xl bg-gradient-to-br from-card to-card/70 border border-primary/20 p-8 sm:p-10 shadow-lg relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="mb-8 text-center max-w-xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-3 border border-primary/20 backdrop-blur-sm">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{workflowBadge || (isAr ? "مسار العمل" : "Workflow")}</span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+            {workflowTitle || (isAr ? "ماذا يحدث بعد الإرسال؟" : "What Happens After Submitting?")}
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          {/* Step 1 */}
+          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-border/80 relative hover:border-primary/40 transition-all hover:shadow-md group flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors border border-primary/20">
+                {workflowStep1Number || "01"}
+              </div>
+              <h4 className="text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                {workflowStep1Title || (isAr ? "نراجع الطلب" : "Reviewing Request")}
+              </h4>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {workflowStep1Desc || (isAr
+                  ? "نراجع المعلومات والمستندات المقدمة ونحدد طبيعة الاحتياج."
+                  : "We review the submitted details and documentation to define the scope of your need.")}
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-border/80 relative hover:border-primary/40 transition-all hover:shadow-md group flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors border border-primary/20">
+                {workflowStep2Number || "02"}
+              </div>
+              <h4 className="text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                {workflowStep2Title || (isAr ? "نحدد الخبرات المناسبة" : "Matching Right Expertise")}
+              </h4>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {workflowStep2Desc || (isAr
+                  ? "نحدد قائد التكليف والخبراء المناسبين من شبكة شروع."
+                  : "We assign the engagement lead and tailored subject matter experts from Shuru's network.")}
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-border/80 relative hover:border-primary/40 transition-all hover:shadow-md group flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors border border-primary/20">
+                {workflowStep3Number || "03"}
+              </div>
+              <h4 className="text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                {workflowStep3Title || (isAr ? "نتواصل معكم" : "Connecting with You")}
+              </h4>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {workflowStep3Desc || (isAr
+                  ? "نتواصل لتأكيد النطاق والخطوات التالية ونموذج التعاون."
+                  : "We connect to align on scope, roadmap, next operational steps, and engagement model.")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
