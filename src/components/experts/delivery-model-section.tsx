@@ -29,7 +29,7 @@ export function DeliveryModelSection({ locale, badge, title, subtitle }: Deliver
       icon: Compass,
       level: "01",
       title: isAr ? "المستوى الأول: الشريك المشرف" : "Tier 1: Managing Partner / Director",
-      subtitle: isAr ? "Strategic Oversight & Governance" : "Strategic Oversight & Governance",
+      subtitle: isAr ? "الإشراف الاستراتيجي والحوكمة" : "Strategic Oversight & Governance",
       desc: isAr
         ? "الإشراف الاستراتيجي الشامل، وضمان الجودة، وتوجيه القرارات الحرجة والمواءمة المباشرة مع الإدارة العليا واللجان القيادية."
         : "High-level strategic oversight, quality assurance, steering critical decisions, and aligning directly with executive leadership.",
@@ -43,7 +43,7 @@ export function DeliveryModelSection({ locale, badge, title, subtitle }: Deliver
       icon: Briefcase,
       level: "02",
       title: isAr ? "المستوى الثاني: قائد المسار الاستشاري" : "Tier 2: Engagement Lead",
-      subtitle: isAr ? "Engagement Lead & Execution" : "Engagement Lead & Execution",
+      subtitle: isAr ? "قيادة المسار والتنفيذ الميداني" : "Engagement Lead & Execution",
       desc: isAr
         ? "إدارة خطة التنفيذ الميدانية اليومية، وقيادة فرق العمل، وضبط الجداول الزمنية والميزانيات لضمان موثوقية التسليم."
         : "Directing day-to-day operations, managing workstreams, controlling schedules and budgets, and ensuring delivery reliability.",
@@ -57,7 +57,7 @@ export function DeliveryModelSection({ locale, badge, title, subtitle }: Deliver
       icon: Layers,
       level: "03",
       title: isAr ? "المستوى الثالث: الخبراء التخصصيون" : "Tier 3: Subject Matter Experts (SMEs)",
-      subtitle: isAr ? "Specialized Domain Expertise" : "Specialized Domain Expertise",
+      subtitle: isAr ? "الخبرة التخصصية العميقة" : "Specialized Domain Expertise",
       desc: isAr
         ? "تقديم الحلول الفنية العميقة في مجالات تأسيس مكاتب PMO، الحوكمة، الذكاء الاصطناعي، وإدارة المعرفة وهندسة العمليات."
         : "Delivering deep technical mastery in PMO setups, governance frameworks, enterprise AI, knowledge assets, and process re-engineering.",
@@ -71,7 +71,7 @@ export function DeliveryModelSection({ locale, badge, title, subtitle }: Deliver
       icon: Users,
       level: "04",
       title: isAr ? "المستوى الرابع: النظراء المؤسسيين" : "Tier 4: Client Counterparts",
-      subtitle: isAr ? "Knowledge Transfer & Enablement" : "Knowledge Transfer & Enablement",
+      subtitle: isAr ? "نقل المعرفة والتمكين الداخلي" : "Knowledge Transfer & Enablement",
       desc: isAr
         ? "العمل التشاركي الميداني مع الكفاءات الداخلية للمؤسسة وتدريبهم المستمر لضمان استدامة الأثر ونقل المعرفة المؤسسية الكاملة."
         : "Co-creating on-the-ground with internal organizational talent and continuous upskilling to embed lasting capabilities and knowledge transfer.",

@@ -70,17 +70,6 @@ export function ExpertsHero({
       <div className="absolute top-20 end-1/4 translate-x-1/2 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-5xl text-center">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground mb-6">
-          <Link href={`/${locale}`} className="hover:text-primary transition-colors">
-            {isAr ? "الرئيسية" : "Home"}
-          </Link>
-          <span>/</span>
-          <span className="text-foreground font-semibold">
-            {isAr ? "الخبراء" : "Experts"}
-          </span>
-        </div>
-
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-bold mb-6 border border-primary/20 backdrop-blur-md shadow-sm">
           <Sparkles className="w-4 h-4" />
