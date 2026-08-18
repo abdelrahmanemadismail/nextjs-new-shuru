@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { locales, type Locale, isLocale, defaultLocale } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/seo";
 import { getExperts } from "@/strapi/experts";
-import { getPageCached } from "@/strapi/page";
+import { getExpertsPageCached } from "@/strapi/experts-page";
 import { getTestimonialsCached } from "@/strapi/home";
 import { DeliveryModelSection } from "@/components/experts/delivery-model-section";
 import { ExpertsGrid } from "@/components/experts/experts-grid";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: ExpertsPageProps): Promise<Me
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
 
-  const pageData = await getPageCached("experts", locale);
+  const pageData = await getExpertsPageCached(locale);
   const heroBlock = pageData?.blocks?.find((b) => b.__component === "home.hero");
 
   const isAr = locale === "ar";
@@ -36,14 +36,14 @@ export async function generateMetadata({ params }: ExpertsPageProps): Promise<Me
   return buildMetadata({
     locale,
     path: "/experts",
-    title: pageData?.seo?.meta_title || heroBlock?.title || defaultTitle,
-    description: pageData?.seo?.meta_description || heroBlock?.subtitle || defaultDesc,
+    title: pageData?.seo?.meta_title || pageData?.heroTitle || heroBlock?.title || defaultTitle,
+    description: pageData?.seo?.meta_description || pageData?.heroSubtitle || heroBlock?.subtitle || defaultDesc,
     keywords: pageData?.seo?.meta_keywords
       ? pageData.seo.meta_keywords.split(",").map((s) => s.trim())
       : undefined,
     ogType: "hero",
-    cta1: heroBlock?.primaryCtaText || (isAr ? "طلب استشارة" : "Request Consultation"),
-    cta2: heroBlock?.secondaryCtaText || (isAr ? "استكشاف الخبراء" : "Explore Experts"),
+    cta1: pageData?.heroPrimaryCtaText || heroBlock?.primaryCtaText || (isAr ? "طلب استشارة" : "Request Consultation"),
+    cta2: pageData?.heroSecondaryCtaText || heroBlock?.secondaryCtaText || (isAr ? "استكشاف الخبراء" : "Explore Experts"),
   });
 }
 
@@ -53,7 +53,7 @@ export default async function ExpertsPage({ params }: ExpertsPageProps) {
   setRequestLocale(locale);
 
   const [pageData, experts, testimonials] = await Promise.all([
-    getPageCached("experts", locale),
+    getExpertsPageCached(locale),
     getExperts(locale),
     getTestimonialsCached(locale),
   ]);
@@ -69,13 +69,13 @@ export default async function ExpertsPage({ params }: ExpertsPageProps) {
       {/* 1. Hero Section */}
       <ExpertsHero
         locale={locale}
-        badgeText={heroBlock?.badgeText}
-        title={heroBlock?.title}
-        subtitle={heroBlock?.subtitle}
-        primaryCtaText={heroBlock?.primaryCtaText}
-        primaryCtaLink={heroBlock?.primaryCtaLink}
-        secondaryCtaText={heroBlock?.secondaryCtaText}
-        secondaryCtaLink={heroBlock?.secondaryCtaLink || "#experts-directory"}
+        badgeText={pageData?.badge || heroBlock?.badgeText}
+        title={pageData?.heroTitle || heroBlock?.title}
+        subtitle={pageData?.heroSubtitle || heroBlock?.subtitle}
+        primaryCtaText={pageData?.heroPrimaryCtaText || heroBlock?.primaryCtaText}
+        primaryCtaLink={pageData?.heroPrimaryCtaLink || heroBlock?.primaryCtaLink}
+        secondaryCtaText={pageData?.heroSecondaryCtaText || heroBlock?.secondaryCtaText}
+        secondaryCtaLink={pageData?.heroSecondaryCtaLink || heroBlock?.secondaryCtaLink || "#experts-directory"}
       />
 
       <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl space-y-16">
