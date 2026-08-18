@@ -23,9 +23,28 @@ import { ExpertCard } from "./expert-card";
 interface ExpertsGridProps {
   experts: StrapiExpert[];
   locale: Locale;
+  directoryBadge?: string;
+  directoryTitle?: string;
+  directorySubtitle?: string;
+  ctaBadge?: string;
+  ctaHeadline?: string;
+  ctaDescription?: string;
+  ctaButtonText?: string;
+  ctaButtonLink?: string;
 }
 
-export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
+export function ExpertsGrid({
+  experts,
+  locale,
+  directoryBadge,
+  directoryTitle,
+  directorySubtitle,
+  ctaBadge,
+  ctaHeadline,
+  ctaDescription,
+  ctaButtonText,
+  ctaButtonLink = "/request-info",
+}: ExpertsGridProps) {
   const isAr = locale === "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -173,7 +192,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
                 <Layers className="w-4 h-4" />
               </div>
               <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                {isAr ? "جميع المستشارين والخبراء التخصصيين" : "All Subject Matter Experts"}
+                {directoryTitle || (isAr ? "جميع المستشارين والخبراء التخصصيين" : "All Subject Matter Experts")}
               </h3>
             </div>
           )}
@@ -364,23 +383,23 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
         <div className="space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{isAr ? "استشارة مخصصة" : "Tailored Advisory"}</span>
+            <span>{ctaBadge || (isAr ? "استشارة مخصصة" : "Tailored Advisory")}</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-            {isAr ? "هل تبحث عن مستشار تنفيذي يقود مبادرتكم القادمة؟" : "Looking for an executive advisor to lead your next initiative?"}
+            {ctaHeadline || (isAr ? "هل تبحث عن مستشار تنفيذي يقود مبادرتكم القادمة؟" : "Looking for an executive advisor to lead your next initiative?")}
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            {isAr
+            {ctaDescription || (isAr
               ? "نساعدكم في تشخيص التحدي وتخصيص الكفاءة الاستشارية الأكثر ملاءمة لطبيعة مشروعكم وسياقه المؤسسي."
-              : "We help diagnose your institutional challenge and allocate the expert best suited for your operating context."}
+              : "We help diagnose your institutional challenge and allocate the expert best suited for your operating context.")}
           </p>
         </div>
 
         <Link
-          href={`/${locale}/request-info`}
+          href={`/${locale}${ctaButtonLink.startsWith("/") ? ctaButtonLink : `/${ctaButtonLink}`}`}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-8 py-4 text-sm shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 hover:-translate-y-0.5 transition-all w-full sm:w-auto"
         >
-          <span>{isAr ? "طلب اجتماع استكشافي" : "Request Discovery Session"}</span>
+          <span>{ctaButtonText || (isAr ? "طلب اجتماع استكشافي" : "Request Discovery Session")}</span>
           <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
         </Link>
       </div>

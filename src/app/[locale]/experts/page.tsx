@@ -83,11 +83,27 @@ export default async function ExpertsPage({ params }: ExpertsPageProps) {
         {timelineBlock ? (
           <BlockRenderer block={timelineBlock} locale={locale} testimonials={testimonials} />
         ) : (
-          <DeliveryModelSection locale={locale} />
+          <DeliveryModelSection
+            locale={locale}
+            badge={pageData?.deliveryModelBadge}
+            title={pageData?.deliveryModelTitle}
+            subtitle={pageData?.deliveryModelSubtitle}
+          />
         )}
 
         {/* 3. Experts Directory & Interactive Filter Grid */}
-        <ExpertsGrid experts={experts} locale={locale} />
+        <ExpertsGrid
+          experts={experts}
+          locale={locale}
+          directoryBadge={pageData?.directoryBadge}
+          directoryTitle={pageData?.directoryTitle}
+          directorySubtitle={pageData?.directorySubtitle}
+          ctaBadge={pageData?.ctaBadge}
+          ctaHeadline={pageData?.ctaHeadline}
+          ctaDescription={pageData?.ctaDescription}
+          ctaButtonText={pageData?.ctaButtonText}
+          ctaButtonLink={pageData?.ctaButtonLink}
+        />
 
         {/* 4. Additional Dynamic Strapi Blocks (e.g. Challenges, FAQs, Quote, CTA) */}
         {otherBlocks.map((block) => (

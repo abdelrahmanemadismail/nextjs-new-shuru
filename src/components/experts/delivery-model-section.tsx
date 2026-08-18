@@ -15,10 +15,12 @@ import { type Locale } from "@/lib/i18n";
 
 interface DeliveryModelSectionProps {
   locale: Locale;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
 }
 
-export function DeliveryModelSection({ locale }: DeliveryModelSectionProps) {
-  const t = useTranslations("experts.deliveryModel");
+export function DeliveryModelSection({ locale, badge, title, subtitle }: DeliveryModelSectionProps) {
   const isAr = locale === "ar";
 
   const tiers = [
@@ -90,15 +92,15 @@ export function DeliveryModelSection({ locale }: DeliveryModelSectionProps) {
       <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 relative z-10">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-bold mb-4 border border-primary/20 backdrop-blur-sm">
           <Sparkles className="w-4 h-4" />
-          <span>{isAr ? "نموذج العمل المتدرج" : "4-Tier Delivery Model"}</span>
+          <span>{badge || (isAr ? "نموذج العمل المتدرج" : "4-Tier Delivery Model")}</span>
         </div>
         <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight mb-4 leading-tight">
-          {isAr ? "نموذج تقديم الاستشارات متعدد المستويات" : "Structured 4-Tier Engagement Model"}
+          {title || (isAr ? "نموذج تقديم الاستشارات متعدد المستويات" : "Structured 4-Tier Engagement Model")}
         </h2>
         <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-          {isAr
+          {subtitle || (isAr
             ? "هيكل تشغيلي منظم يضمن الإشراف الاستراتيجي رفيع المستوى، والقيادة الميدانية، والعمق التخصصي، مع التركيز على بناء واستدامة القدرات الداخلية لمنظمتكم."
-            : "A proven operating framework ensuring strategic direction, on-the-ground leadership, deep technical mastery, and internal organizational capability enablement."}
+            : "A proven operating framework ensuring strategic direction, on-the-ground leadership, deep technical mastery, and internal organizational capability enablement.")}
         </p>
       </div>
 
