@@ -1,16 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
 import {
   Award,
   Briefcase,
   ExternalLink,
   Linkedin,
   Sparkles,
-  User,
   ArrowRight,
-  CheckCircle,
+  Layers,
 } from "lucide-react";
 import { type StrapiExpert } from "@/strapi/experts";
 import { type Locale } from "@/lib/i18n";
@@ -22,7 +21,6 @@ interface ExpertCardProps {
 }
 
 export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
-  const t = useTranslations("experts.card");
   const isAr = locale === "ar";
 
   const expertiseTags = expert.expertise
@@ -34,8 +32,8 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
     : [];
 
   return (
-    <div className="group relative rounded-3xl bg-card border border-border/70 hover:border-primary/50 p-6 sm:p-7 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between overflow-hidden">
-      {/* Top accent line on hover */}
+    <div className="group relative rounded-3xl bg-card border border-border/70 hover:border-primary/50 p-6 sm:p-7 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col justify-between overflow-hidden">
+      {/* Top accent glow line on hover */}
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-amber-500 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       <div>
@@ -68,7 +66,7 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
             {expert.featured && (
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] font-bold border border-amber-500/20">
                 <Sparkles className="w-3 h-3" />
-                <span>{t("featuredBadge")}</span>
+                <span>{isAr ? "خبير رئيسي" : "Featured Lead"}</span>
               </span>
             )}
 
@@ -78,7 +76,7 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-xl border border-border bg-background hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-colors shadow-sm"
-                title={t("linkedin")}
+                title="LinkedIn"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Linkedin className="w-4 h-4" />
@@ -106,7 +104,7 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
         {expertiseTags.length > 0 && (
           <div className="space-y-1.5 mb-4">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 block">
-              {t("expertise")}
+              {isAr ? "مجالات الخبرة" : "Areas of Expertise"}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {expertiseTags.slice(0, 3).map((tag, idx) => (
@@ -130,7 +128,7 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
         {certTags.length > 0 && (
           <div className="space-y-1.5 mb-5">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 block">
-              {t("certifications")}
+              {isAr ? "الشهادات والاعتمادات" : "Certifications"}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {certTags.slice(0, 3).map((cert, idx) => (
@@ -151,15 +149,22 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
         )}
       </div>
 
-      {/* Action button */}
-      <div className="pt-4 border-t border-border/50">
+      {/* Action buttons */}
+      <div className="pt-4 border-t border-border/50 flex gap-2">
         <button
           onClick={() => onSelect(expert)}
-          className="w-full py-2.5 px-4 rounded-xl border border-border bg-accent/20 hover:bg-primary hover:text-primary-foreground text-foreground text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group-hover:border-primary/40"
+          className="flex-1 py-2.5 px-4 rounded-xl border border-border bg-accent/20 hover:bg-accent text-foreground text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group-hover:border-primary/40"
         >
-          <span>{t("viewBio")}</span>
-          <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+          <span>{isAr ? "عرض السيرة" : "View Bio"}</span>
         </button>
+
+        <Link
+          href={`/${locale}/request-info?expert=${expert.slug}`}
+          className="py-2.5 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm shadow-primary/20"
+        >
+          <span>{isAr ? "طلب اجتماع" : "Engage"}</span>
+          <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100" />
+        </Link>
       </div>
     </div>
   );

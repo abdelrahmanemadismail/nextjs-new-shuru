@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import {
   Search,
   Sparkles,
@@ -12,7 +11,6 @@ import {
   ExternalLink,
   Linkedin,
   X,
-  CheckCircle2,
   Send,
   Layers,
   ArrowRight,
@@ -28,7 +26,6 @@ interface ExpertsGridProps {
 }
 
 export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
-  const t = useTranslations("experts");
   const isAr = locale === "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,7 +75,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
   }, [filteredExperts]);
 
   return (
-    <div className="space-y-12">
+    <div id="experts-directory" className="space-y-12">
       {/* Search & Filter Bar */}
       <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -89,7 +86,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("filter.searchPlaceholder")}
+              placeholder={isAr ? "ابحث بالاسم، التخصص، أو الشهادة..." : "Search by name, expertise, or certification..."}
               className="w-full h-12 ps-11 pe-4 rounded-full border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-inner"
             />
             {searchQuery && (
@@ -106,8 +103,8 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
             <Filter className="w-3.5 h-3.5 text-primary" />
             <span>
               {isAr
-                ? `عرض ${filteredExperts.length} من أصل ${experts.length} خبير`
-                : `Showing ${filteredExperts.length} of ${experts.length} experts`}
+                ? `عرض ${filteredExperts.length} من أصل ${experts.length} خبير ومستشار`
+                : `Showing ${filteredExperts.length} of ${experts.length} senior advisors`}
             </span>
           </div>
         </div>
@@ -123,7 +120,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
                   : "bg-accent/40 hover:bg-accent text-foreground border border-border/60"
               }`}
             >
-              {t("filter.all")}
+              {isAr ? "جميع التخصصات" : "All Specializations"}
             </button>
             {allDomainTags.map((tag) => (
               <button
@@ -150,7 +147,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
               <Sparkles className="w-4 h-4" />
             </div>
             <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-              {t("filter.featured")}
+              {isAr ? "قيادات التحول والمستشارون الرئيسيون" : "Featured Lead Advisors"}
             </h3>
           </div>
 
@@ -176,7 +173,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
                 <Layers className="w-4 h-4" />
               </div>
               <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                {t("filter.allExperts")}
+                {isAr ? "جميع المستشارين والخبراء التخصصيين" : "All Subject Matter Experts"}
               </h3>
             </div>
           )}
@@ -256,7 +253,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
                 {activeModalExpert.featured && (
                   <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-500/20 mb-1">
                     <Sparkles className="w-3 h-3" />
-                    <span>{t("card.featuredBadge")}</span>
+                    <span>{isAr ? "خبير رئيسي" : "Featured Lead"}</span>
                   </span>
                 )}
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground leading-tight">
@@ -285,7 +282,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
               <div className="space-y-2 rounded-2xl bg-accent/20 p-5 border border-border/60">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Briefcase className="w-4 h-4 text-primary" />
-                  <span>{t("modal.about")}</span>
+                  <span>{isAr ? "نبذة عن المسار والخبرات" : "Professional Biography"}</span>
                 </h4>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {activeModalExpert.bio}
@@ -298,7 +295,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Layers className="w-4 h-4 text-primary" />
-                  <span>{t("modal.expertise")}</span>
+                  <span>{isAr ? "مجالات الخبرة والتخصص" : "Areas of Expertise"}</span>
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {activeModalExpert.expertise.split(/[,،]/).map((tag, idx) => {
@@ -322,7 +319,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Award className="w-4 h-4 text-primary" />
-                  <span>{t("modal.certifications")}</span>
+                  <span>{isAr ? "الشهادات والاعتمادات الدولية" : "Certifications & Credentials"}</span>
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {activeModalExpert.certifications.split(/[,،]/).map((cert, idx) => {
@@ -344,36 +341,38 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
             {/* Action buttons */}
             <div className="pt-4 border-t border-border/60 flex flex-col sm:flex-row gap-3">
               <Link
-                href={`/${locale}/request-info`}
+                href={`/${locale}/request-info?expert=${activeModalExpert.slug}`}
                 className="flex-1 py-3.5 px-6 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all flex items-center justify-center gap-2"
                 onClick={() => setActiveModalExpert(null)}
               >
-                <span>{t("modal.requestExpert")}</span>
+                <span>{isAr ? "طلب اجتماع استشاري مع هذا الخبير" : "Request Consultation with this Advisor"}</span>
                 <Send className="w-4 h-4 rtl:-scale-x-100" />
               </Link>
               <button
                 onClick={() => setActiveModalExpert(null)}
                 className="px-6 py-3.5 rounded-full border border-border bg-card hover:bg-accent text-foreground text-sm font-semibold transition-all"
               >
-                {t("modal.close")}
+                {isAr ? "إغلاق" : "Close"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Bottom CTA Card */}
+      {/* Bottom Consultation CTA Banner */}
       <div className="rounded-3xl bg-gradient-to-r from-primary/15 via-primary/5 to-amber-500/10 border border-primary/20 p-8 sm:p-10 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-start">
         <div className="space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{t("cta.badge")}</span>
+            <span>{isAr ? "استشارة مخصصة" : "Tailored Advisory"}</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-            {t("cta.title")}
+            {isAr ? "هل تبحث عن مستشار تنفيذي يقود مبادرتكم القادمة؟" : "Looking for an executive advisor to lead your next initiative?"}
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            {t("cta.desc")}
+            {isAr
+              ? "نساعدكم في تشخيص التحدي وتخصيص الكفاءة الاستشارية الأكثر ملاءمة لطبيعة مشروعكم وسياقه المؤسسي."
+              : "We help diagnose your institutional challenge and allocate the expert best suited for your operating context."}
           </p>
         </div>
 
@@ -381,7 +380,7 @@ export function ExpertsGrid({ experts, locale }: ExpertsGridProps) {
           href={`/${locale}/request-info`}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-8 py-4 text-sm shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 hover:-translate-y-0.5 transition-all w-full sm:w-auto"
         >
-          <span>{t("cta.button")}</span>
+          <span>{isAr ? "طلب اجتماع استكشافي" : "Request Discovery Session"}</span>
           <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
         </Link>
       </div>
