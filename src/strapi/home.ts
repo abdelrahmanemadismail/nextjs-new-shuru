@@ -168,6 +168,7 @@ export type StrapiHomeBlock =
   | { __component: 'shared.challenges-section'; [key: string]: any }
   | { __component: 'shared.timeline-section'; [key: string]: any }
   | { __component: 'shared.quote-section'; [key: string]: any }
+  | { __component: 'shared.faq-section'; [key: string]: any }
   | { __component: 'shared.media'; [key: string]: any }
   | { __component: 'shared.quote'; [key: string]: any }
   | { __component: 'shared.rich-text'; [key: string]: any }

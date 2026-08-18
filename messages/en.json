@@ -58,6 +58,16 @@
       "challengeLabel": "The Challenge",
       "solutionLabel": "OUR SOLUTION",
       "resultLabel": "The Result"
+    },
+    "faqSection": {
+      "defaultBadge": "FAQ",
+      "defaultTitle": "Frequently Asked Questions",
+      "defaultIntro": "Find answers to the most common questions about our services and execution methodologies.",
+      "allCategories": "All Questions",
+      "searchPlaceholder": "Search FAQ...",
+      "noResults": "No questions matched your search.",
+      "defaultContactText": "Can't find the answer you're looking for?",
+      "defaultContactLinkText": "Contact us directly"
     }
   },
   "common": {

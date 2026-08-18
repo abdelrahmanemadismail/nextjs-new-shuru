@@ -70,6 +70,25 @@ export type StrapiSharedSliderBlock = {
   files?: any[];
 };
 
+export type StrapiFaqItem = {
+  id: number;
+  question: string;
+  answer: string;
+  category?: string;
+};
+
+export type StrapiFaqSectionBlock = {
+  __component: 'shared.faq-section';
+  id: number;
+  badge?: string;
+  title: string;
+  introText?: string;
+  items: StrapiFaqItem[];
+  contactText?: string;
+  contactLinkText?: string;
+  contactLink?: string;
+};
+
 export type StrapiPageBlock =
   | StrapiHeroBlock
   | StrapiOverviewBlock
@@ -80,6 +99,7 @@ export type StrapiPageBlock =
   | StrapiChallengesSectionBlock
   | StrapiTimelineSectionBlock
   | StrapiQuoteSectionBlock
+  | StrapiFaqSectionBlock
   | StrapiSharedMediaBlock
   | StrapiSharedQuoteBlock
   | StrapiSharedRichTextBlock

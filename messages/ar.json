@@ -58,6 +58,16 @@
       "challengeLabel": "التحدي",
       "solutionLabel": "حلولنا",
       "resultLabel": "النتيجة"
+    },
+    "faqSection": {
+      "defaultBadge": "الأسئلة الشائعة",
+      "defaultTitle": "هل لديك أي استفسارات؟",
+      "defaultIntro": "إليك إجابات على أبرز الأسئلة الشائعة حول خدماتنا وحلولنا التنفيذية.",
+      "allCategories": "جميع الأسئلة",
+      "searchPlaceholder": "ابحث في الأسئلة الشائعة...",
+      "noResults": "لم نجد أي أسئلة تطابق بحثك.",
+      "defaultContactText": "لم تجد إجابة لسؤالك؟",
+      "defaultContactLinkText": "تواصل معنا مباشرة"
     }
   },
   "common": {

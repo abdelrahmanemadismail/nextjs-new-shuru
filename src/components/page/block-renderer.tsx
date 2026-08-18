@@ -29,6 +29,9 @@ const TimelineSection = dynamic(() =>
 const QuoteSection = dynamic(() =>
   import("@/components/shared/quote-section").then((mod) => mod.QuoteSection)
 );
+const FaqSection = dynamic(() =>
+  import("@/components/shared/faq-section").then((mod) => mod.FaqSection)
+);
 const MediaBlock = dynamic(() =>
   import("@/components/shared/media-block").then((mod) => mod.MediaBlock)
 );
@@ -89,6 +92,20 @@ export function BlockRenderer({ block, locale, testimonials }: { block: StrapiPa
         <QuoteSection
           quoteText={block.quoteText}
           author={block.author}
+        />
+      );
+
+    case "shared.faq-section":
+      return (
+        <FaqSection
+          badge={block.badge}
+          title={block.title}
+          introText={block.introText}
+          items={block.items}
+          contactText={block.contactText}
+          contactLinkText={block.contactLinkText}
+          contactLink={block.contactLink}
+          locale={locale}
         />
       );
 
