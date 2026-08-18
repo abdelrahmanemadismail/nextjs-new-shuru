@@ -185,6 +185,181 @@
     "saveSuccess": "Insight saved!",
     "unsaveSuccess": "Insight unsaved!"
   },
+  "requestInfo": {
+    "badge": "Request Information & Advisory",
+    "title": "Request for Information (RFI)",
+    "description": "Share your project needs and documentation. The Shuru team will evaluate your request and propose the optimal scope and tailored experts to achieve your goals.",
+    "sections": {
+      "applicant": "Applicant Information",
+      "request": "Request & Need Details",
+      "documents": "Documents & Scope of Work",
+      "communication": "Communication Preferences",
+      "consent": "Consent & Privacy"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "jobTitle": "Job Title",
+      "organization": "Organization Name",
+      "department": "Department / Division",
+      "email": "Work Email",
+      "phone": "Mobile Number",
+      "cityCountry": "City / Country",
+      "entityType": "Organization Type",
+      "needDomain": "Area of Need",
+      "requestTitle": "Request Title",
+      "challengeDescription": "Need or Challenge Description",
+      "expectedOutcomes": "Expected Outcomes",
+      "currentStage": "Current Stage",
+      "expectedStartDate": "Expected Start Date",
+      "expectedDuration": "Expected Duration",
+      "estimatedBudget": "Estimated Budget (Optional)",
+      "preferredContactMethod": "Preferred Contact Method",
+      "bestTimeToContact": "Best Time to Contact",
+      "additionalNotes": "Additional Notes",
+      "rfpFile": "Upload RFP or Scope of Work",
+      "supportingDocs": "Upload Supporting Documents",
+      "fileFormatsNote": "Supported formats: PDF, DOCX, XLSX, PPTX (Max size: 20 MB)"
+    },
+    "options": {
+      "entityTypes": {
+        "government": "Government Entity",
+        "private": "Private Enterprise",
+        "nonProfit": "Non-Profit Organization",
+        "startup": "Startup",
+        "other": "Other"
+      },
+      "needDomains": {
+        "pmo": "PMO Setup & Enhancement",
+        "maturity": "Institutional Maturity Assessment",
+        "governance": "Governance & Operating Models",
+        "knowledge": "Knowledge Management",
+        "digitalAi": "AI & Digital Transformation",
+        "benefits": "Benefits & Value Management",
+        "ppm": "Portfolio, Program & Project Management",
+        "executiveStudies": "Executive Studies & Research",
+        "experts": "Expert & Consultant Provision",
+        "contactRequest": "Contact Request",
+        "other": "Other"
+      },
+      "stages": {
+        "discovery": "Initial Discovery",
+        "sowPrep": "Scope of Work Preparation",
+        "proposalPrep": "Proposal Preparation",
+        "bidEval": "Bid Evaluation",
+        "existingSupport": "Existing Project Needing Support",
+        "other": "Other"
+      },
+      "budgets": {
+        "notSet": "Not determined yet",
+        "under100k": "Under 100k SAR",
+        "100kTo250k": "100k–250k SAR",
+        "250kTo500k": "250k–500k SAR",
+        "500kTo1m": "500k–1M SAR",
+        "over1m": "More than 1M SAR"
+      },
+      "contactMethods": {
+        "email": "Email",
+        "phone": "Phone Call",
+        "virtualMeeting": "Virtual Meeting"
+      }
+    },
+    "consentText": "I agree to the use of the submitted information for reviewing the request and contacting me, in accordance with the Privacy Policy.",
+    "submit": "Submit Request",
+    "submitting": "Submitting Request...",
+    "whatHappensNext": {
+      "title": "What happens after submitting?",
+      "step1": {
+        "number": "01",
+        "title": "We Review the Request",
+        "desc": "We review the submitted information and documents to evaluate the nature of your need."
+      },
+      "step2": {
+        "number": "02",
+        "title": "We Match Suitable Expertise",
+        "desc": "We assign the engagement lead and matching experts from the Shuru network."
+      },
+      "step3": {
+        "number": "03",
+        "title": "We Reach Out to You",
+        "desc": "We contact you to confirm scope, next steps, and collaboration framework."
+      }
+    },
+    "success": {
+      "title": "Your Request Has Been Received",
+      "message": "Thank you for contacting SHURU. Our team will review the submitted information and contact you within two business days.",
+      "anotherRequest": "Submit Another Request",
+      "backHome": "Back to Home"
+    }
+  },
+  "companyProfile": {
+    "badge": "Company Profile",
+    "title": "SHURU Company Profile",
+    "subtitle": "Discover SHURU's business model, elite expert network, and advanced advisory solutions empowering organizations toward sustainable execution.",
+    "downloadPdf": "Download Company Profile (PDF)",
+    "viewPdf": "View Document",
+    "fileInfo": "High Quality PDF Document • Updated 2026 Edition",
+    "requestInfoCta": "Looking for a tailored Scope of Work or dedicated advisory?",
+    "requestInfoBtn": "Submit Request for Information (RFI)",
+    "contactBtn": "Book Diagnostic Session"
+  },
+  "experts": {
+    "badge": "SHURU Expert Network",
+    "title": "Elite Advisory Leaders & Subject Specialists",
+    "subtitle": "At SHURU, we leverage an extraordinary network of seasoned practitioners and executive advisors with deep track records in leading major transformations and national programs.",
+    "deliveryModel": {
+      "badge": "Operational Delivery Model",
+      "title": "Expert-Led Delivery Model",
+      "subtitle": "An integrated operating structure ensuring seamless knowledge transfer, rigorous quality governance, and direct collaborative synergy with client teams.",
+      "tiers": {
+        "director": {
+          "title": "SHURU Engagement Director",
+          "subtitle": "Engagement & Partnership Director",
+          "desc": "Leads overall strategic oversight, ensuring alignment with executive vision, strategic milestones, and world-class governance standards."
+        },
+        "leadConsultant": {
+          "title": "Lead Consultant",
+          "subtitle": "Consulting & Track Leader",
+          "desc": "Drives daily workstreams, on-the-ground execution, and converts strategic blueprints into robust, actionable operational frameworks."
+        },
+        "subjectMatterExperts": {
+          "title": "Subject-Matter Experts",
+          "subtitle": "Specialized Domain Authorities",
+          "desc": "Niche authorities in specialized fields (such as PMO, Enterprise AI, Governance, Value Realization) delivering rigorous technical depth."
+        },
+        "clientCounterparts": {
+          "title": "Client Counterparts",
+          "subtitle": "Client Peers & Core Teams",
+          "desc": "Direct co-working with internal institutional teams to facilitate knowledge transfer and build enduring institutional capacity."
+        }
+      }
+    },
+    "filter": {
+      "all": "All",
+      "searchPlaceholder": "Search expert by name, specialization, or certification...",
+      "featured": "Featured Experts",
+      "allExperts": "All Experts & Advisors"
+    },
+    "card": {
+      "viewBio": "View Profile & Credentials",
+      "linkedin": "LinkedIn Profile",
+      "expertise": "Areas of Expertise",
+      "certifications": "Certifications & Credentials",
+      "featuredBadge": "Featured Expert"
+    },
+    "modal": {
+      "about": "Expert Biography",
+      "expertise": "Areas of Expertise",
+      "certifications": "Certifications & Credentials",
+      "requestExpert": "Request This Expert for Your Project",
+      "close": "Close"
+    },
+    "cta": {
+      "badge": "Engage Our Experts",
+      "title": "Looking for Dedicated Advisory Leadership for Your Project?",
+      "desc": "Specify your project requirements and required expertise through our RFI portal. Our leadership will calibrate and assign the optimal experts for your entity.",
+      "button": "Submit RFI / Request Experts"
+    }
+  },
   "validation": {
     "required": "This field is required",
     "invalidEmail": "Please enter a valid email address",
