@@ -1001,61 +1001,6 @@ export function RequestInfoForm() {
           </div>
         </form>
       </Form>
-
-      {/* SECTION: What Happens After Submitting (3 Steps Card) */}
-      <div className="rounded-3xl bg-gradient-to-br from-card to-card/70 border border-primary/20 p-8 sm:p-10 shadow-lg relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
-        <div className="mb-8 text-center max-w-xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-3 border border-primary/20">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{isAr ? "مسار العمل" : "Workflow"}</span>
-          </div>
-          <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-            {t("whatHappensNext.title")}
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-          {/* Step 1 */}
-          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-border/80 relative hover:border-primary/40 transition-all hover:shadow-md group">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-              {t("whatHappensNext.step1.number")}
-            </div>
-            <h4 className="text-base font-bold text-foreground mb-2">
-              {t("whatHappensNext.step1.title")}
-            </h4>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              {t("whatHappensNext.step1.desc")}
-            </p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-border/80 relative hover:border-primary/40 transition-all hover:shadow-md group">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-              {t("whatHappensNext.step2.number")}
-            </div>
-            <h4 className="text-base font-bold text-foreground mb-2">
-              {t("whatHappensNext.step2.title")}
-            </h4>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              {t("whatHappensNext.step2.desc")}
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-border/80 relative hover:border-primary/40 transition-all hover:shadow-md group">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-              {t("whatHappensNext.step3.number")}
-            </div>
-            <h4 className="text-base font-bold text-foreground mb-2">
-              {t("whatHappensNext.step3.title")}
-            </h4>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              {t("whatHappensNext.step3.desc")}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
