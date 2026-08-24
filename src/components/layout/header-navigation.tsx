@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Menu, Search, User } from "lucide-react";
@@ -80,7 +80,10 @@ export function HeaderNavigation({
   const pathname = usePathname();
   const router = useRouter();
 
-  const headerItems = items.filter((item) => item.onHeader);
+  const headerItems = useMemo(() => {
+    const explicitlyOnHeader = items.filter((item) => item.onHeader);
+    return explicitlyOnHeader.length > 0 ? explicitlyOnHeader : items;
+  }, [items]);
 
   useEffect(() => {
     if (!isMenuOpen && !isSearchOpen) {

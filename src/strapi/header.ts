@@ -126,11 +126,13 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
     return null;
   }
 
-  const lightLogoUrl = toAbsoluteUrl(extractMediaUrl(data.lightLogoImage));
-  const darkLogoUrl = toAbsoluteUrl(extractMediaUrl(data.darkLogoImage));
-  const logoAlt = data.alt?.trim() || "Site logo";
-  const showQuickLinks = data.showQuickLinks !== false;
-  const navigationItems = (data.navigation?.primaryMenuItems ?? [])
+  const attrs = ((data as any).attributes || data) as StrapiHeaderEntry;
+
+  const lightLogoUrl = toAbsoluteUrl(extractMediaUrl(attrs.lightLogoImage));
+  const darkLogoUrl = toAbsoluteUrl(extractMediaUrl(attrs.darkLogoImage));
+  const logoAlt = attrs.alt?.trim() || "Site logo";
+  const showQuickLinks = attrs.showQuickLinks !== false;
+  const navigationItems = (attrs.navigation?.primaryMenuItems ?? [])
     .map(normalizeItem)
     .filter((item): item is HeaderMenuItem => item !== null)
     .sort((a, b) => a.order - b.order);
@@ -142,7 +144,7 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
     logoAlt,
     showQuickLinks,
     navigationItems,
-    topBar: data.topBar || null,
+    topBar: attrs.topBar || null,
   };
 };
 
@@ -151,16 +153,7 @@ async function fetchHeader(locale: Locale) {
   params.append("locale", locale);
   params.append("populate[lightLogoImage][fields][0]", "url");
   params.append("populate[darkLogoImage][fields][0]", "url");
-  params.append("populate[navigation][populate][primaryMenuItems][fields][0]", "label");
-  params.append("populate[navigation][populate][primaryMenuItems][fields][1]", "url");
-  params.append("populate[navigation][populate][primaryMenuItems][fields][2]", "openInNewTab");
-  params.append("populate[navigation][populate][primaryMenuItems][fields][3]", "order");
-  params.append("populate[navigation][populate][primaryMenuItems][fields][4]", "onHeader");
-  params.append("populate[navigation][populate][primaryMenuItems][fields][5]", "onSideBar");
-  params.append("populate[navigation][populate][primaryMenuItems][populate][subItems][fields][0]", "label");
-  params.append("populate[navigation][populate][primaryMenuItems][populate][subItems][fields][1]", "url");
-  params.append("populate[navigation][populate][primaryMenuItems][populate][subItems][fields][2]", "openInNewTab");
-  params.append("populate[navigation][populate][primaryMenuItems][populate][subItems][fields][3]", "order");
+  params.append("populate[navigation][populate][primaryMenuItems][populate][subItems]", "*");
   params.append("populate[topBar][populate]", "*");
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/header?${params.toString()}`, {
@@ -201,7 +194,8 @@ export async function getHeaderSettings(locale: Locale): Promise<HeaderSettings 
     }
 
     return null;
-  } catch {
+  } catch (err) {
+    console.error("Error in getHeaderSettings:", err);
     if (locale !== defaultLocale) {
       try {
         return await getHeaderSettingsCached(defaultLocale);

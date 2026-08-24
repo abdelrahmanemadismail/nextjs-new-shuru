@@ -1,58 +1,140 @@
 import { revalidatePath, revalidateTag } from "next/cache";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { GLOBAL_SETTINGS_TAG } from "@/strapi/global";
 import { HEADER_SETTINGS_TAG } from "@/strapi/header";
 import { FOOTER_SETTINGS_TAG } from "@/strapi/footer";
 import { HOME_TAG, TESTIMONIALS_TAG } from "@/strapi/home";
+import { EXPERTS_PAGE_TAG } from "@/strapi/experts-page";
+import { COMPANY_PROFILE_PAGE_TAG } from "@/strapi/company-profile-page";
+import { REQUEST_INFO_PAGE_TAG } from "@/strapi/request-info-page";
 import { PAGE_TAG } from "@/strapi/page";
 
-type RevalidateBody = {
-  model?: string;
-};
+// Complete list of all application cache tags to purge on every change
+const ALL_TAGS = [
+  HEADER_SETTINGS_TAG,
+  FOOTER_SETTINGS_TAG,
+  GLOBAL_SETTINGS_TAG,
+  HOME_TAG,
+  TESTIMONIALS_TAG,
+  EXPERTS_PAGE_TAG,
+  "experts",
+  COMPANY_PROFILE_PAGE_TAG,
+  REQUEST_INFO_PAGE_TAG,
+  "services",
+  "articles",
+  "author",
+  "categories",
+  "news-items",
+  "magazine-issues",
+  "majlises",
+  "podcasts",
+  "insights",
+  PAGE_TAG,
+];
 
-const MODEL_TO_TAGS: Record<string, string|null> = {
-  global: GLOBAL_SETTINGS_TAG,
-  about: "about",
-  article: "articles",
-  author: "author",
-  category: "categories",
-  footer: FOOTER_SETTINGS_TAG,
-  header: HEADER_SETTINGS_TAG,
-  home: HOME_TAG,
-  testimonial: TESTIMONIALS_TAG,
-  page: PAGE_TAG,
-  none: null,
-};
+function safeRevalidateTag(tag: string) {
+  try {
+    (revalidateTag as any)(tag, "default");
+  } catch {
+    try {
+      (revalidateTag as any)(tag);
+    } catch (err) {
+      console.error(`[Revalidation] Error revalidating tag ${tag}:`, err);
+    }
+  }
+}
 
-export async function POST(request: Request) {
-  const expectedSecret = process.env.STRAPI_REVALIDATE_SECRET;
+function verifySecret(request: NextRequest, bodySecret?: string): boolean {
+  const expectedSecret = process.env.STRAPI_REVALIDATE_SECRET || "secret";
 
-  if (!expectedSecret) {
-    return NextResponse.json(
-      { error: "Missing STRAPI_REVALIDATE_SECRET on server" },
-      { status: 500 }
-    );
+  const secretFromHeader =
+    request.headers.get("x-revalidate-secret") ||
+    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+
+  const secretFromQuery = request.nextUrl.searchParams.get("secret");
+
+  const providedSecret = secretFromHeader || secretFromQuery || bodySecret;
+
+  return Boolean(providedSecret && providedSecret === expectedSecret);
+}
+
+async function handleRevalidation(request: NextRequest, isGet = false) {
+  let body: Record<string, any> = {};
+
+  if (!isGet) {
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
   }
 
-  const providedSecret = request.headers.get("x-revalidate-secret");
-  if (providedSecret !== expectedSecret) {
+  if (!verifySecret(request, body.secret)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let payload: RevalidateBody = {};
-  try {
-    payload = (await request.json()) as RevalidateBody;
-  } catch {
-    payload = {};
+  const model = (
+    request.nextUrl.searchParams.get("model") ||
+    body.model ||
+    body.event?.split(".")?.[0] ||
+    ""
+  ).toLowerCase();
+
+  const explicitTag = request.nextUrl.searchParams.get("tag") || body.tag;
+  const explicitPath = request.nextUrl.searchParams.get("path") || body.path;
+
+  const revalidatedTags: string[] = [];
+  const revalidatedPaths: string[] = [];
+
+  // 1. Revalidate ALL application cache tags
+  for (const tag of ALL_TAGS) {
+    safeRevalidateTag(tag);
+    revalidatedTags.push(tag);
   }
 
-  console.log("Revalidation request received with payload:", payload);
+  // 2. Revalidate explicit tag if any additional one is provided
+  if (explicitTag && !revalidatedTags.includes(explicitTag)) {
+    safeRevalidateTag(explicitTag);
+    revalidatedTags.push(explicitTag);
+  }
 
-  // Always revalidate all pages on any payload
-  revalidatePath('/', 'layout');
+  // 3. Revalidate entire site layout and routes
+  try {
+    revalidatePath("/", "layout");
+    revalidatePath("/[locale]", "layout");
+    revalidatedPaths.push("/", "/[locale]");
+  } catch (err) {
+    console.error(`[Revalidation] Error revalidating layout paths:`, err);
+  }
+
+  // 4. Revalidate explicit path if provided
+  if (explicitPath && !revalidatedPaths.includes(explicitPath)) {
+    try {
+      revalidatePath(explicitPath);
+      revalidatedPaths.push(explicitPath);
+    } catch (err) {
+      console.error(`[Revalidation] Error revalidating path ${explicitPath}:`, err);
+    }
+  }
+
+  console.log(
+    `[Revalidation] Revalidated everything successfully! Model: "${model || "all"}". Tags: ${revalidatedTags.length}, Paths: [${revalidatedPaths.join(", ")}]`
+  );
 
   return NextResponse.json({
     revalidated: true,
-    message: 'Revalidated all pages',
+    message: "Revalidated all application caches and layouts successfully",
+    model: model || "all",
+    revalidatedTags: Array.from(new Set(revalidatedTags)),
+    revalidatedPaths: Array.from(new Set(revalidatedPaths)),
+    timestamp: new Date().toISOString(),
   });
+}
+
+export async function POST(request: NextRequest) {
+  return handleRevalidation(request, false);
+}
+
+export async function GET(request: NextRequest) {
+  return handleRevalidation(request, true);
 }
