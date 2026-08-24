@@ -195,16 +195,16 @@ export function RequestInfoForm({
       email: "",
       phone: "",
       cityCountry: "",
-      entityType: resolvedEntityTypeOptions[0] || (isAr ? "جهة حكومية" : "Government Entity"),
-      needDomain: resolvedNeedDomainOptions[0] || (isAr ? "تأسيس أو تطوير PMO" : "PMO Setup & Enhancement"),
+      entityType: "",
+      needDomain: "",
       requestTitle: "",
       challengeDescription: "",
       expectedOutcomes: "",
-      currentStage: resolvedCurrentStageOptions[0] || (isAr ? "إعداد نطاق العمل" : "Scope of Work Preparation"),
+      currentStage: "",
       expectedStartDate: "",
       expectedDuration: "",
-      estimatedBudget: resolvedEstimatedBudgetOptions[0] || (isAr ? "لم تحدد بعد" : "Not determined yet"),
-      preferredContactMethod: resolvedPreferredContactMethodOptions[0] || (isAr ? "البريد الإلكتروني" : "Email"),
+      estimatedBudget: "",
+      preferredContactMethod: "",
       bestTimeToContact: "",
       additionalNotes: "",
       consent: false,
@@ -589,6 +589,9 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
+                        <option value="" disabled>
+                          {isAr ? "اختر نوع الجهة" : "Select entity type"}
+                        </option>
                         {resolvedEntityTypeOptions.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -615,6 +618,9 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
+                        <option value="" disabled>
+                          {isAr ? "اختر مجال الاحتياج" : "Select area of need"}
+                        </option>
                         {resolvedNeedDomainOptions.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -703,6 +709,9 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
+                        <option value="">
+                          {isAr ? "اختر المرحلة (اختياري)" : "Select stage (optional)"}
+                        </option>
                         {resolvedCurrentStageOptions.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -770,6 +779,9 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
+                        <option value="">
+                          {isAr ? "اختر الميزانية (اختياري)" : "Select budget (optional)"}
+                        </option>
                         {resolvedEstimatedBudgetOptions.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -941,6 +953,9 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
+                        <option value="">
+                          {isAr ? "اختر وسيلة التواصل (اختياري)" : "Select contact method (optional)"}
+                        </option>
                         {resolvedPreferredContactMethodOptions.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}

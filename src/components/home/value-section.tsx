@@ -47,51 +47,53 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
           )}
         </div>
 
-        <div className="relative w-full max-w-4xl mx-auto py-4 sm:py-6 min-h-[300px] flex items-center justify-center perspective-1000">
-          <AnimatePresence mode="wait">
-            {points.length > 0 && (
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-                className="w-full max-w-2xl p-6 sm:p-8 md:p-10 bg-card/95 backdrop-blur-none md:bg-background/60 md:backdrop-blur-xl rounded-3xl shadow-xl border border-border/50 flex flex-col items-center text-center relative overflow-hidden group hover:border-primary/50 transition-colors"
-              >
-                {/* Subtle Glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-500" />
-
-                <div
-                  className="relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-primary/10 mb-4 sm:mb-6 text-primary shadow-md ring-1 ring-primary/20 group-hover:scale-105 transition-transform duration-300"
+        <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
+          <div className="relative w-full flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              {points.length > 0 && (
+                <motion.div
+                  key={currentIndex}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="w-full max-w-2xl p-6 sm:p-8 md:p-10 bg-card/95 backdrop-blur-none md:bg-background/60 md:backdrop-blur-xl rounded-3xl shadow-xl border border-border/50 flex flex-col items-center text-center relative overflow-hidden group hover:border-primary/50 transition-colors"
                 >
-                  {getIcon(points[currentIndex].iconName, <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10" />)}
-                </div>
+                  {/* Subtle Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-500" />
 
-                <h3
-                  className="relative text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground mb-2 sm:mb-4 transition-colors group-hover:text-primary"
-                >
-                  {points[currentIndex].title}
-                </h3>
-
-                {points[currentIndex].description && (
-                  <p
-                    className="relative text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl"
+                  <div
+                    className="relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-primary/10 mb-4 sm:mb-6 text-primary shadow-md ring-1 ring-primary/20 group-hover:scale-105 transition-transform duration-300"
                   >
-                    {points[currentIndex].description}
-                  </p>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    {getIcon(points[currentIndex].iconName, <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10" />)}
+                  </div>
+
+                  <h3
+                    className="relative text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground mb-2 sm:mb-4 transition-colors group-hover:text-primary"
+                  >
+                    {points[currentIndex].title}
+                  </h3>
+
+                  {points[currentIndex].description && (
+                    <p
+                      className="relative text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl"
+                    >
+                      {points[currentIndex].description}
+                    </p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Dots Indicator */}
           {points.length > 1 && (
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center gap-1">
+            <div className="flex justify-center items-center gap-1 mt-6 sm:mt-8">
               {points.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
-                  className="group flex h-12 w-12 items-center justify-center focus:outline-none"
+                  className="group flex h-8 w-8 items-center justify-center focus:outline-none cursor-pointer"
                   aria-label={`Show slide ${idx + 1}`}
                 >
                   <span
