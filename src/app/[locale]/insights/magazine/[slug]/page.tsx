@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { getMagazineIssueBySlugCached } from "@/strapi/insights";
@@ -54,7 +54,7 @@ export default async function MagazineIssuePage({ params }: Props) {
 
   const issue = await getMagazineIssueBySlugCached(slug, locale);
   if (!issue) {
-    notFound();
+    redirect(`/${locale}`);
   }
 
   const t = await getTranslations({ locale, namespace: 'insights' });

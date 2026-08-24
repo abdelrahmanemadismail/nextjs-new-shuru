@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
@@ -42,7 +42,7 @@ export default async function DynamicPage({ params }: Props) {
   const { locale, slug } = await params;
 
   if (!routing.locales.includes(locale)) {
-    notFound();
+    redirect(`/${routing.defaultLocale}`);
   }
 
   setRequestLocale(locale);
@@ -53,7 +53,7 @@ export default async function DynamicPage({ params }: Props) {
   ]);
 
   if (!page) {
-    notFound();
+    redirect(`/${locale}`);
   }
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { type Locale } from '@/lib/i18n';
 import { getMagazineIssueBySlugCached } from '@/strapi/insights';
@@ -52,7 +52,7 @@ export default async function MagazineReadPage({ params }: Props) {
   const issue = await getMagazineIssueBySlugCached(slug, locale);
 
   if (!issue || !issue.pdf_attachment?.url) {
-    notFound();
+    redirect(`/${locale}`);
   }
 
   const pdfUrl = issue.pdf_attachment.url;

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { getMajlisBySlugCached } from "@/strapi/insights";
@@ -47,7 +47,7 @@ export default async function MajlisPage({ params }: Props) {
 
   const majlis = await getMajlisBySlugCached(slug, locale);
   if (!majlis) {
-    notFound();
+    redirect(`/${locale}`);
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';

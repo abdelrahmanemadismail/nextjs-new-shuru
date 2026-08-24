@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { type Locale } from '@/lib/i18n';
 import { getMe } from '@/lib/actions/auth';
@@ -29,8 +29,7 @@ export default async function ProfilePage({ params }: Props) {
   // Retrieve user session
   const session = await getMe();
   if (!session) {
-    // Should be handled by middleware, but fallback to 404/notFound just in case
-    notFound();
+    redirect(`/${locale}/auth/login?redirect=/${locale}/profile`);
   }
 
   // Load saved insights

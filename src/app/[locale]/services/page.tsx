@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
@@ -46,7 +46,7 @@ export default async function ServicesPage({ params }: Props) {
   const { locale } = await params;
 
   if (!routing.locales.includes(locale)) {
-    notFound();
+    redirect(`/${routing.defaultLocale}`);
   }
 
   setRequestLocale(locale);

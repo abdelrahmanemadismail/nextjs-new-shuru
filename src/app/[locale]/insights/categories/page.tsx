@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CategoriesIndexPage({ params }: Props) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale)) notFound();
+  if (!routing.locales.includes(locale)) redirect(`/${routing.defaultLocale}`);
   setRequestLocale(locale);
 
   const t = await getTranslations("common");

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { getArticleBySlugCached } from "@/strapi/insights";
@@ -51,7 +51,7 @@ export default async function ArticlePage({ params }: Props) {
 
   const article = await getArticleBySlugCached(slug, locale);
   if (!article) {
-    notFound();
+    redirect(`/${locale}`);
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';

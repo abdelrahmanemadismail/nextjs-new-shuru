@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { routing } from "@/i18n/routing";
@@ -83,14 +83,14 @@ export default async function CategoryPage(props: Props) {
   const searchParams = await props.searchParams;
 
   const { locale, slug } = params;
-  if (!routing.locales.includes(locale)) notFound();
+  if (!routing.locales.includes(locale)) redirect(`/${routing.defaultLocale}`);
   setRequestLocale(locale);
 
   const t = await getTranslations("common");
   const it = await getTranslations("insights");
   const category = await getCategoryBySlugCached(slug, locale);
 
-  if (!category) notFound();
+  if (!category) redirect(`/${locale}`);
 
   const subcategories = category.children_categories || [];
 

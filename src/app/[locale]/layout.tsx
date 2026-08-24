@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import { isLocale, locales } from '@/lib/i18n';
+import { defaultLocale, isLocale, locales } from '@/lib/i18n';
 import { SiteHeader } from '@/components/layout/site-header';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { Toaster } from '@/components/ui/sonner';
@@ -20,7 +20,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const { locale } = await params;
 
   if (!isLocale(locale)) {
-    notFound();
+    redirect(`/${defaultLocale}`);
   }
 
   setRequestLocale(locale);
