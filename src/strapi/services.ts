@@ -19,7 +19,7 @@ export type StrapiServiceEntry = {
   shortDescription?: string;
   icon?: string;
   coverImage?: StrapiMedia | null;
-  features?: string[] | null;
+  features?: string[];
   order?: number;
   isFeatured?: boolean;
   cardCtaText?: string;
@@ -28,7 +28,7 @@ export type StrapiServiceEntry = {
 };
 
 export type StrapiServicesPayload = {
-  data?: StrapiServiceEntry[];
+  data?: any[];
   meta?: {
     pagination?: {
       page: number;
@@ -41,27 +41,74 @@ export type StrapiServicesPayload = {
 
 export const SERVICES_TAG = "services";
 
-const normalizeService = (service: StrapiServiceEntry): StrapiServiceEntry => {
-  if (service.coverImage) {
-    service.coverImage.url = toAbsoluteUrl(extractMediaUrl(service.coverImage)) || service.coverImage.url;
+export const normalizeFeatures = (raw: any): string[] => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) {
+    return raw
+      .map((item) => (typeof item === "string" ? item.trim() : (item?.title || item?.name || item?.label || "").trim()))
+      .filter(Boolean);
+  }
+  if (typeof raw === "string") {
+    return raw
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const normalizeService = (raw: any): StrapiServiceEntry => {
+  const item = raw.attributes || raw;
+  let coverImage = item.coverImage;
+  if (coverImage) {
+    const url = extractMediaUrl(coverImage);
+    if (url) {
+      coverImage = {
+        ...coverImage,
+        url: toAbsoluteUrl(url) || url,
+      };
+    }
   }
 
-  // Normalize image URLs in dynamic zone blocks if present
-  service.blocks?.forEach((block) => {
-    if (block.__component === 'home.hero' && block.image) {
-      block.image.url = toAbsoluteUrl(extractMediaUrl(block.image));
+  // Normalize dynamic zone blocks
+  const blocks = (item.blocks || []).map((block: any) => {
+    if (block.__component === "home.hero" && block.image) {
+      const url = extractMediaUrl(block.image);
+      return {
+        ...block,
+        image: {
+          ...block.image,
+          url: toAbsoluteUrl(url) || url,
+        },
+      };
     }
+    return block;
   });
 
-  return service;
+  return {
+    id: raw.id || item.id,
+    documentId: raw.documentId || item.documentId || String(raw.id || item.id),
+    title: item.title || "",
+    slug: item.slug || "",
+    badge: item.badge,
+    shortDescription: item.shortDescription,
+    icon: item.icon,
+    coverImage: coverImage || null,
+    features: normalizeFeatures(item.features),
+    order: typeof item.order === "number" ? item.order : 0,
+    isFeatured: Boolean(item.isFeatured),
+    cardCtaText: item.cardCtaText,
+    blocks,
+    seo: item.seo,
+  };
 };
 
 async function fetchServices(locale: Locale): Promise<StrapiServiceEntry[]> {
   const params = new URLSearchParams();
   params.append("locale", locale);
   params.append("sort", "order:asc");
-  params.append("populate[coverImage][fields][0]", "url");
-  params.append("populate[coverImage][fields][1]", "alternativeText");
+  params.append("populate[coverImage][populate]", "*");
+  params.append("populate[blocks][populate]", "*");
   params.append("populate[seo][populate]", "*");
   params.append("pagination[pageSize]", "100");
 

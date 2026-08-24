@@ -7,12 +7,35 @@ import {
   Cpu,
   Zap,
   Users2,
+  Users,
   ShieldCheck,
+  Shield,
   Target,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
   Sparkles,
+  Briefcase,
+  Layers,
+  Settings,
+  Workflow,
+  TrendingUp,
+  BarChart3,
+  PieChart,
+  FolderKanban,
+  Activity,
+  Lightbulb,
+  Compass,
+  FileCheck2,
+  Building2,
+  Rocket,
+  Scale,
+  FileText,
+  Globe,
+  Gauge,
+  Clock,
+  Coins,
+  Search,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, any> = {
@@ -21,8 +44,32 @@ const ICON_MAP: Record<string, any> = {
   Cpu,
   Zap,
   Users2,
+  Users,
   ShieldCheck,
+  Shield,
   Target,
+  Briefcase,
+  Layers,
+  Settings,
+  Workflow,
+  TrendingUp,
+  BarChart3,
+  PieChart,
+  FolderKanban,
+  Activity,
+  Sparkles,
+  Lightbulb,
+  Compass,
+  FileCheck2,
+  Building2,
+  Rocket,
+  Scale,
+  FileText,
+  Globe,
+  Gauge,
+  Clock,
+  Coins,
+  Search,
 };
 
 export function ServiceCard({
@@ -39,7 +86,7 @@ export function ServiceCard({
   const IconComponent = (service.icon && ICON_MAP[service.icon]) || Sparkles;
   const serviceUrl = `/${locale}/services/${service.slug}`;
 
-  // Normalize features from JSON or array
+  // Normalized features array
   const featuresList: string[] = Array.isArray(service.features)
     ? service.features
     : [];
@@ -76,7 +123,7 @@ export function ServiceCard({
           </p>
         )}
 
-        {/* Key Features / Deliverables List (Inspired by empower-sa cards) */}
+        {/* Key Features / Deliverables List */}
         {featuresList.length > 0 && (
           <div className="border-t border-border/40 pt-4 mb-6">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 mb-3">
