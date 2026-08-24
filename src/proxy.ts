@@ -19,6 +19,14 @@ export default function proxy(request: NextRequest) {
   const localeMatch = pathname.match(/^\/(ar|en)/);
   const locale = localeMatch ? localeMatch[1] : routing.defaultLocale;
 
+  // Handle redirects for old /articles routes to /insights/articles
+  if (pathWithoutLocale === '/articles' || pathWithoutLocale.startsWith('/articles/')) {
+    const articlePath = pathWithoutLocale.replace(/^\/articles/, '/insights/articles');
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}${articlePath}`;
+    return NextResponse.redirect(url, 308);
+  }
+
   if (isProfileRoute) {
     if (!session) {
       const url = request.nextUrl.clone();

@@ -23,6 +23,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/articles/:slug*',
+        destination: '/insights/articles/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/:locale(ar|en)/articles/:slug*',
+        destination: '/:locale/insights/articles/:slug*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
