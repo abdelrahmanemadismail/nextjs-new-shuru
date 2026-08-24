@@ -1,5 +1,4 @@
-import { unstable_cache } from "next/cache";
-import { defaultLocale, type Locale } from "@/lib/i18n";
+import { type Locale } from "@/lib/i18n";
 import {
   extractMediaUrl,
   getStrapiBaseUrl,
@@ -135,7 +134,7 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
   const navigationItems = (attrs.navigation?.primaryMenuItems ?? [])
     .map(normalizeItem)
     .filter((item): item is HeaderMenuItem => item !== null)
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   return {
     locale,
@@ -148,62 +147,32 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
   };
 };
 
-async function fetchHeader(locale: Locale) {
-  const params = new URLSearchParams();
-  params.append("locale", locale);
-  params.append("populate[lightLogoImage][fields][0]", "url");
-  params.append("populate[darkLogoImage][fields][0]", "url");
-  params.append("populate[navigation][populate][primaryMenuItems][populate][subItems]", "*");
-  params.append("populate[topBar][populate]", "*");
+export async function getHeaderSettings(locale: Locale): Promise<HeaderSettings | null> {
+  try {
+    const params = new URLSearchParams();
+    params.append("locale", locale);
+    params.append("populate[lightLogoImage][fields][0]", "url");
+    params.append("populate[darkLogoImage][fields][0]", "url");
+    params.append("populate[navigation][populate][primaryMenuItems][populate][subItems]", "*");
+    params.append("populate[topBar][populate]", "*");
 
-  const response = await fetch(`${getStrapiBaseUrl()}/api/header?${params.toString()}`, {
-    headers: getStrapiRequestHeaders(),
-    next: { revalidate: 60, tags: [HEADER_SETTINGS_TAG] },
-  });
+    const response = await fetch(`${getStrapiBaseUrl()}/api/header?${params.toString()}`, {
+      headers: getStrapiRequestHeaders(),
+      next: { tags: [HEADER_SETTINGS_TAG] },
+    });
 
-  if (!response.ok) {
-    if (response.status === 404) {
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      console.error(`Failed to fetch Strapi header (${response.status})`);
       return null;
     }
 
-    throw new Error(`Failed to fetch Strapi header (${response.status})`);
-  }
-
-  const payload = (await response.json()) as StrapiHeaderPayload;
-  return normalizeHeader(locale, payload);
-}
-
-const getHeaderSettingsCached = unstable_cache(
-  async (locale: Locale) => fetchHeader(locale),
-  [HEADER_SETTINGS_TAG],
-  {
-    revalidate: 60,
-    tags: [HEADER_SETTINGS_TAG],
-  }
-);
-
-export async function getHeaderSettings(locale: Locale): Promise<HeaderSettings | null> {
-  try {
-    const localized = await getHeaderSettingsCached(locale);
-    if (localized) {
-      return localized;
-    }
-
-    if (locale !== defaultLocale) {
-      return await getHeaderSettingsCached(defaultLocale);
-    }
-
-    return null;
+    const payload = (await response.json()) as StrapiHeaderPayload;
+    return normalizeHeader(locale, payload);
   } catch (err) {
     console.error("Error in getHeaderSettings:", err);
-    if (locale !== defaultLocale) {
-      try {
-        return await getHeaderSettingsCached(defaultLocale);
-      } catch {
-        return null;
-      }
-    }
-
     return null;
   }
 }

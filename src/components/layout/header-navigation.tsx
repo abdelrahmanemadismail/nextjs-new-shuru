@@ -80,10 +80,7 @@ export function HeaderNavigation({
   const pathname = usePathname();
   const router = useRouter();
 
-  const headerItems = useMemo(() => {
-    const explicitlyOnHeader = items.filter((item) => item.onHeader);
-    return explicitlyOnHeader.length > 0 ? explicitlyOnHeader : items;
-  }, [items]);
+  const headerItems = items;
 
   useEffect(() => {
     if (!isMenuOpen && !isSearchOpen) {

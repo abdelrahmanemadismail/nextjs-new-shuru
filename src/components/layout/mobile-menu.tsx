@@ -76,10 +76,7 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
   }, [isOpen]);
   const t = useTranslations("insights");
 
-  const menuItems = useMemo(() => {
-    const sideItems = items.filter((item) => item.onSideBar);
-    return sideItems.length > 0 ? sideItems : items;
-  }, [items]);
+  const menuItems = items;
 
   const toggleExpanded = (itemOrder: number) => {
     setExpandedItems((prev) =>

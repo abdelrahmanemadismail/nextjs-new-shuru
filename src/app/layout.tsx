@@ -113,6 +113,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${fontSans.variable} ${fontMono.variable} antialiased min-h-dvh flex flex-col`}
       >
         <ThemeProvider
