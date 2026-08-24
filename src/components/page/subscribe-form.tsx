@@ -94,7 +94,6 @@ export function SubscribeForm() {
                         </span>
                         <FormControl>
                           <Input
-                            placeholder={t("form.fullName").replace(" *", "")}
                             {...field}
                             disabled={isPending}
                             className="ps-9 h-11 border-border bg-background/50 backdrop-blur-xs focus-visible:border-primary/80 focus-visible:ring-primary/20 hover:border-border/80 transition-all duration-300 rounded-xl"
@@ -120,7 +119,6 @@ export function SubscribeForm() {
                         </span>
                         <FormControl>
                           <Input
-                            placeholder={t("form.email").replace(" *", "")}
                             type="email"
                             {...field}
                             disabled={isPending}

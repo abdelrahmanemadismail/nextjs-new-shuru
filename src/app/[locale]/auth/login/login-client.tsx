@@ -93,7 +93,6 @@ function LoginFormContent({ locale }: { locale: string }) {
               <Input
                 id="identifier"
                 type="text"
-                placeholder="you@example.com"
                 className="rounded-xl border-border/60 bg-background/50 focus-visible:ring-primary h-11"
                 disabled={isPending}
                 {...register('identifier')}
@@ -110,7 +109,6 @@ function LoginFormContent({ locale }: { locale: string }) {
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
                 className="rounded-xl border-border/60 bg-background/50 focus-visible:ring-primary h-11"
                 {...register('password')}
                 disabled={isPending}

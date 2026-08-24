@@ -45,7 +45,7 @@ const SliderBlock = dynamic(() =>
   import("@/components/shared/slider-block").then((mod) => mod.SliderBlock)
 );
 
-export function BlockRenderer({ block, locale, testimonials }: { block: StrapiPageBlock; locale: Locale; testimonials: StrapiTestimonial[] }) {
+export function BlockRenderer({ block, locale, testimonials = [] }: { block: StrapiPageBlock; locale: Locale; testimonials?: StrapiTestimonial[] }) {
   switch (block.__component) {
     case "home.hero":
       return <HeroSection hero={block} locale={locale} />;

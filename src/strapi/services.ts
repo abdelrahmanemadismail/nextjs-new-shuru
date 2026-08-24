@@ -68,7 +68,7 @@ async function fetchServices(locale: Locale): Promise<StrapiServiceEntry[]> {
   try {
     const response = await fetch(`${getStrapiBaseUrl()}/api/services?${params.toString()}`, {
       headers: getStrapiRequestHeaders(),
-      next: { tags: [SERVICES_TAG, `services-${locale}`], revalidate: 3600 },
+      next: { tags: [SERVICES_TAG, `services-${locale}`], revalidate: 60 },
     });
 
     if (!response.ok) {
@@ -95,7 +95,7 @@ async function fetchServiceBySlug(slug: string, locale: Locale): Promise<StrapiS
   try {
     const response = await fetch(`${getStrapiBaseUrl()}/api/services?${params.toString()}`, {
       headers: getStrapiRequestHeaders(),
-      next: { tags: [SERVICES_TAG, `service-${slug}`, `service-${slug}-${locale}`], revalidate: 3600 },
+      next: { tags: [SERVICES_TAG, `service-${slug}`, `service-${slug}-${locale}`], revalidate: 60 },
     });
 
     if (!response.ok) {
@@ -116,7 +116,7 @@ export const getServicesCached = unstable_cache(
   async (locale: Locale) => fetchServices(locale),
   [SERVICES_TAG],
   {
-    revalidate: 3600,
+    revalidate: 60,
     tags: [SERVICES_TAG],
   }
 );
@@ -125,7 +125,7 @@ export const getServiceBySlugCached = unstable_cache(
   async (slug: string, locale: Locale) => fetchServiceBySlug(slug, locale),
   [SERVICES_TAG],
   {
-    revalidate: 3600,
+    revalidate: 60,
     tags: [SERVICES_TAG],
   }
 );

@@ -26,6 +26,7 @@ type StrapiHeaderEntry = {
   lightLogoImage?: StrapiMedia | null;
   darkLogoImage?: StrapiMedia | null;
   alt?: string | null;
+  showQuickLinks?: boolean | null;
   navigation?: {
     primaryMenuItems?: StrapiNavigationItem[] | null;
   } | null;
@@ -71,6 +72,7 @@ export type HeaderSettings = {
   lightLogoUrl: string | null;
   darkLogoUrl: string | null;
   logoAlt: string;
+  showQuickLinks: boolean;
   navigationItems: HeaderMenuItem[];
   topBar: StrapiTopBar | null;
 };
@@ -127,6 +129,7 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
   const lightLogoUrl = toAbsoluteUrl(extractMediaUrl(data.lightLogoImage));
   const darkLogoUrl = toAbsoluteUrl(extractMediaUrl(data.darkLogoImage));
   const logoAlt = data.alt?.trim() || "Site logo";
+  const showQuickLinks = data.showQuickLinks !== false;
   const navigationItems = (data.navigation?.primaryMenuItems ?? [])
     .map(normalizeItem)
     .filter((item): item is HeaderMenuItem => item !== null)
@@ -137,6 +140,7 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
     lightLogoUrl,
     darkLogoUrl,
     logoAlt,
+    showQuickLinks,
     navigationItems,
     topBar: data.topBar || null,
   };
@@ -145,7 +149,6 @@ const normalizeHeader = (locale: Locale, payload: StrapiHeaderPayload): HeaderSe
 async function fetchHeader(locale: Locale) {
   const params = new URLSearchParams();
   params.append("locale", locale);
-  params.append("fields[0]", "alt");
   params.append("populate[lightLogoImage][fields][0]", "url");
   params.append("populate[darkLogoImage][fields][0]", "url");
   params.append("populate[navigation][populate][primaryMenuItems][fields][0]", "label");
@@ -162,7 +165,7 @@ async function fetchHeader(locale: Locale) {
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/header?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
-    next: { revalidate: 86400, tags: [HEADER_SETTINGS_TAG] },
+    next: { revalidate: 60, tags: [HEADER_SETTINGS_TAG] },
   });
 
   if (!response.ok) {
@@ -181,7 +184,7 @@ const getHeaderSettingsCached = unstable_cache(
   async (locale: Locale) => fetchHeader(locale),
   [HEADER_SETTINGS_TAG],
   {
-    revalidate: 86400,
+    revalidate: 60,
     tags: [HEADER_SETTINGS_TAG],
   }
 );

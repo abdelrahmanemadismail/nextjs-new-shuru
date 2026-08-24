@@ -22,11 +22,34 @@ export interface StrapiRequestInfoPage {
   workflowStep3Title?: string;
   workflowStep3Desc?: string;
   consentText?: string;
+  entityTypeOptions?: string[];
+  needDomainOptions?: string[];
+  currentStageOptions?: string[];
+  estimatedBudgetOptions?: string[];
+  preferredContactMethodOptions?: string[];
   blocks?: StrapiPageBlock[];
   seo?: StrapiSeo;
 }
 
 export const REQUEST_INFO_PAGE_TAG = "request-info-page";
+
+const normalizeOptions = (raw: any): string[] | undefined => {
+  if (!raw) return undefined;
+  if (Array.isArray(raw)) {
+    const list = raw
+      .map((item) => (typeof item === "string" ? item.trim() : (item?.label || item?.value || "").trim()))
+      .filter(Boolean);
+    return list.length > 0 ? list : undefined;
+  }
+  if (typeof raw === "string") {
+    const list = raw
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    return list.length > 0 ? list : undefined;
+  }
+  return undefined;
+};
 
 async function fetchRequestInfoPage(locale: Locale): Promise<StrapiRequestInfoPage | null> {
   try {
@@ -78,6 +101,11 @@ async function fetchRequestInfoPage(locale: Locale): Promise<StrapiRequestInfoPa
       workflowStep3Title: attrs.workflowStep3Title,
       workflowStep3Desc: attrs.workflowStep3Desc,
       consentText: attrs.consentText,
+      entityTypeOptions: normalizeOptions(attrs.entityTypeOptions),
+      needDomainOptions: normalizeOptions(attrs.needDomainOptions),
+      currentStageOptions: normalizeOptions(attrs.currentStageOptions),
+      estimatedBudgetOptions: normalizeOptions(attrs.estimatedBudgetOptions),
+      preferredContactMethodOptions: normalizeOptions(attrs.preferredContactMethodOptions),
       blocks: attrs.blocks || [],
       seo: attrs.seo,
     };

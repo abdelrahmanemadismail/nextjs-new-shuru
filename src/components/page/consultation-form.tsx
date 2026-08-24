@@ -75,7 +75,7 @@ export function ConsultationForm() {
               <FormItem>
                 <FormLabel>{t("form.fullName")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("form.fullName")} {...field} disabled={isPending} />
+                  <Input {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -88,7 +88,7 @@ export function ConsultationForm() {
               <FormItem>
                 <FormLabel>{t("form.email")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("form.email")} type="email" {...field} disabled={isPending} />
+                  <Input type="email" {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,7 +104,7 @@ export function ConsultationForm() {
               <FormItem>
                 <FormLabel>{t("form.phone")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("form.phone")} type="tel" {...field} disabled={isPending} />
+                  <Input type="tel" {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -117,7 +117,7 @@ export function ConsultationForm() {
               <FormItem>
                 <FormLabel>{t("form.company")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("form.company")} {...field} disabled={isPending} />
+                  <Input {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -152,7 +152,6 @@ export function ConsultationForm() {
               <FormLabel>{t("form.message")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder={t("form.message")}
                   className="min-h-[120px]"
                   {...field}
                   disabled={isPending}

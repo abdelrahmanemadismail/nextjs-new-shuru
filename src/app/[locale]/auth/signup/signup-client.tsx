@@ -103,7 +103,6 @@ function SignupFormContent({ locale }: { locale: string }) {
               <Input
                 id="username"
                 type="text"
-                placeholder="johndoe"
                 className="rounded-xl border-border/60 bg-background/50 focus-visible:ring-primary h-11"
                 disabled={isPending}
                 {...register('username')}
@@ -120,7 +119,6 @@ function SignupFormContent({ locale }: { locale: string }) {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
                 className="rounded-xl border-border/60 bg-background/50 focus-visible:ring-primary h-11"
                 disabled={isPending}
                 {...register('email')}
@@ -137,7 +135,6 @@ function SignupFormContent({ locale }: { locale: string }) {
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
                 className="rounded-xl border-border/60 bg-background/50 focus-visible:ring-primary h-11"
                 disabled={isPending}
                 {...register('password')}
@@ -154,7 +151,6 @@ function SignupFormContent({ locale }: { locale: string }) {
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="••••••••"
                 className="rounded-xl border-border/60 bg-background/50 focus-visible:ring-primary h-11"
                 disabled={isPending}
                 {...register('confirmPassword')}

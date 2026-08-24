@@ -33,6 +33,7 @@ export async function SiteHeader({ locale }: SiteHeaderProps) {
         darkLogoUrl={headerData.darkLogoUrl}
         logoAlt={headerData.logoAlt}
         topBar={headerData.topBar}
+        showQuickLinks={headerData.showQuickLinks}
         latestMagazine={latestMagazine}
         user={session?.user || null}
       />

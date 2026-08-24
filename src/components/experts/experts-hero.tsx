@@ -13,7 +13,15 @@ interface ExpertsHeroProps {
   primaryCtaLink?: string;
   secondaryCtaText?: string;
   secondaryCtaLink?: string;
+  trustMetrics?: Array<{
+    id?: number;
+    value: string;
+    label: string;
+    subtext?: string;
+  }>;
 }
+
+const defaultIcons = [Award, ShieldCheck, Users];
 
 export function ExpertsHero({
   locale,
@@ -24,6 +32,7 @@ export function ExpertsHero({
   primaryCtaLink = "/request-info",
   secondaryCtaText,
   secondaryCtaLink = "#experts-directory",
+  trustMetrics: strapiMetrics,
 }: ExpertsHeroProps) {
   const isAr = locale === "ar";
 
@@ -42,7 +51,7 @@ export function ExpertsHero({
   const defaultPrimaryCta = isAr ? "طلب استشارة مع خبير" : "Request an Advisory Session";
   const defaultSecondaryCta = isAr ? "استعراض شبكة الخبراء" : "Explore Expert Directory";
 
-  const trustMetrics = [
+  const defaultTrustMetrics = [
     {
       icon: Award,
       value: "+18",
@@ -59,6 +68,14 @@ export function ExpertsHero({
       label: isAr ? "برنامج تحولي ومكتب PMO مُدار" : "Transformations & PMOs Delivered",
     },
   ];
+
+  const renderedMetrics = strapiMetrics && strapiMetrics.length > 0
+    ? strapiMetrics.map((m, idx) => ({
+        icon: defaultIcons[idx % defaultIcons.length],
+        value: m.value,
+        label: m.label,
+      }))
+    : defaultTrustMetrics;
 
   return (
     <div className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24 border-b border-border/40 bg-gradient-to-b from-primary/10 via-background to-background">
@@ -107,7 +124,7 @@ export function ExpertsHero({
 
         {/* Trust Stats Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-8 border-t border-border/50 max-w-3xl mx-auto">
-          {trustMetrics.map((metric, idx) => {
+          {renderedMetrics.map((metric, idx) => {
             const IconComp = metric.icon;
             return (
               <div

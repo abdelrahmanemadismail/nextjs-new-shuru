@@ -3,6 +3,13 @@ import { type Locale } from "@/lib/i18n";
 import { getStrapiBaseUrl, getStrapiRequestHeaders, type StrapiSeo } from "@/lib/strapi";
 import type { StrapiPageBlock } from "./page";
 
+export type ExpertTrustMetric = {
+  id?: number;
+  label: string;
+  value: string;
+  subtext?: string;
+};
+
 export interface StrapiExpertsPage {
   id: number;
   documentId?: string;
@@ -14,6 +21,7 @@ export interface StrapiExpertsPage {
   heroPrimaryCtaLink?: string;
   heroSecondaryCtaText?: string;
   heroSecondaryCtaLink?: string;
+  trustMetrics?: ExpertTrustMetric[];
   deliveryModelBadge?: string;
   deliveryModelTitle?: string;
   deliveryModelSubtitle?: string;
@@ -36,12 +44,13 @@ async function fetchExpertsPage(locale: Locale): Promise<StrapiExpertsPage | nul
     const params = new URLSearchParams();
     params.append("locale", locale);
     params.append("populate[blocks][populate]", "*");
+    params.append("populate[trustMetrics]", "*");
     params.append("populate[seo][populate]", "*");
 
     // Try single type endpoint first: /api/experts-page
     let response = await fetch(`${getStrapiBaseUrl()}/api/experts-page?${params.toString()}`, {
       headers: getStrapiRequestHeaders(),
-      next: { tags: [EXPERTS_PAGE_TAG] },
+      next: { revalidate: 60, tags: [EXPERTS_PAGE_TAG] },
     });
 
     if (!response.ok) {
@@ -50,11 +59,12 @@ async function fetchExpertsPage(locale: Locale): Promise<StrapiExpertsPage | nul
       fallbackParams.append("locale", locale);
       fallbackParams.append("filters[slug][$eq]", "experts");
       fallbackParams.append("populate[blocks][populate]", "*");
+      fallbackParams.append("populate[trustMetrics]", "*");
       fallbackParams.append("populate[seo][populate]", "*");
 
       response = await fetch(`${getStrapiBaseUrl()}/api/pages?${fallbackParams.toString()}`, {
         headers: getStrapiRequestHeaders(),
-        next: { tags: [EXPERTS_PAGE_TAG] },
+        next: { revalidate: 60, tags: [EXPERTS_PAGE_TAG] },
       });
     }
 
@@ -79,6 +89,7 @@ async function fetchExpertsPage(locale: Locale): Promise<StrapiExpertsPage | nul
       heroPrimaryCtaLink: attrs.heroPrimaryCtaLink,
       heroSecondaryCtaText: attrs.heroSecondaryCtaText,
       heroSecondaryCtaLink: attrs.heroSecondaryCtaLink,
+      trustMetrics: attrs.trustMetrics || [],
       deliveryModelBadge: attrs.deliveryModelBadge,
       deliveryModelTitle: attrs.deliveryModelTitle,
       deliveryModelSubtitle: attrs.deliveryModelSubtitle,
@@ -103,6 +114,6 @@ export const getExpertsPageCached = unstable_cache(
   async (locale: Locale) => fetchExpertsPage(locale),
   [EXPERTS_PAGE_TAG],
   {
-    revalidate: 3600,
+    revalidate: 60,
   }
 );

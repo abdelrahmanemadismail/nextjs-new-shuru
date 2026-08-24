@@ -65,6 +65,11 @@ export interface RequestInfoFormProps {
   workflowStep3Title?: string;
   workflowStep3Desc?: string;
   consentText?: string;
+  entityTypeOptions?: string[];
+  needDomainOptions?: string[];
+  currentStageOptions?: string[];
+  estimatedBudgetOptions?: string[];
+  preferredContactMethodOptions?: string[];
 }
 
 export function RequestInfoForm({
@@ -80,6 +85,11 @@ export function RequestInfoForm({
   workflowStep3Title,
   workflowStep3Desc,
   consentText,
+  entityTypeOptions,
+  needDomainOptions,
+  currentStageOptions,
+  estimatedBudgetOptions,
+  preferredContactMethodOptions,
 }: RequestInfoFormProps = {}) {
   const t = useTranslations("requestInfo");
   const [isPending, startTransition] = useTransition();
@@ -94,6 +104,52 @@ export function RequestInfoForm({
   const localeMatch = pathname?.match(/^\/(ar|en)/);
   const locale = localeMatch ? localeMatch[1] : "ar";
   const isAr = locale === "ar";
+
+  const resolvedEntityTypeOptions = entityTypeOptions && entityTypeOptions.length > 0 ? entityTypeOptions : [
+    t("options.entityTypes.government"),
+    t("options.entityTypes.private"),
+    t("options.entityTypes.nonProfit"),
+    t("options.entityTypes.startup"),
+    t("options.entityTypes.other"),
+  ];
+
+  const resolvedNeedDomainOptions = needDomainOptions && needDomainOptions.length > 0 ? needDomainOptions : [
+    t("options.needDomains.pmo"),
+    t("options.needDomains.maturity"),
+    t("options.needDomains.governance"),
+    t("options.needDomains.knowledge"),
+    t("options.needDomains.digitalAi"),
+    t("options.needDomains.benefits"),
+    t("options.needDomains.ppm"),
+    t("options.needDomains.executiveStudies"),
+    t("options.needDomains.experts"),
+    t("options.needDomains.contactRequest"),
+    t("options.needDomains.other"),
+  ];
+
+  const resolvedCurrentStageOptions = currentStageOptions && currentStageOptions.length > 0 ? currentStageOptions : [
+    t("options.stages.discovery"),
+    t("options.stages.sowPrep"),
+    t("options.stages.proposalPrep"),
+    t("options.stages.bidEval"),
+    t("options.stages.existingSupport"),
+    t("options.stages.other"),
+  ];
+
+  const resolvedEstimatedBudgetOptions = estimatedBudgetOptions && estimatedBudgetOptions.length > 0 ? estimatedBudgetOptions : [
+    t("options.budgets.notSet"),
+    t("options.budgets.under100k"),
+    t("options.budgets.100kTo250k"),
+    t("options.budgets.250kTo500k"),
+    t("options.budgets.500kTo1m"),
+    t("options.budgets.over1m"),
+  ];
+
+  const resolvedPreferredContactMethodOptions = preferredContactMethodOptions && preferredContactMethodOptions.length > 0 ? preferredContactMethodOptions : [
+    t("options.contactMethods.email"),
+    t("options.contactMethods.phone"),
+    t("options.contactMethods.virtualMeeting"),
+  ];
 
   const formSchema = z.object({
     // Applicant Info
@@ -139,16 +195,16 @@ export function RequestInfoForm({
       email: "",
       phone: "",
       cityCountry: "",
-      entityType: isAr ? "جهة حكومية" : "Government Entity",
-      needDomain: isAr ? "تأسيس أو تطوير PMO" : "PMO Setup & Enhancement",
+      entityType: resolvedEntityTypeOptions[0] || (isAr ? "جهة حكومية" : "Government Entity"),
+      needDomain: resolvedNeedDomainOptions[0] || (isAr ? "تأسيس أو تطوير PMO" : "PMO Setup & Enhancement"),
       requestTitle: "",
       challengeDescription: "",
       expectedOutcomes: "",
-      currentStage: isAr ? "إعداد نطاق العمل" : "Scope of Work Preparation",
+      currentStage: resolvedCurrentStageOptions[0] || (isAr ? "إعداد نطاق العمل" : "Scope of Work Preparation"),
       expectedStartDate: "",
       expectedDuration: "",
-      estimatedBudget: isAr ? "لم تحدد بعد" : "Not determined yet",
-      preferredContactMethod: isAr ? "البريد الإلكتروني" : "Email",
+      estimatedBudget: resolvedEstimatedBudgetOptions[0] || (isAr ? "لم تحدد بعد" : "Not determined yet"),
+      preferredContactMethod: resolvedPreferredContactMethodOptions[0] || (isAr ? "البريد الإلكتروني" : "Email"),
       bestTimeToContact: "",
       additionalNotes: "",
       consent: false,
@@ -366,7 +422,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "مثال: د. عبدالله التميمي" : "e.g. Dr. Abdullah Al-Tamimi"}
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -387,7 +442,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "مثال: مدير إدارة المشاريع / مستشار التحول" : "e.g. PMO Director / Transformation Lead"}
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -410,7 +464,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "اسم الوزارة، الهيئة، أو الشركة" : "Ministry, Authority, or Enterprise Name"}
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -431,7 +484,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "الإدارة العامة للاستراتيجية / مكتب تحقيق الرؤية" : "Strategy Office / VRO / Operations"}
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -455,7 +507,6 @@ export function RequestInfoForm({
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="name@entity.gov.sa"
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -477,7 +528,6 @@ export function RequestInfoForm({
                     <FormControl>
                       <Input
                         type="tel"
-                        placeholder="+966 5X XXX XXXX"
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -498,7 +548,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -540,11 +589,11 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
-                        <option value={t("options.entityTypes.government")}>{t("options.entityTypes.government")}</option>
-                        <option value={t("options.entityTypes.private")}>{t("options.entityTypes.private")}</option>
-                        <option value={t("options.entityTypes.nonProfit")}>{t("options.entityTypes.nonProfit")}</option>
-                        <option value={t("options.entityTypes.startup")}>{t("options.entityTypes.startup")}</option>
-                        <option value={t("options.entityTypes.other")}>{t("options.entityTypes.other")}</option>
+                        {resolvedEntityTypeOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -566,17 +615,11 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
-                        <option value={t("options.needDomains.pmo")}>{t("options.needDomains.pmo")}</option>
-                        <option value={t("options.needDomains.maturity")}>{t("options.needDomains.maturity")}</option>
-                        <option value={t("options.needDomains.governance")}>{t("options.needDomains.governance")}</option>
-                        <option value={t("options.needDomains.knowledge")}>{t("options.needDomains.knowledge")}</option>
-                        <option value={t("options.needDomains.digitalAi")}>{t("options.needDomains.digitalAi")}</option>
-                        <option value={t("options.needDomains.benefits")}>{t("options.needDomains.benefits")}</option>
-                        <option value={t("options.needDomains.ppm")}>{t("options.needDomains.ppm")}</option>
-                        <option value={t("options.needDomains.executiveStudies")}>{t("options.needDomains.executiveStudies")}</option>
-                        <option value={t("options.needDomains.experts")}>{t("options.needDomains.experts")}</option>
-                        <option value={t("options.needDomains.contactRequest")}>{t("options.needDomains.contactRequest")}</option>
-                        <option value={t("options.needDomains.other")}>{t("options.needDomains.other")}</option>
+                        {resolvedNeedDomainOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -595,11 +638,6 @@ export function RequestInfoForm({
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={
-                        isAr
-                          ? "مثال: مشروع تأسيس مكتب إدارة المشاريع والتحول الرقمي لعام 2026"
-                          : "e.g. PMO Establishment & Strategic Execution Support Project 2026"
-                      }
                       className="rounded-xl h-11"
                       {...field}
                       disabled={isPending}
@@ -620,11 +658,6 @@ export function RequestInfoForm({
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={
-                        isAr
-                          ? "وضح أبرز التحديات الحالية، نطاق العمل المتوقع، والأهداف الاستراتيجية التي تسعون لتحقيقها..."
-                          : "Describe current challenges, estimated scope of work, and key strategic objectives..."
-                      }
                       className="min-h-[120px] rounded-xl leading-relaxed"
                       {...field}
                       disabled={isPending}
@@ -645,11 +678,6 @@ export function RequestInfoForm({
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={
-                        isAr
-                          ? "ما هي المخرجات الملموسة أو مؤشرات النجاح المتوقعة من هذا التكليف؟"
-                          : "What are the tangible deliverables and success indicators expected?"
-                      }
                       className="min-h-[80px] rounded-xl"
                       {...field}
                       disabled={isPending}
@@ -675,12 +703,11 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
-                        <option value={t("options.stages.discovery")}>{t("options.stages.discovery")}</option>
-                        <option value={t("options.stages.sowPrep")}>{t("options.stages.sowPrep")}</option>
-                        <option value={t("options.stages.proposalPrep")}>{t("options.stages.proposalPrep")}</option>
-                        <option value={t("options.stages.bidEval")}>{t("options.stages.bidEval")}</option>
-                        <option value={t("options.stages.existingSupport")}>{t("options.stages.existingSupport")}</option>
-                        <option value={t("options.stages.other")}>{t("options.stages.other")}</option>
+                        {resolvedCurrentStageOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -719,7 +746,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "مثال: 6 أشهر" : "e.g. 6 Months"}
                         className="rounded-xl h-11 text-xs"
                         {...field}
                         disabled={isPending}
@@ -744,12 +770,11 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
-                        <option value={t("options.budgets.notSet")}>{t("options.budgets.notSet")}</option>
-                        <option value={t("options.budgets.under100k")}>{t("options.budgets.under100k")}</option>
-                        <option value={t("options.budgets.100kTo250k")}>{t("options.budgets.100kTo250k")}</option>
-                        <option value={t("options.budgets.250kTo500k")}>{t("options.budgets.250kTo500k")}</option>
-                        <option value={t("options.budgets.500kTo1m")}>{t("options.budgets.500kTo1m")}</option>
-                        <option value={t("options.budgets.over1m")}>{t("options.budgets.over1m")}</option>
+                        {resolvedEstimatedBudgetOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -916,9 +941,11 @@ export function RequestInfoForm({
                         disabled={isPending}
                         className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring h-11"
                       >
-                        <option value={t("options.contactMethods.email")}>{t("options.contactMethods.email")}</option>
-                        <option value={t("options.contactMethods.phone")}>{t("options.contactMethods.phone")}</option>
-                        <option value={t("options.contactMethods.virtualMeeting")}>{t("options.contactMethods.virtualMeeting")}</option>
+                        {resolvedPreferredContactMethodOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -936,7 +963,6 @@ export function RequestInfoForm({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isAr ? "مثال: من 9 صباحاً حتى 1 ظهراً" : "e.g. 9:00 AM - 1:00 PM (GMT+3)"}
                         className="rounded-xl h-11"
                         {...field}
                         disabled={isPending}
@@ -958,7 +984,6 @@ export function RequestInfoForm({
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={isAr ? "أي متطلبات أو شروط خاصة تود التنويه عنها..." : "Any additional notes or specific constraints..."}
                       className="min-h-[80px] rounded-xl"
                       {...field}
                       disabled={isPending}

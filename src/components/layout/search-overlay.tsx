@@ -14,6 +14,7 @@ type SearchOverlayProps = {
   onClose: () => void;
   locale: Locale;
   items: HeaderMenuItem[];
+  showQuickLinks?: boolean;
 };
 
 type SearchEntry = {
@@ -73,7 +74,13 @@ const getLinkProps = (openInNewTab: boolean) =>
       }
     : {};
 
-export default function SearchOverlay({ isOpen, onClose, locale, items }: SearchOverlayProps) {
+export default function SearchOverlay({
+  isOpen,
+  onClose,
+  locale,
+  items,
+  showQuickLinks = true,
+}: SearchOverlayProps) {
   const t = useTranslations("search");
   const [term, setTerm] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
@@ -132,20 +139,34 @@ export default function SearchOverlay({ isOpen, onClose, locale, items }: Search
     return () => clearTimeout(delayDebounce);
   }, [term, locale]);
 
-  // Parse navigation items as shortcuts when search term is empty
+  // Parse navigation items as shortcuts when search term is empty, deduplicating and cleaning URLs
   const navigationShortcuts = useMemo<SearchEntry[]>(() => {
-    return items.flatMap((item) => [
+    const seen = new Set<string>();
+    const entries: SearchEntry[] = [];
+
+    const all = items.flatMap((item) => [
       {
-        label: item.label,
-        url: item.url,
-        openInNewTab: item.openInNewTab,
+        label: item.label?.trim() || "",
+        url: item.url?.trim() || "",
+        openInNewTab: Boolean(item.openInNewTab),
       },
       ...item.subItems.map((subItem) => ({
-        label: subItem.label,
-        url: subItem.url,
-        openInNewTab: subItem.openInNewTab,
+        label: subItem.label?.trim() || "",
+        url: subItem.url?.trim() || "",
+        openInNewTab: Boolean(subItem.openInNewTab),
       })),
     ]);
+
+    for (const entry of all) {
+      if (!entry.label || !entry.url || entry.url === "#") continue;
+      const key = `${entry.label.toLowerCase()}-${entry.url.toLowerCase()}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        entries.push(entry);
+      }
+    }
+
+    return entries;
   }, [items]);
 
   const hasResults = useMemo(() => {
@@ -275,7 +296,7 @@ export default function SearchOverlay({ isOpen, onClose, locale, items }: Search
                   )
               )}
             </div>
-          ) : (
+          ) : showQuickLinks && navigationShortcuts.length > 0 ? (
             /* Navigation Shortcuts (Term is empty) */
             <div className="max-w-2xl mx-auto w-full mt-6">
               <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-3 px-2">
@@ -296,7 +317,7 @@ export default function SearchOverlay({ isOpen, onClose, locale, items }: Search
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

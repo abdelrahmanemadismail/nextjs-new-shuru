@@ -29,25 +29,25 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
   }, [points.length]);
 
   return (
-    <section className="py-16 sm:py-24 lg:py-32 bg-background relative overflow-hidden flex flex-col items-center">
+    <section className="py-10 sm:py-14 lg:py-18 bg-background relative overflow-hidden flex flex-col items-center">
       {/* Decorative Glow - hidden on mobile for performance, optimized on desktop */}
-      <div className="hidden md:block absolute top-1/2 start-0 -translate-y-1/2 -ms-32 h-96 w-96 rounded-full bg-primary/5 blur-[100px] -z-10"></div>
+      <div className="hidden md:block absolute top-1/2 start-0 -translate-y-1/2 -ms-32 h-80 w-80 rounded-full bg-primary/5 blur-[90px] -z-10"></div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full z-10">
         <div
-          className="mx-auto max-w-2xl lg:text-center mb-16 sm:mb-24"
+          className="mx-auto max-w-2xl lg:text-center mb-8 sm:mb-10"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
             {value.title}
           </h2>
           {value.introText && (
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-8 text-muted-foreground font-medium">
+            <p className="mt-3 sm:mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-medium">
               {value.introText}
             </p>
           )}
         </div>
 
-        <div className="relative w-full max-w-5xl mx-auto py-8 sm:py-16 min-h-[450px] flex items-center justify-center perspective-1000">
+        <div className="relative w-full max-w-4xl mx-auto py-4 sm:py-6 min-h-[300px] flex items-center justify-center perspective-1000">
           <AnimatePresence mode="wait">
             {points.length > 0 && (
               <motion.div
@@ -56,26 +56,26 @@ export function ValueSection({ value }: { value: import('@/strapi/home').StrapiV
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                className="w-full max-w-3xl p-10 sm:p-14 md:p-20 bg-card/95 backdrop-blur-none md:bg-background/60 md:backdrop-blur-xl rounded-3xl shadow-2xl border border-border/50 flex flex-col items-center text-center relative overflow-hidden group hover:border-primary/50 transition-colors"
+                className="w-full max-w-2xl p-6 sm:p-8 md:p-10 bg-card/95 backdrop-blur-none md:bg-background/60 md:backdrop-blur-xl rounded-3xl shadow-xl border border-border/50 flex flex-col items-center text-center relative overflow-hidden group hover:border-primary/50 transition-colors"
               >
                 {/* Subtle Glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 pointer-events-none group-hover:opacity-100 transition-opacity duration-500" />
 
                 <div
-                  className="relative flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-[2rem] bg-primary/10 mb-8 sm:mb-10 text-primary shadow-lg ring-1 ring-primary/20 group-hover:scale-110 transition-transform duration-500"
+                  className="relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-primary/10 mb-4 sm:mb-6 text-primary shadow-md ring-1 ring-primary/20 group-hover:scale-105 transition-transform duration-300"
                 >
-                  {getIcon(points[currentIndex].iconName, <CheckCircle className="h-12 w-12 sm:h-14 sm:w-14" />)}
+                  {getIcon(points[currentIndex].iconName, <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10" />)}
                 </div>
 
                 <h3
-                  className="relative text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4 sm:mb-6 transition-colors group-hover:text-primary"
+                  className="relative text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground mb-2 sm:mb-4 transition-colors group-hover:text-primary"
                 >
                   {points[currentIndex].title}
                 </h3>
 
                 {points[currentIndex].description && (
                   <p
-                    className="relative text-base sm:text-xl text-muted-foreground leading-relaxed max-w-2xl"
+                    className="relative text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl"
                   >
                     {points[currentIndex].description}
                   </p>

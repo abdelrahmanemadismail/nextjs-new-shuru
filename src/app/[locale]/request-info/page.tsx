@@ -70,6 +70,11 @@ export default async function RequestInfoPage({ params }: RequestInfoPageProps) 
           workflowStep3Title={pageData?.workflowStep3Title}
           workflowStep3Desc={pageData?.workflowStep3Desc}
           consentText={pageData?.consentText}
+          entityTypeOptions={pageData?.entityTypeOptions}
+          needDomainOptions={pageData?.needDomainOptions}
+          currentStageOptions={pageData?.currentStageOptions}
+          estimatedBudgetOptions={pageData?.estimatedBudgetOptions}
+          preferredContactMethodOptions={pageData?.preferredContactMethodOptions}
         />
       </div>
     </main>

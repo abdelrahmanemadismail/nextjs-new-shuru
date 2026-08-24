@@ -198,7 +198,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel className="text-xs font-semibold">{t("form.fullName")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("form.fullName")} className="rounded-xl" {...field} disabled={isPending} />
+                    <Input className="rounded-xl" {...field} disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -212,7 +212,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel className="text-xs font-semibold">{t("form.email")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("form.email")} className="rounded-xl" type="email" {...field} disabled={isPending} />
+                    <Input className="rounded-xl" type="email" {...field} disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -228,7 +228,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel className="text-xs font-semibold">{t("form.phone")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("form.phone")} className="rounded-xl" type="tel" {...field} disabled={isPending} />
+                    <Input className="rounded-xl" type="tel" {...field} disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -242,7 +242,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel className="text-xs font-semibold">{isAr ? 'اسم الشركة / المؤسسة *' : 'Organization Name *'}</FormLabel>
                   <FormControl>
-                    <Input placeholder={isAr ? 'مثال: وزارة / شركة ...' : 'e.g. Acme Corp'} className="rounded-xl" {...field} disabled={isPending} />
+                    <Input className="rounded-xl" {...field} disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -272,7 +272,6 @@ export function ContactForm() {
                 <FormLabel className="text-xs font-semibold">{isAr ? 'ملاحظات أو تفاصيل إضافية (اختياري)' : 'Additional Notes (Optional)'}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={isAr ? 'أضف أي تفاصيل تود مشاركتها قبل الجلسة...' : 'Add any context before the session...'}
                     className="min-h-[90px] rounded-xl"
                     {...field}
                     disabled={isPending}

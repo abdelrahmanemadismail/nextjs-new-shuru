@@ -158,7 +158,7 @@ async function fetchFooter(locale: Locale) {
 
   const response = await fetch(`${getStrapiBaseUrl()}/api/footer?${params.toString()}`, {
     headers: getStrapiRequestHeaders(),
-    next: { revalidate: 86400, tags: [FOOTER_SETTINGS_TAG] },
+    next: { revalidate: 60, tags: [FOOTER_SETTINGS_TAG] },
   });
 
   if (!response.ok) {
@@ -177,7 +177,7 @@ const getFooterSettingsCached = unstable_cache(
   async (locale: Locale) => fetchFooter(locale),
   [FOOTER_SETTINGS_TAG],
   {
-    revalidate: 86400,
+    revalidate: 60,
     tags: [FOOTER_SETTINGS_TAG],
   }
 );

@@ -58,9 +58,16 @@ export default async function ServicesPage({ params }: Props) {
   const isAr = locale === "ar";
   const pageTitle = page?.title || (isAr ? "الخدمات الاستشارية" : "Consulting Services");
 
-  // If page from Strapi has a hero block, extract it; otherwise fallback hero
+  // If page from Strapi has a hero or overview block, extract them
   const heroBlock = page?.blocks?.find((b) => b.__component === "home.hero");
-  const otherBlocks = page?.blocks?.filter((b) => b.__component !== "home.hero") || [];
+  const overviewBlock = page?.blocks?.find((b) => b.__component === "home.overview") as any;
+  const otherBlocks = page?.blocks?.filter((b) => b.__component !== "home.hero" && b.__component !== "home.overview") || [];
+
+  const gridBadge = overviewBlock?.badge || (isAr ? "مسارات الخدمات الاستشارية" : "Consulting Tracks");
+  const gridTitle = overviewBlock?.title || (isAr ? "خدماتنا الاستشارية المتكاملة" : "Our Integrated Consulting Services");
+  const gridIntro = overviewBlock?.introText || (isAr
+    ? "خدمات استشارية وتنفيذية متخصصة تُغطي أبرز احتياجات التطوير المؤسسي — انقر على أي خدمة للاطلاع على نطاق العمل والتفاصيل الكاملة."
+    : "Specialized consulting tracks engineered to bridge operational gaps — click on any service to explore detailed scope and deliverables.");
 
   return (
     <main className="min-h-screen bg-background">
@@ -96,13 +103,9 @@ export default async function ServicesPage({ params }: Props) {
       <ServicesGrid
         services={services}
         locale={locale}
-        badge={isAr ? "مسارات الخدمات الاستشارية" : "Consulting Tracks"}
-        title={isAr ? "خدماتنا الاستشارية المتكاملة" : "Our Integrated Consulting Services"}
-        introText={
-          isAr
-            ? "ست خدمات استشارية متخصصة تُغطي أبرز احتياجات التطوير المؤسسي — انقر على أي خدمة للاطلاع على نطاق العمل والتفاصيل الكاملة."
-            : "Specialized consulting tracks engineered to bridge operational gaps — click on any service to explore detailed scope and deliverables."
-        }
+        badge={gridBadge}
+        title={gridTitle}
+        introText={gridIntro}
       />
 
       {/* Render additional Strapi page blocks if configured (e.g. Why choose Shuru, FAQs, Testimonials, CTA) */}

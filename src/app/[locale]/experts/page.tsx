@@ -76,6 +76,7 @@ export default async function ExpertsPage({ params }: ExpertsPageProps) {
         primaryCtaLink={pageData?.heroPrimaryCtaLink || heroBlock?.primaryCtaLink}
         secondaryCtaText={pageData?.heroSecondaryCtaText || heroBlock?.secondaryCtaText}
         secondaryCtaLink={pageData?.heroSecondaryCtaLink || heroBlock?.secondaryCtaLink || "#experts-directory"}
+        trustMetrics={pageData?.trustMetrics}
       />
 
       <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl space-y-16">

@@ -23,6 +23,7 @@ type HeaderNavigationProps = {
   darkLogoUrl: string | null;
   logoAlt: string;
   topBar: StrapiTopBar | null;
+  showQuickLinks?: boolean;
   latestMagazine?: StrapiMagazineIssue | null;
   user?: { id: number; username: string; email: string } | null;
 };
@@ -66,6 +67,7 @@ export function HeaderNavigation({
   darkLogoUrl,
   logoAlt,
   topBar,
+  showQuickLinks = true,
   latestMagazine,
   user = null,
 }: HeaderNavigationProps) {
@@ -328,6 +330,7 @@ export function HeaderNavigation({
         onClose={() => setIsSearchOpen(false)}
         locale={locale}
         items={items}
+        showQuickLinks={showQuickLinks}
       />
     </>
   );

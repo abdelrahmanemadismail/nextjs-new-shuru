@@ -4,7 +4,7 @@ import { BlockRenderer } from "./block-renderer";
 
 import { type StrapiTestimonial } from "@/strapi/home";
 
-export function PageContent({ page, locale, testimonials }: { page: StrapiPageEntry; locale: Locale; testimonials: StrapiTestimonial[] }) {
+export function PageContent({ page, locale, testimonials = [] }: { page: StrapiPageEntry; locale: Locale; testimonials?: StrapiTestimonial[] }) {
   return (
     <>
       {page.blocks?.map((block) => (

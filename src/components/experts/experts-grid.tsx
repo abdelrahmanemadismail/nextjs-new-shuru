@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
@@ -358,18 +358,10 @@ export function ExpertsGrid({
             )}
 
             {/* Action buttons */}
-            <div className="pt-4 border-t border-border/60 flex flex-col sm:flex-row gap-3">
-              <Link
-                href={`/${locale}/request-info?expert=${activeModalExpert.slug}`}
-                className="flex-1 py-3.5 px-6 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all flex items-center justify-center gap-2"
-                onClick={() => setActiveModalExpert(null)}
-              >
-                <span>{isAr ? "طلب اجتماع استشاري مع هذا الخبير" : "Request Consultation with this Advisor"}</span>
-                <Send className="w-4 h-4 rtl:-scale-x-100" />
-              </Link>
+            <div className="pt-4 border-t border-border/60 flex justify-end">
               <button
                 onClick={() => setActiveModalExpert(null)}
-                className="px-6 py-3.5 rounded-full border border-border bg-card hover:bg-accent text-foreground text-sm font-semibold transition-all"
+                className="w-full sm:w-auto px-8 py-3 rounded-full border border-border bg-card hover:bg-accent text-foreground text-sm font-semibold transition-all"
               >
                 {isAr ? "إغلاق" : "Close"}
               </button>
