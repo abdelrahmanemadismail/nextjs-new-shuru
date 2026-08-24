@@ -16,19 +16,92 @@ import {
   HelpCircle,
   Building2,
   Zap,
+  Target,
+  LineChart,
+  Cpu,
+  Award,
+  Users,
+  Briefcase,
+  Globe,
+  Compass,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DownloadPdfButton } from "@/components/ui/download-pdf-button";
+import type { CompanyProfilePillar } from "@/strapi/company-profile-page";
 
 interface CompanyProfileViewerProps {
   pdfUrl?: string;
   fileName?: string;
+  fileTitle?: string;
+  fileSubtitle?: string;
+  downloadButtonText?: string;
+  openNewTabButtonText?: string;
+  shareButtonText?: string;
+  previewBadge?: string;
+  pillars?: CompanyProfilePillar[];
+  ctaBadge?: string;
+  ctaTitle?: string;
+  ctaSubtitle?: string;
+  ctaPrimaryButtonText?: string;
+  ctaPrimaryButtonLink?: string;
+  ctaSecondaryButtonText?: string;
+  ctaSecondaryButtonLink?: string;
 }
+
+const renderPillarIcon = (name?: string) => {
+  switch (name?.toLowerCase()) {
+    case "building":
+    case "building2":
+      return <Building2 className="w-6 h-6" />;
+    case "zap":
+    case "flash":
+      return <Zap className="w-6 h-6" />;
+    case "shield":
+    case "security":
+      return <Shield className="w-6 h-6" />;
+    case "target":
+      return <Target className="w-6 h-6" />;
+    case "linechart":
+    case "chart":
+      return <LineChart className="w-6 h-6" />;
+    case "cpu":
+    case "tech":
+      return <Cpu className="w-6 h-6" />;
+    case "award":
+      return <Award className="w-6 h-6" />;
+    case "users":
+      return <Users className="w-6 h-6" />;
+    case "briefcase":
+      return <Briefcase className="w-6 h-6" />;
+    case "globe":
+      return <Globe className="w-6 h-6" />;
+    case "compass":
+      return <Compass className="w-6 h-6" />;
+    case "layers":
+      return <Layers className="w-6 h-6" />;
+    default:
+      return <Building2 className="w-6 h-6" />;
+  }
+};
 
 export function CompanyProfileViewer({
   pdfUrl = "/documents/shuru-company-profile.pdf",
   fileName = "shuru-company-profile.pdf",
+  fileTitle,
+  fileSubtitle,
+  downloadButtonText,
+  openNewTabButtonText,
+  shareButtonText,
+  previewBadge,
+  pillars,
+  ctaBadge,
+  ctaTitle,
+  ctaSubtitle,
+  ctaPrimaryButtonText,
+  ctaPrimaryButtonLink = "/request-info",
+  ctaSecondaryButtonText,
+  ctaSecondaryButtonLink = "/contact",
 }: CompanyProfileViewerProps) {
   const t = useTranslations("companyProfile");
   const pathname = usePathname();
@@ -68,6 +141,33 @@ export function CompanyProfileViewer({
     }
   };
 
+  // Fallback pillars if not provided by Strapi
+  const defaultPillars: CompanyProfilePillar[] = [
+    {
+      title: isAr ? "خبرات استشارية وتنفيذية متقدمة" : "Advanced Advisory & Execution",
+      description: isAr
+        ? "نجمع بين الفكر الاستراتيجي المعمق والقدرة على التشغيل الميداني لضمان تحقيق المستهدفات."
+        : "Bridging strategic formulation with rigorous field execution to ensure milestone delivery.",
+      iconName: "Building2",
+    },
+    {
+      title: isAr ? "حلول تشغيلية مخصصة" : "Tailored Operational Solutions",
+      description: isAr
+        ? "تصميم مسارات عمل ونماذج حوكمة تتماشى تماماً مع بيئة عمل جهتك وثقافتها التنظيمية."
+        : "Designing governance models and execution tracks uniquely calibrated to your entity's environment.",
+      iconName: "Zap",
+    },
+    {
+      title: isAr ? "نقل المعرفة والتمكين المؤسسي" : "Knowledge Transfer & Enablement",
+      description: isAr
+        ? "بناء قدرات الفرق الداخلية وتأهيل الكفاءات الوطنية لضمان استدامة الأثر والنتائج."
+        : "Empowering internal teams and upskilling national talent for enduring, sustainable impact.",
+      iconName: "Shield",
+    },
+  ];
+
+  const activePillars = pillars && pillars.length > 0 ? pillars : defaultPillars;
+
   return (
     <div className="space-y-10">
       {/* Control & Action Bar */}
@@ -78,9 +178,11 @@ export function CompanyProfileViewer({
           </div>
           <div>
             <h3 className="text-lg sm:text-xl font-bold text-foreground">
-              {isAr ? "الملف التعريفي الرسمي (2026)" : "Official Company Profile (2026)"}
+              {fileTitle || (isAr ? "الملف التعريفي الرسمي (2026)" : "Official Company Profile (2026)")}
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{t("fileInfo")}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {fileSubtitle || t("fileInfo")}
+            </p>
           </div>
         </div>
 
@@ -93,7 +195,7 @@ export function CompanyProfileViewer({
             loadingText={isAr ? "جاري التحميل..." : "Downloading..."}
           >
             <Download className="w-4 h-4" />
-            <span>{t("downloadPdf")}</span>
+            <span>{downloadButtonText || t("downloadPdf")}</span>
           </DownloadPdfButton>
 
           {/* Open in new tab */}
@@ -104,14 +206,14 @@ export function CompanyProfileViewer({
             className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition-all duration-200 shadow-sm"
           >
             <ExternalLink className="w-4 h-4" />
-            <span>{isAr ? "فتح في نافذة جديدة" : "Open in New Tab"}</span>
+            <span>{openNewTabButtonText || (isAr ? "فتح في نافذة جديدة" : "Open in New Tab")}</span>
           </a>
 
           {/* Share Button */}
           <button
             onClick={handleShare}
             className="inline-flex items-center justify-center p-3 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-sm"
-            title={isAr ? "مشاركة الرابط" : "Share link"}
+            title={shareButtonText || (isAr ? "مشاركة الرابط" : "Share link")}
           >
             {copied ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
           </button>
@@ -126,12 +228,12 @@ export function CompanyProfileViewer({
             <span className="w-3 h-3 rounded-full bg-amber-400/80 inline-block" />
             <span className="w-3 h-3 rounded-full bg-emerald-400/80 inline-block" />
             <span className="text-xs font-semibold text-muted-foreground ms-2">
-              shuru-company-profile.pdf
+              {fileName}
             </span>
           </div>
 
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span>{isAr ? "معاينة تفاعلية" : "Interactive Preview"}</span>
+            <span>{previewBadge || (isAr ? "معاينة تفاعلية" : "Interactive Preview")}</span>
           </div>
         </div>
 
@@ -165,7 +267,7 @@ export function CompanyProfileViewer({
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
               className="w-full h-full border-none"
-              title={isAr ? "بروفايل شركة شروع" : "SHURU Company Profile"}
+              title={fileTitle || (isAr ? "بروفايل شركة شروع" : "SHURU Company Profile")}
             />
           )}
         </div>
@@ -173,47 +275,22 @@ export function CompanyProfileViewer({
 
       {/* Value Pillars / Quick Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-card border border-border/70 rounded-3xl p-6 shadow-sm hover:border-primary/40 transition-all group">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Building2 className="w-6 h-6" />
+        {activePillars.map((pillar, idx) => (
+          <div
+            key={idx}
+            className="bg-card border border-border/70 rounded-3xl p-6 shadow-sm hover:border-primary/40 transition-all group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              {renderPillarIcon(pillar.iconName)}
+            </div>
+            <h4 className="text-base font-bold text-foreground mb-2">
+              {pillar.title}
+            </h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {pillar.description}
+            </p>
           </div>
-          <h4 className="text-base font-bold text-foreground mb-2">
-            {isAr ? "خبرات استشارية وتنفيذية متقدمة" : "Advanced Advisory & Execution"}
-          </h4>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {isAr
-              ? "نجمع بين الفكر الاستراتيجي المعمق والقدرة على التشغيل الميداني لضمان تحقيق المستهدفات."
-              : "Bridging strategic formulation with rigorous field execution to ensure milestone delivery."}
-          </p>
-        </div>
-
-        <div className="bg-card border border-border/70 rounded-3xl p-6 shadow-sm hover:border-primary/40 transition-all group">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Zap className="w-6 h-6" />
-          </div>
-          <h4 className="text-base font-bold text-foreground mb-2">
-            {isAr ? "حلول تشغيلية مخصصة" : "Tailored Operational Solutions"}
-          </h4>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {isAr
-              ? "تصميم مسارات عمل ونماذج حوكمة تتماشى تماماً مع بيئة عمل جهتك وثقافتها التنظيمية."
-              : "Designing governance models and execution tracks uniquely calibrated to your entity's environment."}
-          </p>
-        </div>
-
-        <div className="bg-card border border-border/70 rounded-3xl p-6 shadow-sm hover:border-primary/40 transition-all group">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Shield className="w-6 h-6" />
-          </div>
-          <h4 className="text-base font-bold text-foreground mb-2">
-            {isAr ? "نقل المعرفة والتمكين المؤسسي" : "Knowledge Transfer & Enablement"}
-          </h4>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {isAr
-              ? "بناء قدرات الفرق الداخلية وتأهيل الكفاءات الوطنية لضمان استدامة الأثر والنتائج."
-              : "Empowering internal teams and upskilling national talent for enduring, sustainable impact."}
-          </p>
-        </div>
+        ))}
       </div>
 
       {/* Call to Action Banner */}
@@ -221,31 +298,31 @@ export function CompanyProfileViewer({
         <div className="space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold border border-primary/20">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{isAr ? "ابدأ رحلة التعاون مع شروع" : "Partner with SHURU"}</span>
+            <span>{ctaBadge || (isAr ? "ابدأ رحلة التعاون مع شروع" : "Partner with SHURU")}</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-            {t("requestInfoCta")}
+            {ctaTitle || t("requestInfoCta")}
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            {isAr
+            {ctaSubtitle || (isAr
               ? "يمكنك تقديم طلب معلومات (RFI) بالمستندات والمتطلبات وسيتواصل معك خبراؤنا مباشرة."
-              : "Submit your Request for Information (RFI) with supporting docs, and our leaders will connect."}
+              : "Submit your Request for Information (RFI) with supporting docs, and our leaders will connect.")}
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Link
-            href={`/${locale}/request-info`}
+            href={ctaPrimaryButtonLink.startsWith("/") ? `/${locale}${ctaPrimaryButtonLink.replace(/^\/(ar|en)/, "")}` : ctaPrimaryButtonLink}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-6 py-3.5 text-sm shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:-translate-y-0.5 transition-all"
           >
-            <span>{t("requestInfoBtn")}</span>
+            <span>{ctaPrimaryButtonText || t("requestInfoBtn")}</span>
             <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
           </Link>
           <Link
-            href={`/${locale}/contact`}
+            href={ctaSecondaryButtonLink.startsWith("/") ? `/${locale}${ctaSecondaryButtonLink.replace(/^\/(ar|en)/, "")}` : ctaSecondaryButtonLink}
             className="inline-flex items-center justify-center rounded-full border border-border bg-card text-foreground font-semibold px-6 py-3.5 text-sm hover:bg-accent transition-all"
           >
-            <span>{t("contactBtn")}</span>
+            <span>{ctaSecondaryButtonText || t("contactBtn")}</span>
           </Link>
         </div>
       </div>
