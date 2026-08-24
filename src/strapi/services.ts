@@ -20,6 +20,10 @@ export type StrapiServiceEntry = {
   icon?: string;
   coverImage?: StrapiMedia | null;
   features?: string[];
+  deliverablesTitle?: string;
+  deliverablesSubtitle?: string;
+  deliverablesFooterText?: string;
+  deliverablesBadge?: string;
   order?: number;
   isFeatured?: boolean;
   cardCtaText?: string;
@@ -95,6 +99,10 @@ const normalizeService = (raw: any): StrapiServiceEntry => {
     icon: item.icon,
     coverImage: coverImage || null,
     features: normalizeFeatures(item.features),
+    deliverablesTitle: item.deliverablesTitle,
+    deliverablesSubtitle: item.deliverablesSubtitle,
+    deliverablesFooterText: item.deliverablesFooterText,
+    deliverablesBadge: item.deliverablesBadge,
     order: typeof item.order === "number" ? item.order : 0,
     isFeatured: Boolean(item.isFeatured),
     cardCtaText: item.cardCtaText,

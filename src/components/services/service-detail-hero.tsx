@@ -177,10 +177,10 @@ export function ServiceDetailHero({
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-foreground">
-                    {isAr ? "نطاق العمل والمخرجات الرئيسية" : "Scope & Core Deliverables"}
+                    {service.deliverablesTitle || (isAr ? "نطاق العمل والمخرجات الرئيسية" : "Scope & Core Deliverables")}
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    {isAr ? "ما ستحصل عليه مؤسستك من هذه الخدمة" : "What your organization achieves with this service"}
+                    {service.deliverablesSubtitle || (isAr ? "ما ستحصل عليه مؤسستك من هذه الخدمة" : "What your organization achieves with this service")}
                   </p>
                 </div>
               </div>
@@ -203,8 +203,8 @@ export function ServiceDetailHero({
               )}
 
               <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{isAr ? "تخصيص كامل وفق المتطلبات" : "Fully customizable scope"}</span>
-                <span className="font-semibold text-primary">{isAr ? "استشارة مجانية" : "Free Discovery Session"}</span>
+                <span>{service.deliverablesFooterText || (isAr ? "تخصيص كامل وفق المتطلبات" : "Fully customizable scope")}</span>
+                <span className="font-semibold text-primary">{service.deliverablesBadge || (isAr ? "استشارة مجانية" : "Free Discovery Session")}</span>
               </div>
             </div>
           </div>
