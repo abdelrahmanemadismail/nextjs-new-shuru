@@ -19,6 +19,8 @@ import {
 import { locales } from '@/lib/i18n';
 import { usePathname } from 'next/navigation';
 import type { StrapiOverviewBlock } from '@/strapi/home';
+import { getCardGridContainerClasses, getCardItemClasses } from '@/lib/grid-utils';
+import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ReactNode> = {
   Activity: <Activity className="h-6 w-6" />,
@@ -83,20 +85,15 @@ export function OverviewSection({ overview }: { overview: StrapiOverviewBlock })
         </div>
 
         {cards.length > 0 && (
-          <div className="mx-auto mt-12 sm:mt-16 max-w-7xl">
-            <div
-              className={`grid grid-cols-1 gap-6 sm:grid-cols-2 ${
-                cards.length === 3
-                  ? 'lg:grid-cols-3'
-                  : cards.length >= 4
-                  ? 'lg:grid-cols-4'
-                  : 'lg:grid-cols-2'
-              }`}
-            >
+          <div className="mx-auto mt-12 sm:mt-16">
+            <div className={getCardGridContainerClasses(cards.length, "gap-6")}>
               {cards.map((card, idx) => (
                 <div
                   key={card.id || idx}
-                  className="group relative flex flex-col justify-between rounded-3xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/40 overflow-hidden"
+                  className={cn(
+                    "group relative flex flex-col justify-between rounded-3xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/40 overflow-hidden",
+                    getCardItemClasses(cards.length, idx)
+                  )}
                 >
                   <div className="hidden md:block absolute top-0 end-0 -m-8 h-32 w-32 rounded-full bg-primary/5 blur-2xl transition-all duration-300 group-hover:bg-primary/10"></div>
 

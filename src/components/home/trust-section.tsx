@@ -2,6 +2,8 @@
 
 import { ShieldCheck, Award, Users, CheckCircle, Building2, Workflow, Sparkles } from 'lucide-react';
 import type { StrapiTrustSectionBlock } from '@/strapi/home';
+import { getCardGridContainerClasses, getCardItemClasses } from '@/lib/grid-utils';
+import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Award,
@@ -41,21 +43,16 @@ export function TrustSection({ block }: { block: StrapiTrustSectionBlock }) {
         </div>
 
         {items.length > 0 && (
-          <div
-            className={`grid grid-cols-1 sm:grid-cols-2 ${
-              items.length === 3
-                ? 'lg:grid-cols-3'
-                : items.length >= 4
-                ? 'lg:grid-cols-4'
-                : 'lg:grid-cols-2'
-            } gap-6`}
-          >
+          <div className={getCardGridContainerClasses(items.length, "gap-6")}>
             {items.map((item, idx) => {
               const Icon = getTrustIcon(item.icon);
               return (
                 <div
                   key={item.id || idx}
-                  className="rounded-2xl bg-card border border-border/50 p-6 shadow-sm flex flex-col justify-between hover:border-primary/40 transition-colors"
+                  className={cn(
+                    "rounded-2xl bg-card border border-border/50 p-6 shadow-sm flex flex-col justify-between hover:border-primary/40 transition-colors",
+                    getCardItemClasses(items.length, idx)
+                  )}
                 >
                   <div>
                     <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">

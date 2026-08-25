@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import type { StrapiHeroBlock } from '@/strapi/home';
+import { getCardGridContainerClasses, getCardItemClasses } from '@/lib/grid-utils';
+import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ReactNode> = {
   Users: <Users className="h-3.5 w-3.5 text-primary" />,
@@ -154,21 +156,18 @@ export function HeroSection({ hero, locale }: { hero: StrapiHeroBlock; locale: L
               </div>
             )}
 
-            {hero.metrics && hero.metrics.length > 0 && (
-              <div
-                className={`grid grid-cols-2 ${
-                  hero.metrics.length === 3
-                    ? 'md:grid-cols-3'
-                    : hero.metrics.length >= 4
-                    ? 'md:grid-cols-4'
-                    : 'md:grid-cols-2'
-                } gap-3 sm:gap-4 text-start`}
-              >
-                {hero.metrics.map((metric, idx) => (
-                  <div
-                    key={metric.id || idx}
-                    className="p-3 sm:p-4 rounded-xl bg-accent/30 border border-border/40"
-                  >
+            {hero.metrics && hero.metrics.length > 0 && (() => {
+              const metrics = hero.metrics;
+              return (
+                <div className={cn(getCardGridContainerClasses(metrics.length, "gap-3 sm:gap-4 text-start"), "w-full")}>
+                  {metrics.map((metric, idx) => (
+                    <div
+                      key={metric.id || idx}
+                      className={cn(
+                        "p-3 sm:p-4 rounded-xl bg-accent/30 border border-border/40",
+                        getCardItemClasses(metrics.length, idx)
+                      )}
+                    >
                     <span className="text-xs font-medium text-muted-foreground block mb-1">
                       {metric.label}
                     </span>
@@ -191,7 +190,7 @@ export function HeroSection({ hero, locale }: { hero: StrapiHeroBlock; locale: L
                   </div>
                 ))}
               </div>
-            )}
+            ); })()}
           </div>
         )}
       </div>

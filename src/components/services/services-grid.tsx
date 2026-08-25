@@ -2,6 +2,8 @@ import { type Locale } from "@/lib/i18n";
 import type { StrapiServiceEntry } from "@/strapi/services";
 import { ServiceCard } from "./service-card";
 import { Sparkles } from "lucide-react";
+import { getCardGridContainerClasses, getCardItemClasses } from "@/lib/grid-utils";
+import { cn } from "@/lib/utils";
 
 export function ServicesGrid({
   services,
@@ -48,16 +50,17 @@ export function ServicesGrid({
           </p>
         </div>
 
-        {/* Services Grid (2 on top, 2 below) */}
+        {/* Services Grid (Adaptive: 3 in row, 4 as 2x2, 5 as 3+2 centered) */}
         {services.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+          <div className={getCardGridContainerClasses(services.length, "gap-6 lg:gap-8")}>
             {services.map((service, index) => (
-              <ServiceCard
-                key={service.id || service.slug}
-                service={service}
-                locale={locale}
-                index={index}
-              />
+              <div key={service.id || service.slug} className={cn("h-full flex flex-col", getCardItemClasses(services.length, index))}>
+                <ServiceCard
+                  service={service}
+                  locale={locale}
+                  index={index}
+                />
+              </div>
             ))}
           </div>
         ) : (

@@ -28,6 +28,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DownloadPdfButton } from "@/components/ui/download-pdf-button";
+import { getCardGridContainerClasses, getCardItemClasses } from "@/lib/grid-utils";
+import { cn } from "@/lib/utils";
 import type { CompanyProfilePillar } from "@/strapi/company-profile-page";
 
 interface CompanyProfileViewerProps {
@@ -274,11 +276,14 @@ export function CompanyProfileViewer({
       </div>
 
       {/* Value Pillars / Quick Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className={getCardGridContainerClasses(activePillars.length, "gap-6")}>
         {activePillars.map((pillar, idx) => (
           <div
             key={idx}
-            className="bg-card border border-border/70 rounded-3xl p-6 shadow-sm hover:border-primary/40 transition-all group"
+            className={cn(
+              "bg-card border border-border/70 rounded-3xl p-6 shadow-sm hover:border-primary/40 transition-all group",
+              getCardItemClasses(activePillars.length, idx)
+            )}
           >
             <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               {renderPillarIcon(pillar.iconName)}

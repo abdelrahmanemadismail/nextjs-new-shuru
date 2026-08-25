@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { Search, Compass, Rocket, GraduationCap, CheckCircle2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { getCardGridContainerClasses, getCardItemClasses } from '@/lib/grid-utils';
+import { cn } from '@/lib/utils';
 
 export function JourneySection() {
   const pathname = usePathname();
@@ -67,13 +69,16 @@ export function JourneySection() {
         </div>
 
         {/* Timeline Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+        <div className={getCardGridContainerClasses(steps.length, "gap-6 relative")}>
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
               <div
                 key={index}
-                className="group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300"
+                className={cn(
+                  "group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300",
+                  getCardItemClasses(steps.length, index)
+                )}
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">

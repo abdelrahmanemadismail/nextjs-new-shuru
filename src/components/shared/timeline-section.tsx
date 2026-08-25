@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import type { StrapiTimelineStep } from '@/strapi/page';
 import { locales, type Locale } from '@/lib/i18n';
+import { getCardGridContainerClasses, getCardItemClasses } from '@/lib/grid-utils';
+import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Search,
@@ -91,22 +93,17 @@ export function TimelineSection({
 
         {/* Timeline Steps Grid */}
         {steps.length > 0 && (
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 ${
-              steps.length === 3
-                ? 'lg:grid-cols-3'
-                : steps.length >= 4
-                ? 'lg:grid-cols-4'
-                : 'lg:grid-cols-2'
-            } gap-6 relative`}
-          >
+          <div className={getCardGridContainerClasses(steps.length, "gap-6 relative")}>
             {steps.map((step, index) => {
               const Icon = getStepIcon(step.icon);
               const stepNumber = step.number || `0${index + 1}`;
               return (
                 <div
                   key={step.id || index}
-                  className="group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300"
+                  className={cn(
+                    "group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300",
+                    getCardItemClasses(steps.length, index)
+                  )}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">

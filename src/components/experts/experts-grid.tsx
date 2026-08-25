@@ -19,6 +19,8 @@ import {
 import { type StrapiExpert } from "@/strapi/experts";
 import { type Locale } from "@/lib/i18n";
 import { ExpertCard } from "./expert-card";
+import { getCardGridContainerClasses, getCardItemClasses } from "@/lib/grid-utils";
+import { cn } from "@/lib/utils";
 
 interface ExpertsGridProps {
   experts: StrapiExpert[];
@@ -170,14 +172,15 @@ export function ExpertsGrid({
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredExperts.map((expert) => (
-              <ExpertCard
-                key={expert.id}
-                expert={expert}
-                locale={locale}
-                onSelect={(exp) => setActiveModalExpert(exp)}
-              />
+          <div className={getCardGridContainerClasses(featuredExperts.length, "gap-6")}>
+            {featuredExperts.map((expert, idx) => (
+              <div key={expert.id} className={cn("h-full flex flex-col", getCardItemClasses(featuredExperts.length, idx))}>
+                <ExpertCard
+                  expert={expert}
+                  locale={locale}
+                  onSelect={(exp) => setActiveModalExpert(exp)}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -197,14 +200,15 @@ export function ExpertsGrid({
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {regularExperts.map((expert) => (
-              <ExpertCard
-                key={expert.id}
-                expert={expert}
-                locale={locale}
-                onSelect={(exp) => setActiveModalExpert(exp)}
-              />
+          <div className={getCardGridContainerClasses(regularExperts.length, "gap-6")}>
+            {regularExperts.map((expert, idx) => (
+              <div key={expert.id} className={cn("h-full flex flex-col", getCardItemClasses(regularExperts.length, idx))}>
+                <ExpertCard
+                  expert={expert}
+                  locale={locale}
+                  onSelect={(exp) => setActiveModalExpert(exp)}
+                />
+              </div>
             ))}
           </div>
         </div>

@@ -12,6 +12,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { type Locale } from "@/lib/i18n";
+import { getCardGridContainerClasses, getCardItemClasses } from "@/lib/grid-utils";
+import { cn } from "@/lib/utils";
 
 interface DeliveryModelSectionProps {
   locale: Locale;
@@ -105,13 +107,16 @@ export function DeliveryModelSection({ locale, badge, title, subtitle }: Deliver
       </div>
 
       {/* Model Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-        {tiers.map((tier) => {
+      <div className={getCardGridContainerClasses(tiers.length, "gap-6 relative z-10")}>
+        {tiers.map((tier, idx) => {
           const IconComponent = tier.icon;
           return (
             <div
               key={tier.id}
-              className="group relative rounded-2xl bg-background/90 backdrop-blur-md border border-border/80 hover:border-primary/50 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+              className={cn(
+                "group relative rounded-2xl bg-background/90 backdrop-blur-md border border-border/80 hover:border-primary/50 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between",
+                getCardItemClasses(tiers.length, idx)
+              )}
             >
               {/* Level indicator */}
               <div className="flex items-center justify-between gap-2 mb-5">
