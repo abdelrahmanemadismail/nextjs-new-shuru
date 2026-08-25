@@ -60,7 +60,7 @@ export function FooterAccordion({ columns, locale }: { columns: FooterColumn[]; 
                 <li key={linkIndex}>
                   <Link
                     href={toLocaleAwareUrl(link.url, locale)}
-                    target={link.openInNewTab ? "_blank" : "_self"}
+                    target={link.openInNewTab ? "_blank" : undefined}
                     rel={link.openInNewTab ? "noopener noreferrer" : undefined}
                     className="group inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                   >

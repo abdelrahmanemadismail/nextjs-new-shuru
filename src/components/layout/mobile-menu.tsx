@@ -52,7 +52,7 @@ const getLinkProps = (openInNewTab: boolean) =>
     : {};
 
 export default function MobileMenu({ isOpen, onClose, locale, items, latestMagazine }: MobileMenuProps) {
-  const [expandedItems, setExpandedItems] = useState<number[]>([]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -76,11 +76,17 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
   }, [isOpen]);
   const t = useTranslations("insights");
 
-  const menuItems = items;
+  const menuItems = useMemo(
+    () =>
+      items
+        .filter((item) => item.onSideBar)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+    [items]
+  );
 
-  const toggleExpanded = (itemOrder: number) => {
+  const toggleExpanded = (itemKey: string) => {
     setExpandedItems((prev) =>
-      prev.includes(itemOrder) ? prev.filter((value) => value !== itemOrder) : [...prev, itemOrder]
+      prev.includes(itemKey) ? prev.filter((value) => value !== itemKey) : [...prev, itemKey]
     );
   };
 
@@ -124,17 +130,18 @@ export default function MobileMenu({ isOpen, onClose, locale, items, latestMagaz
 
           <div className="mb-3 border-b border-border pb-3">
             {menuItems.map((item) => {
+              const itemKey = `${item.label}-${item.url}`;
               const hasSubItems = item.subItems.length > 0;
-              const expanded = expandedItems.includes(item.order);
+              const expanded = expandedItems.includes(itemKey);
 
               return (
-                <div key={`${item.label}-${item.url}`}>
+                <div key={itemKey}>
                   {hasSubItems ? (
                     <Button
                       variant="ghost"
                       size="default"
                       className="min-h-12 w-full justify-between px-3 py-3 text-base font-medium"
-                      onClick={() => toggleExpanded(item.order)}
+                      onClick={() => toggleExpanded(itemKey)}
                     >
                       <span>{item.label}</span>
                       <ChevronDown className={cn("h-4 w-4 transition-transform", expanded ? "rotate-180" : "rotate-0")} />

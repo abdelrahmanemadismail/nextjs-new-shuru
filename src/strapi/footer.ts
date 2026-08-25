@@ -21,21 +21,23 @@ type StrapiFooterEntry = {
   description?: string | null;
   columns?: StrapiFooterColumn[] | null;
   socialLinks?: StrapiSocialLink[] | null;
-  bottomLinks?: StrapiNavigationSubItem[] | null;
+  bottomLinks?: StrapiFooterLink[] | null;
 };
 
 type StrapiFooterColumn = {
   id: number;
   title: string;
-  links?: StrapiNavigationSubItem[] | null;
+  links?: StrapiFooterLink[] | null;
 };
 
-type StrapiNavigationSubItem = {
-  id: number;
+type StrapiFooterLink = {
+  id?: number;
   label?: string | null;
   url?: string | null;
   openInNewTab?: boolean | null;
   order?: number | null;
+  onFooter?: boolean | null;
+  onHeader?: boolean | null;
 };
 
 type StrapiSocialLink = {
@@ -49,6 +51,7 @@ export type FooterLink = {
   url: string;
   openInNewTab: boolean;
   order: number;
+  onFooter: boolean;
 };
 
 export type FooterColumn = {
@@ -73,7 +76,7 @@ export type FooterSettings = {
 
 export const FOOTER_SETTINGS_TAG = "footer";
 
-const normalizeLink = (item: StrapiNavigationSubItem): FooterLink | null => {
+const normalizeLink = (item: StrapiFooterLink): FooterLink | null => {
   const label = item.label?.trim() || "";
   const url = item.url?.trim() || "";
 
@@ -81,11 +84,19 @@ const normalizeLink = (item: StrapiNavigationSubItem): FooterLink | null => {
     return null;
   }
 
+  const onFooter =
+    item.onFooter !== undefined && item.onFooter !== null
+      ? Boolean(item.onFooter)
+      : item.onHeader !== undefined && item.onHeader !== null
+      ? Boolean(item.onHeader)
+      : true;
+
   return {
     label,
     url,
     openInNewTab: Boolean(item.openInNewTab),
     order: item.order ?? 0,
+    onFooter,
   };
 };
 
@@ -95,8 +106,8 @@ const normalizeColumn = (col: StrapiFooterColumn): FooterColumn | null => {
 
   const links = (col.links ?? [])
     .map(normalizeLink)
-    .filter((link): link is FooterLink => link !== null)
-    .sort((a, b) => a.order - b.order);
+    .filter((link): link is FooterLink => link !== null && link.onFooter !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   return {
     title,
@@ -126,8 +137,8 @@ const normalizeFooter = (locale: Locale, payload: StrapiFooterPayload): FooterSe
 
   const bottomLinks = (data.bottomLinks ?? [])
     .map(normalizeLink)
-    .filter((link): link is FooterLink => link !== null)
-    .sort((a, b) => a.order - b.order);
+    .filter((link): link is FooterLink => link !== null && link.onFooter !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   return {
     locale,
@@ -141,25 +152,45 @@ const normalizeFooter = (locale: Locale, payload: StrapiFooterPayload): FooterSe
 };
 
 async function fetchFooter(locale: Locale) {
-  const params = new URLSearchParams();
-  params.append("locale", locale);
-  params.append("populate[lightLogoImage][fields][0]", "url");
-  params.append("populate[darkLogoImage][fields][0]", "url");
-  params.append("populate[columns][populate][links][fields][0]", "label");
-  params.append("populate[columns][populate][links][fields][1]", "url");
-  params.append("populate[columns][populate][links][fields][2]", "openInNewTab");
-  params.append("populate[columns][populate][links][fields][3]", "order");
-  params.append("populate[socialLinks][fields][0]", "platform");
-  params.append("populate[socialLinks][fields][1]", "url");
-  params.append("populate[bottomLinks][fields][0]", "label");
-  params.append("populate[bottomLinks][fields][1]", "url");
-  params.append("populate[bottomLinks][fields][2]", "openInNewTab");
-  params.append("populate[bottomLinks][fields][3]", "order");
+  const baseUrl = getStrapiBaseUrl();
+  const headers = getStrapiRequestHeaders();
 
-  const response = await fetch(`${getStrapiBaseUrl()}/api/footer?${params.toString()}`, {
-    headers: getStrapiRequestHeaders(),
+  // Try populating all fields (works with layout.footer-link)
+  const params1 = new URLSearchParams();
+  params1.append("locale", locale);
+  params1.append("populate[lightLogoImage][fields][0]", "url");
+  params1.append("populate[darkLogoImage][fields][0]", "url");
+  params1.append("populate[columns][populate]", "*");
+  params1.append("populate[socialLinks]", "*");
+  params1.append("populate[bottomLinks]", "*");
+
+  let response = await fetch(`${baseUrl}/api/footer?${params1.toString()}`, {
+    headers,
     next: { revalidate: 60, tags: [FOOTER_SETTINGS_TAG] },
   });
+
+  // Fallback if legacy layout.navigation-item was still in place
+  if (!response.ok && response.status !== 404) {
+    const params2 = new URLSearchParams();
+    params2.append("locale", locale);
+    params2.append("populate[lightLogoImage][fields][0]", "url");
+    params2.append("populate[darkLogoImage][fields][0]", "url");
+    params2.append("populate[columns][populate][links][fields][0]", "label");
+    params2.append("populate[columns][populate][links][fields][1]", "url");
+    params2.append("populate[columns][populate][links][fields][2]", "openInNewTab");
+    params2.append("populate[columns][populate][links][fields][3]", "order");
+    params2.append("populate[socialLinks][fields][0]", "platform");
+    params2.append("populate[socialLinks][fields][1]", "url");
+    params2.append("populate[bottomLinks][fields][0]", "label");
+    params2.append("populate[bottomLinks][fields][1]", "url");
+    params2.append("populate[bottomLinks][fields][2]", "openInNewTab");
+    params2.append("populate[bottomLinks][fields][3]", "order");
+
+    response = await fetch(`${baseUrl}/api/footer?${params2.toString()}`, {
+      headers,
+      next: { revalidate: 60, tags: [FOOTER_SETTINGS_TAG] },
+    });
+  }
 
   if (!response.ok) {
     if (response.status === 404) {

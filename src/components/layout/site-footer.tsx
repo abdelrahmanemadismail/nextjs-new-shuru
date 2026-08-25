@@ -132,7 +132,7 @@ export async function SiteFooter({ locale }: SiteFooterProps) {
               <li key={index}>
                 <Link
                   href={toLocaleAwareUrl(link.url, locale)}
-                  target={link.openInNewTab ? "_blank" : "_self"}
+                  target={link.openInNewTab ? "_blank" : undefined}
                   rel={link.openInNewTab ? "noopener noreferrer" : undefined}
                   className="hover:text-primary transition-colors duration-200"
                 >

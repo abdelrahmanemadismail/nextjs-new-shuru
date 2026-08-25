@@ -79,7 +79,13 @@ export function HeaderNavigation({
   const [showBanner, setShowBanner] = useState(topBar?.isVisible ?? false);
   const pathname = usePathname();
 
-  const headerItems = items;
+  const headerItems = useMemo(
+    () =>
+      items
+        .filter((item) => item.onHeader)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+    [items]
+  );
 
   useEffect(() => {
     if (!isMenuOpen && !isSearchOpen) {
