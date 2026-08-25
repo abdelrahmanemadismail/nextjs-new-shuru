@@ -92,11 +92,11 @@ export function ServiceCard({
     : [];
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-gradient-to-b from-card/80 via-card/50 to-card/20 p-6 lg:p-8 backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/50 hover:shadow-[0_12px_32px_-8px_rgba(20,184,166,0.15)]">
+    <div className="group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-gradient-to-b from-card/80 via-card/50 to-card/20 p-6 lg:p-8 backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/50 hover:shadow-[0_12px_32px_-8px_rgba(20,184,166,0.15)] h-full w-full">
       {/* Subtle top gradient accent on hover */}
       <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/0 to-transparent transition-opacity duration-300 group-hover:via-primary/70" />
 
-      <div>
+      <div className="flex-1 flex flex-col">
         {/* Header: Icon & Badge */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">

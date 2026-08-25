@@ -32,11 +32,11 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
     : [];
 
   return (
-    <div className="group relative rounded-3xl bg-card border border-border/70 hover:border-primary/50 p-6 sm:p-7 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col justify-between overflow-hidden">
+    <div className="group relative rounded-3xl bg-card border border-border/70 hover:border-primary/50 p-6 sm:p-7 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col justify-between overflow-hidden h-full w-full">
       {/* Top accent glow line on hover */}
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-amber-500 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div>
+      <div className="flex-1 flex flex-col">
         {/* Top Header with Avatar & Badges */}
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="relative">
@@ -94,7 +94,7 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
             {expert.title}
           </p>
           {expert.bio && (
-            <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed pt-1">
+            <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed pt-1 text-justify [text-align-last:start] [text-justify:inter-word]">
               {expert.bio}
             </p>
           )}
@@ -150,7 +150,7 @@ export function ExpertCard({ expert, locale, onSelect }: ExpertCardProps) {
       </div>
 
       {/* Action buttons */}
-      <div className="pt-4 border-t border-border/50 flex gap-2">
+      <div className="pt-4 border-t border-border/50 flex gap-2 mt-auto">
         <button
           onClick={() => onSelect(expert)}
           className="flex-1 py-2.5 px-4 rounded-xl border border-border bg-accent/20 hover:bg-accent text-foreground text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group-hover:border-primary/40"

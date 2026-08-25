@@ -307,7 +307,7 @@ export function ExpertsGrid({
                   <Briefcase className="w-4 h-4 text-primary" />
                   <span>{isAr ? "نبذة عن المسار والخبرات" : "Professional Biography"}</span>
                 </h4>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed text-justify [text-align-last:start] [text-justify:inter-word]">
                   {activeModalExpert.bio}
                 </p>
               </div>
@@ -384,7 +384,7 @@ export function ExpertsGrid({
           <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
             {ctaHeadline || (isAr ? "هل تبحث عن مستشار تنفيذي يقود مبادرتكم القادمة؟" : "Looking for an executive advisor to lead your next initiative?")}
           </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed text-justify [text-align-last:start] [text-justify:inter-word]">
             {ctaDescription || (isAr
               ? "نساعدكم في تشخيص التحدي وتخصيص الكفاءة الاستشارية الأكثر ملاءمة لطبيعة مشروعكم وسياقه المؤسسي."
               : "We help diagnose your institutional challenge and allocate the expert best suited for your operating context.")}

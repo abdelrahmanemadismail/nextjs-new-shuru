@@ -101,7 +101,7 @@ export function TimelineSection({
                 <div
                   key={step.id || index}
                   className={cn(
-                    "group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300",
+                    "group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300 h-full",
                     getCardItemClasses(steps.length, index)
                   )}
                 >
