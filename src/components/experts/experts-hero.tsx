@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, ArrowRight, ShieldCheck, Award, Users, ChevronDown } from "lucide-react";
+import { Sparkles, ArrowRight, ChevronDown } from "lucide-react";
 import { type Locale } from "@/lib/i18n";
 
 interface ExpertsHeroProps {
@@ -21,8 +21,6 @@ interface ExpertsHeroProps {
   }>;
 }
 
-const defaultIcons = [Award, ShieldCheck, Users];
-
 export function ExpertsHero({
   locale,
   badgeText,
@@ -32,7 +30,6 @@ export function ExpertsHero({
   primaryCtaLink = "/request-info",
   secondaryCtaText,
   secondaryCtaLink = "#experts-directory",
-  trustMetrics: strapiMetrics,
 }: ExpertsHeroProps) {
   const isAr = locale === "ar";
 
@@ -50,32 +47,6 @@ export function ExpertsHero({
 
   const defaultPrimaryCta = isAr ? "طلب استشارة مع خبير" : "Request an Advisory Session";
   const defaultSecondaryCta = isAr ? "استعراض شبكة الخبراء" : "Explore Expert Directory";
-
-  const defaultTrustMetrics = [
-    {
-      icon: Award,
-      value: "+18",
-      label: isAr ? "سنة متوسط الخبرة الاستشارية" : "Years Avg. Advisory Experience",
-    },
-    {
-      icon: ShieldCheck,
-      value: "100%",
-      label: isAr ? "خبراء معتمدون ومرخصون" : "Certified & Licensed Experts",
-    },
-    {
-      icon: Users,
-      value: "+50",
-      label: isAr ? "برنامج تحولي ومكتب PMO مُدار" : "Transformations & PMOs Delivered",
-    },
-  ];
-
-  const renderedMetrics = strapiMetrics && strapiMetrics.length > 0
-    ? strapiMetrics.map((m, idx) => ({
-        icon: defaultIcons[idx % defaultIcons.length],
-        value: m.value,
-        label: m.label,
-      }))
-    : defaultTrustMetrics;
 
   return (
     <div className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24 border-b border-border/40 bg-gradient-to-b from-primary/10 via-background to-background">
@@ -104,7 +75,7 @@ export function ExpertsHero({
         </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href={`/${locale}${primaryCtaLink.startsWith("/") ? primaryCtaLink : `/${primaryCtaLink}`}`}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold text-sm sm:text-base shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 hover:-translate-y-0.5 transition-all"
@@ -120,31 +91,6 @@ export function ExpertsHero({
             <span>{secondaryCtaText || defaultSecondaryCta}</span>
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </a>
-        </div>
-
-        {/* Trust Stats Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-8 border-t border-border/50 max-w-3xl mx-auto">
-          {renderedMetrics.map((metric, idx) => {
-            const IconComp = metric.icon;
-            return (
-              <div
-                key={idx}
-                className="flex items-center justify-center sm:justify-start gap-3 p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md"
-              >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
-                  <IconComp className="w-5 h-5" />
-                </div>
-                <div className="text-start">
-                  <div className="text-xl font-extrabold text-foreground tracking-tight">
-                    {metric.value}
-                  </div>
-                  <div className="text-[11px] font-medium text-muted-foreground leading-tight">
-                    {metric.label}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
     </div>

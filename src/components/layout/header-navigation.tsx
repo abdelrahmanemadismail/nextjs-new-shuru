@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, Menu, Search, User } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronDown, Menu, Search } from "lucide-react";
 import { locales, type Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { HeaderMenuItem, StrapiTopBar } from "@/strapi/header";
@@ -78,7 +78,6 @@ export function HeaderNavigation({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(topBar?.isVisible ?? false);
   const pathname = usePathname();
-  const router = useRouter();
 
   const headerItems = items;
 
@@ -213,21 +212,6 @@ export function HeaderNavigation({
           </div>
 
           <div className="flex items-center justify-end gap-0.5 sm:gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "hidden sm:flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-transparent transition-all cursor-pointer",
-                user
-                  ? "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20"
-                  : "hover:border-border"
-              )}
-              onClick={() => router.push(user ? `/${locale}/profile` : `/${locale}/auth/login`)}
-              aria-label={user ? "Profile" : "Login"}
-            >
-              <User className="h-4 w-4" />
-            </Button>
-
             <ModeToggle />
             <LocaleSwitcher currentLocale={locale} />
           </div>

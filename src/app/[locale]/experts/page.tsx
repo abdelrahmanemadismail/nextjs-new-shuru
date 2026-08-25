@@ -5,7 +5,6 @@ import { buildMetadata } from "@/lib/seo";
 import { getExperts } from "@/strapi/experts";
 import { getExpertsPageCached } from "@/strapi/experts-page";
 import { getTestimonialsCached } from "@/strapi/home";
-import { DeliveryModelSection } from "@/components/experts/delivery-model-section";
 import { ExpertsGrid } from "@/components/experts/experts-grid";
 import { ExpertsHero } from "@/components/experts/experts-hero";
 import { BlockRenderer } from "@/components/page/block-renderer";
@@ -59,7 +58,6 @@ export default async function ExpertsPage({ params }: ExpertsPageProps) {
   ]);
 
   const heroBlock = pageData?.blocks?.find((b) => b.__component === "home.hero");
-  const timelineBlock = pageData?.blocks?.find((b) => b.__component === "shared.timeline-section");
   const otherBlocks = pageData?.blocks?.filter(
     (b) => b.__component !== "home.hero" && b.__component !== "shared.timeline-section"
   ) || [];
@@ -80,19 +78,7 @@ export default async function ExpertsPage({ params }: ExpertsPageProps) {
       />
 
       <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl space-y-16">
-        {/* 2. Structured 4-Tier Delivery Model */}
-        {timelineBlock ? (
-          <BlockRenderer block={timelineBlock} locale={locale} testimonials={testimonials} />
-        ) : (
-          <DeliveryModelSection
-            locale={locale}
-            badge={pageData?.deliveryModelBadge}
-            title={pageData?.deliveryModelTitle}
-            subtitle={pageData?.deliveryModelSubtitle}
-          />
-        )}
-
-        {/* 3. Experts Directory & Interactive Filter Grid */}
+        {/* 2. Experts Directory & Interactive Filter Grid */}
         <ExpertsGrid
           experts={experts}
           locale={locale}
