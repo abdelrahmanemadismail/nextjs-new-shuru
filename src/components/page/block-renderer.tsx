@@ -4,7 +4,12 @@ import type { StrapiPageBlock } from "@/strapi/page";
 import { type Locale } from "@/lib/i18n";
 import type { StrapiTestimonial } from "@/strapi/home";
 
+import type { StrapiServiceEntry } from "@/strapi/services";
+
 // Dynamically import below-the-fold components to reduce initial page bundle sizes
+const ServicesGrid = dynamic(() =>
+  import("@/components/services/services-grid").then((mod) => mod.ServicesGrid)
+);
 const OverviewSection = dynamic(() =>
   import("@/components/home/overview-section").then((mod) => mod.OverviewSection)
 );
@@ -45,10 +50,31 @@ const SliderBlock = dynamic(() =>
   import("@/components/shared/slider-block").then((mod) => mod.SliderBlock)
 );
 
-export function BlockRenderer({ block, locale, testimonials = [] }: { block: StrapiPageBlock; locale: Locale; testimonials?: StrapiTestimonial[] }) {
+export function BlockRenderer({
+  block,
+  locale,
+  testimonials = [],
+  services = [],
+}: {
+  block: StrapiPageBlock;
+  locale: Locale;
+  testimonials?: StrapiTestimonial[];
+  services?: StrapiServiceEntry[];
+}) {
   switch (block.__component) {
     case "home.hero":
       return <HeroSection hero={block} locale={locale} />;
+
+    case "shared.services-section":
+      return (
+        <ServicesGrid
+          services={services}
+          locale={locale}
+          badge={block.badge}
+          title={block.title}
+          introText={block.introText}
+        />
+      );
 
     case "home.overview":
       return <OverviewSection overview={block} />;

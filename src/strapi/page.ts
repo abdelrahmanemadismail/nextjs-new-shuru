@@ -89,6 +89,14 @@ export type StrapiFaqSectionBlock = {
   contactLink?: string;
 };
 
+export type StrapiServicesSectionBlock = {
+  __component: 'shared.services-section';
+  id: number;
+  badge?: string;
+  title?: string;
+  introText?: string;
+};
+
 export type StrapiPageBlock =
   | StrapiHeroBlock
   | StrapiOverviewBlock
@@ -100,6 +108,7 @@ export type StrapiPageBlock =
   | StrapiTimelineSectionBlock
   | StrapiQuoteSectionBlock
   | StrapiFaqSectionBlock
+  | StrapiServicesSectionBlock
   | StrapiSharedMediaBlock
   | StrapiSharedQuoteBlock
   | StrapiSharedRichTextBlock
