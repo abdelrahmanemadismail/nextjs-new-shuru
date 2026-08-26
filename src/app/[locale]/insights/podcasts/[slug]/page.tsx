@@ -109,6 +109,7 @@ export default async function PodcastPage({ params }: Props) {
                 src={podcast.cover_image.url}
                 alt={podcast.title}
                 fill
+                sizes="(max-width: 896px) 100vw, 896px"
                 className="object-cover opacity-80"
                 priority
               />

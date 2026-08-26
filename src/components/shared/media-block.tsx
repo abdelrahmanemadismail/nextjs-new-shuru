@@ -34,6 +34,7 @@ export function MediaBlock({ block }: MediaBlockProps) {
             src={url}
             alt={block.file.alternativeText || "Media"}
             fill
+            sizes="(max-width: 1024px) 100vw, 1024px"
             className="object-cover w-full h-full"
           />
         )}

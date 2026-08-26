@@ -47,6 +47,7 @@ export function SliderBlock({ block }: SliderBlockProps) {
                   src={url}
                   alt={file.alternativeText || `Slider image ${index + 1}`}
                   fill
+                  sizes="(max-width: 1152px) 100vw, 1152px"
                   className="object-cover"
                 />
               </div>

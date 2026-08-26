@@ -79,6 +79,7 @@ export default async function MajlisPage({ params }: Props) {
               src={majlis.cover_image.url}
               alt={majlis.title}
               fill
+              sizes="(max-width: 896px) 100vw, 896px"
               className="object-cover"
               priority
             />

@@ -263,6 +263,7 @@ export function ExpertsGrid({
                     src={activeModalExpert.avatarUrl}
                     alt={activeModalExpert.name}
                     fill
+                    sizes="(max-width: 640px) 80px, 96px"
                     className="object-cover"
                   />
                 </div>

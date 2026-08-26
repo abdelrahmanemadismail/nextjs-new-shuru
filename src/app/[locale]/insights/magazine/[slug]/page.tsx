@@ -103,6 +103,7 @@ export default async function MagazineIssuePage({ params }: Props) {
                   src={issue.cover_image.url}
                   alt={issue.title}
                   fill
+                  sizes="(max-width: 1024px) 100vw, 384px"
                   className="object-cover"
                   priority
                 />
