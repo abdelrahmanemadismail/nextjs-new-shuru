@@ -175,7 +175,7 @@
     @apply bg-background text-foreground;
     touch-action: manipulation;
   }
-  p, .parse-p, article, .prose p {
+  .parse-p, article p, .prose p {
     text-align: justify;
     text-justify: inter-word;
     text-align-last: start;

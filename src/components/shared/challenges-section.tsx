@@ -35,9 +35,9 @@ export function ChallengesSection({ title, introText, challenges }: ChallengesSe
               key={challenge.id}
               className="bg-card border rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="grid md:grid-cols-12 md:divide-x divide-border">
-                {/* Left Side: Problem & Solution (Context) */}
-                <div className="md:col-span-8 p-8 md:p-10 space-y-8">
+              <div className="grid md:grid-cols-12 md:divide-x rtl:md:divide-x-reverse divide-border">
+                {/* Problem & Solution (Context) */}
+                <div className="md:col-span-8 p-8 md:p-10 space-y-8 text-start">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="flex items-center justify-center w-8 h-8 rounded-full bg-destructive/10 text-destructive">
@@ -47,33 +47,33 @@ export function ChallengesSection({ title, introText, challenges }: ChallengesSe
                         {t("challengeLabel")}
                       </h4>
                     </div>
-                    <p className="text-xl md:text-2xl font-medium leading-snug text-foreground">
+                    <p className="text-xl md:text-2xl font-medium leading-snug text-foreground text-start">
                       "{challenge.pain}"
                     </p>
                   </div>
 
-                  <div className="border-l-2 border-primary/30 pl-6 py-1">
+                  <div className="border-s-2 border-primary/30 ps-6 py-1 text-start">
                     <div className="flex items-center gap-2 mb-2">
-                      <ArrowRight className="w-4 h-4 text-primary" />
+                      <ArrowRight className="w-4 h-4 text-primary rtl:rotate-180" />
                       <h4 className="font-semibold text-primary uppercase tracking-widest text-xs">
                         {t("solutionLabel")}
                       </h4>
                     </div>
-                    <p className="text-muted-foreground text-lg leading-relaxed">
+                    <p className="text-muted-foreground text-lg leading-relaxed text-start">
                       {challenge.solution}
                     </p>
                   </div>
                 </div>
 
-                {/* Right Side: Result (Impact highlight) */}
+                {/* Result (Impact highlight) */}
                 <div className="md:col-span-4 bg-muted/30 p-8 md:p-10 flex flex-col justify-center items-center text-center border-t md:border-t-0 border-border">
                   <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <h4 className="font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest text-xs mb-4">
+                  <h4 className="font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest text-xs mb-4 text-center">
                     {t("resultLabel")}
                   </h4>
-                  <p className="text-2xl md:text-3xl font-bold text-foreground">
+                  <p className="text-2xl md:text-3xl font-bold text-foreground text-center leading-snug">
                     {challenge.result}
                   </p>
                 </div>
