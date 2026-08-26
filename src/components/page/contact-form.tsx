@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Calendar, Building2, Target, CheckCircle2, ArrowRight } from "lucide-react";
+import { Calendar, Building2, ArrowRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,45 @@ import {
 } from "@/components/ui/form";
 import { sendContactEmail } from "@/lib/actions/contact";
 
-export function ContactForm() {
+export interface ContactFormProps {
+  step1Title?: string;
+  entityTypeLabel?: string;
+  entityTypeOptions?: string[];
+  desiredServiceLabel?: string;
+  desiredServiceOptions?: string[];
+  challengeLabel?: string;
+  challengeOptions?: string[];
+  step2Title?: string;
+  fullNameLabel?: string;
+  emailLabel?: string;
+  phoneLabel?: string;
+  companyLabel?: string;
+  preferredDateLabel?: string;
+  messageLabel?: string;
+  submitButtonText?: string;
+  submittingButtonText?: string;
+  successMessage?: string;
+}
+
+export function ContactForm({
+  step1Title,
+  entityTypeLabel,
+  entityTypeOptions,
+  desiredServiceLabel,
+  desiredServiceOptions,
+  challengeLabel,
+  challengeOptions,
+  step2Title,
+  fullNameLabel,
+  emailLabel,
+  phoneLabel,
+  companyLabel,
+  preferredDateLabel,
+  messageLabel,
+  submitButtonText,
+  submittingButtonText,
+  successMessage,
+}: ContactFormProps) {
   const t = useTranslations("contact");
   const [isPending, startTransition] = useTransition();
 
@@ -29,6 +67,42 @@ export function ContactForm() {
   const localeMatch = pathname?.match(/^\/(ar|en)/);
   const locale = localeMatch ? localeMatch[1] : 'ar';
   const isAr = locale === 'ar';
+
+  const defaultEntityTypes = isAr
+    ? ["جهة حكومية / شبه حكومية", "شركة / قطاع خاص", "مؤسسة أصلية / قطاع ثالث", "أخرى"]
+    : ["Government / Semi-Government", "Enterprise / Private Sector", "Non-Profit / Foundation", "Other"];
+
+  const defaultServices = isAr
+    ? [
+        "1. التشخيص وإعادة الهيكلة التشغيلية",
+        "2. تصميم استراتيجية التنفيذ والخرائط",
+        "3. التنفيذ الذكي والتشغيل الميداني",
+        "4. بناء القدرات وتطوير الكفاءات",
+      ]
+    : [
+        "1. Operational Diagnosis & Restructuring",
+        "2. Execution Strategy & Roadmap Design",
+        "3. Smart Field Execution & Live KPIs",
+        "4. Capacity Building & Team Enablement",
+      ];
+
+  const defaultChallenges = isAr
+    ? [
+        "بطء تنفيذ المبادرات وتأخر المخرجات عن الجدول الزمني",
+        "صعوبة قياس الأداء وغياب لوحات المتابعة اللحظية",
+        "فجوة بين الخطط الاستراتيجية والتشغيل الميداني",
+        "تأهيل الفرق وتطوير القدرات التشغيلية الداخلية",
+      ]
+    : [
+        "Slow initiative delivery & delayed milestones",
+        "Difficulty tracking live performance & metrics",
+        "Gap between high-level strategy and field execution",
+        "Up-skilling internal teams & operational enablement",
+      ];
+
+  const entityTypes = entityTypeOptions && entityTypeOptions.length > 0 ? entityTypeOptions : defaultEntityTypes;
+  const services = desiredServiceOptions && desiredServiceOptions.length > 0 ? desiredServiceOptions : defaultServices;
+  const challenges = challengeOptions && challengeOptions.length > 0 ? challengeOptions : defaultChallenges;
 
   const formSchema = z.object({
     fullName: z.string().min(2, { message: isAr ? "الاسم مطلوب" : "Name is required" }),
@@ -49,9 +123,9 @@ export function ContactForm() {
       email: "",
       phone: "",
       company: "",
-      entityType: isAr ? "قطاع حكومي" : "Government",
-      challenge: isAr ? "بطء تنفيذ المبادرات والتعثر التشغيلي" : "Initiative Delivery Bottlenecks",
-      desiredService: isAr ? "تشخيص وإعادة هيكلة المسارات" : "Diagnosis & Restructuring",
+      entityType: entityTypes[0] || "",
+      challenge: challenges[0] || "",
+      desiredService: services[0] || "",
       preferredDate: "",
       message: "",
     },
@@ -65,7 +139,10 @@ export function ContactForm() {
           subject: `${values.company} - ${values.entityType} (${values.desiredService})`,
         });
         if (result.success) {
-          toast.success(isAr ? "تم حجز طلب جلسة التشخيص بنجاح! سيتواصل معك فريقنا قريباً." : "Diagnostic session request received! Our team will contact you shortly.");
+          const defaultSuccess = isAr
+            ? "تم حجز طلب جلسة التشخيص بنجاح! سيتواصل معك فريقنا قريباً."
+            : "Diagnostic session request received! Our team will contact you shortly.";
+          toast.success(successMessage || defaultSuccess);
           form.reset();
         } else {
           console.error("Contact form submission failed:", result.error);
@@ -81,12 +158,11 @@ export function ContactForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        
         {/* Step 1: Sector & Service Selection */}
         <div className="space-y-4 rounded-2xl bg-accent/30 p-5 border border-border/50">
           <h3 className="text-base font-bold text-foreground flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            <span>{isAr ? '1. معلومات الجهة والتحدي' : '1. Entity & Challenge Details'}</span>
+            <span>{step1Title || (isAr ? "1. معلومات الجهة والتحدي" : "1. Entity & Challenge Details")}</span>
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -96,7 +172,7 @@ export function ContactForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-semibold text-foreground">
-                    {isAr ? 'نوع الجهة / القطاع *' : 'Entity Type / Sector *'}
+                    {entityTypeLabel || (isAr ? "نوع الجهة / القطاع *" : "Entity Type / Sector *")}
                   </FormLabel>
                   <FormControl>
                     <select
@@ -104,10 +180,11 @@ export function ContactForm() {
                       disabled={isPending}
                       className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     >
-                      <option value={isAr ? "قطاع حكومي" : "Government Sector"}>{isAr ? 'جهة حكومية / شبه حكومية' : 'Government / Semi-Government'}</option>
-                      <option value={isAr ? "قطاع خاص / شركات" : "Private Sector"}>{isAr ? 'شركة / قطاع خاص' : 'Enterprise / Private Sector'}</option>
-                      <option value={isAr ? "قطاع غير ربحي" : "Non-Profit"}>{isAr ? 'مؤسسة أصلية / قطاع ثالث' : 'Non-Profit / Foundation'}</option>
-                      <option value={isAr ? "أخرى" : "Other"}>{isAr ? 'قطاع آخر' : 'Other'}</option>
+                      {entityTypes.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
                     </select>
                   </FormControl>
                   <FormMessage />
@@ -121,7 +198,7 @@ export function ContactForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-semibold text-foreground">
-                    {isAr ? 'الخدمة / المسار المطلوب *' : 'Desired Track / Service *'}
+                    {desiredServiceLabel || (isAr ? "الخدمة / المسار المطلوب *" : "Desired Track / Service *")}
                   </FormLabel>
                   <FormControl>
                     <select
@@ -129,18 +206,11 @@ export function ContactForm() {
                       disabled={isPending}
                       className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     >
-                      <option value={isAr ? "تشخيص وإعادة هيكلة المسارات" : "Diagnosis & Restructuring"}>
-                        {isAr ? '1. التشخيص وإعادة الهيكلة التشغيلية' : '1. Operational Diagnosis & Restructuring'}
-                      </option>
-                      <option value={isAr ? "تصميم استراتيجية التنفيذ" : "Execution Strategy Design"}>
-                        {isAr ? '2. تصميم استراتيجية التنفيذ والخرائط' : '2. Execution Strategy & Roadmap Design'}
-                      </option>
-                      <option value={isAr ? "التنفيذ الذكي ومتابعة الأداء" : "Smart Execution & KPIs"}>
-                        {isAr ? '3. التنفيذ الذكي والتشغيل الميداني' : '3. Smart Field Execution & Live KPIs'}
-                      </option>
-                      <option value={isAr ? "بناء القدرات والتمكين المؤسسي" : "Capacity Building"}>
-                        {isAr ? '4. بناء القدرات وتطوير الكفاءات' : '4. Capacity Building & Team Enablement'}
-                      </option>
+                      {services.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
                     </select>
                   </FormControl>
                   <FormMessage />
@@ -155,7 +225,7 @@ export function ContactForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs font-semibold text-foreground">
-                  {isAr ? 'التحدي الرئيسي الذي تواجهه جهتك حالياً *' : 'Primary Challenge Facing Your Entity *'}
+                  {challengeLabel || (isAr ? "التحدي الرئيسي الذي تواجهه جهتك حالياً *" : "Primary Challenge Facing Your Entity *")}
                 </FormLabel>
                 <FormControl>
                   <select
@@ -163,18 +233,11 @@ export function ContactForm() {
                     disabled={isPending}
                     className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <option value={isAr ? "بطء تنفيذ المبادرات والتعثر التشغيلي" : "Slow Initiative Delivery"}>
-                      {isAr ? 'بطء تنفيذ المبادرات وتأخر المخرجات عن الجدول الزمني' : 'Slow initiative delivery & delayed milestones'}
-                    </option>
-                    <option value={isAr ? "غياب نظام متابعة الأداء واللوحات اللحظية" : "Lack of Real-time Performance System"}>
-                      {isAr ? 'صعوبة قياس الأداء وغياب لوحات المتابعة اللحظية' : 'Difficulty tracking live performance & metrics'}
-                    </option>
-                    <option value={isAr ? "صعوبة تحويل الاستراتيجية إلى تشغيل ميداني" : "Strategy-to-Execution Gap"}>
-                      {isAr ? 'فجوة بين الخطط الاستراتيجية والتشغيل الميداني' : 'Gap between high-level strategy and field execution'}
-                    </option>
-                    <option value={isAr ? "الحاجة لنقل المعرفة وبناء قدرات الفرق" : "Need for Team Capacity Building"}>
-                      {isAr ? 'تأهيل الفرق وتطوير القدرات التشغيلية الداخلية' : 'Up-skilling internal teams & operational enablement'}
-                    </option>
+                    {challenges.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
                   </select>
                 </FormControl>
                 <FormMessage />
@@ -187,7 +250,7 @@ export function ContactForm() {
         <div className="space-y-4 rounded-2xl bg-accent/30 p-5 border border-border/50">
           <h3 className="text-base font-bold text-foreground flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            <span>{isAr ? '2. موعد الجلسة والبيانات الشخصية' : '2. Appointment & Contact Info'}</span>
+            <span>{step2Title || (isAr ? "2. موعد الجلسة والبيانات الشخصية" : "2. Appointment & Contact Info")}</span>
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -196,7 +259,9 @@ export function ContactForm() {
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold">{t("form.fullName")}</FormLabel>
+                  <FormLabel className="text-xs font-semibold">
+                    {fullNameLabel || t("form.fullName")}
+                  </FormLabel>
                   <FormControl>
                     <Input className="rounded-xl" {...field} disabled={isPending} />
                   </FormControl>
@@ -210,7 +275,9 @@ export function ContactForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold">{t("form.email")}</FormLabel>
+                  <FormLabel className="text-xs font-semibold">
+                    {emailLabel || t("form.email")}
+                  </FormLabel>
                   <FormControl>
                     <Input className="rounded-xl" type="email" {...field} disabled={isPending} />
                   </FormControl>
@@ -226,7 +293,9 @@ export function ContactForm() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold">{t("form.phone")}</FormLabel>
+                  <FormLabel className="text-xs font-semibold">
+                    {phoneLabel || t("form.phone")}
+                  </FormLabel>
                   <FormControl>
                     <Input className="rounded-xl" type="tel" {...field} disabled={isPending} />
                   </FormControl>
@@ -240,7 +309,9 @@ export function ContactForm() {
               name="company"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold">{isAr ? 'اسم الشركة / المؤسسة *' : 'Organization Name *'}</FormLabel>
+                  <FormLabel className="text-xs font-semibold">
+                    {companyLabel || (isAr ? "اسم الشركة / المؤسسة *" : "Organization Name *")}
+                  </FormLabel>
                   <FormControl>
                     <Input className="rounded-xl" {...field} disabled={isPending} />
                   </FormControl>
@@ -254,7 +325,9 @@ export function ContactForm() {
               name="preferredDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold">{isAr ? 'الموعد والوقت المناسب للجلسة' : 'Preferred Date & Time'}</FormLabel>
+                  <FormLabel className="text-xs font-semibold">
+                    {preferredDateLabel || (isAr ? "الموعد والوقت المناسب للجلسة" : "Preferred Date & Time")}
+                  </FormLabel>
                   <FormControl>
                     <Input type="datetime-local" className="rounded-xl" {...field} disabled={isPending} />
                   </FormControl>
@@ -269,7 +342,9 @@ export function ContactForm() {
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-semibold">{isAr ? 'ملاحظات أو تفاصيل إضافية (اختياري)' : 'Additional Notes (Optional)'}</FormLabel>
+                <FormLabel className="text-xs font-semibold">
+                  {messageLabel || (isAr ? "ملاحظات أو تفاصيل إضافية (اختياري)" : "Additional Notes (Optional)")}
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     className="min-h-[90px] rounded-xl"
@@ -289,7 +364,9 @@ export function ContactForm() {
           className="group relative inline-flex items-center justify-center rounded-full bg-primary px-10 py-4 text-base font-bold text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 disabled:pointer-events-none disabled:opacity-50 w-full cursor-pointer overflow-hidden"
         >
           <span className="relative z-10 flex items-center gap-2">
-            {isPending ? (isAr ? 'جاري إرسال الطلب...' : 'Submitting Request...') : (isAr ? 'تأكيد وحجز جلسة التشخيص' : 'Confirm Diagnostic Session Booking')}
+            {isPending
+              ? (submittingButtonText || (isAr ? "جاري إرسال الطلب..." : "Submitting Request..."))
+              : (submitButtonText || (isAr ? "تأكيد وحجز جلسة التشخيص" : "Confirm Diagnostic Session Booking"))}
             <ArrowRight className="h-5 w-5 rtl:-scale-x-100" />
           </span>
         </button>

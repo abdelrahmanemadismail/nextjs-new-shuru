@@ -7,6 +7,7 @@ import { HOME_TAG, TESTIMONIALS_TAG } from "@/strapi/home";
 import { EXPERTS_PAGE_TAG } from "@/strapi/experts-page";
 import { COMPANY_PROFILE_PAGE_TAG } from "@/strapi/company-profile-page";
 import { REQUEST_INFO_PAGE_TAG } from "@/strapi/request-info-page";
+import { CONTACT_PAGE_TAG } from "@/strapi/contact-page";
 import { PAGE_TAG } from "@/strapi/page";
 
 // Complete list of all application cache tags to purge on every change
@@ -20,6 +21,7 @@ const ALL_TAGS = [
   "experts",
   COMPANY_PROFILE_PAGE_TAG,
   REQUEST_INFO_PAGE_TAG,
+  CONTACT_PAGE_TAG,
   "services",
   "articles",
   "author",

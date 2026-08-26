@@ -3,6 +3,7 @@ import { ContactForm } from "@/components/page/contact-form";
 import { PageContent } from "@/components/page/page-content";
 import { buildMetadata } from "@/lib/seo";
 import { type Locale, isLocale, defaultLocale } from "@/lib/i18n";
+import { getContactPageCached } from "@/strapi/contact-page";
 import { getPageCached } from "@/strapi/page";
 
 export async function generateMetadata({
@@ -12,17 +13,22 @@ export async function generateMetadata({
 }) {
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? (rawLocale as Locale) : defaultLocale;
-  const [t, page] = await Promise.all([
+  const [t, contactPage, genericPage] = await Promise.all([
     getTranslations({ locale, namespace: "contact" }),
+    getContactPageCached(locale).catch(() => null),
     getPageCached("contact", locale).catch(() => null),
   ]);
+
+  const page = contactPage || genericPage;
 
   return buildMetadata({
     locale,
     path: "/contact",
-    title: page?.seo?.meta_title || page?.title || t("title"),
-    description: page?.seo?.meta_description || t("description"),
-    keywords: page?.seo?.meta_keywords
+    title: contactPage?.seo?.meta_title || contactPage?.heroTitle || page?.title || t("title"),
+    description: contactPage?.seo?.meta_description || contactPage?.heroSubtitle || page?.seo?.meta_description || t("description"),
+    keywords: contactPage?.seo?.meta_keywords
+      ? contactPage.seo.meta_keywords.split(",").map((k) => k.trim())
+      : page?.seo?.meta_keywords
       ? page.seo.meta_keywords.split(",").map((k) => k.trim())
       : undefined,
   });
@@ -38,17 +44,19 @@ export default async function ContactUsPage({
   setRequestLocale(locale);
   const isAr = locale === "ar";
 
-  const [t, page] = await Promise.all([
+  const [t, contactPage, genericPage] = await Promise.all([
     getTranslations({ locale, namespace: "contact" }),
+    getContactPageCached(locale).catch(() => null),
     getPageCached("contact", locale).catch(() => null),
   ]);
 
+  const page = contactPage || genericPage;
   const heroBlock = page?.blocks?.find((b) => b.__component === "home.hero") as any;
   const otherBlocks = page?.blocks?.filter((b) => b.__component !== "home.hero") || [];
 
-  const badgeText = heroBlock?.badgeText || (isAr ? "جلسة تشخيصية تخصصية" : "Specialized Diagnostic Session");
-  const titleText = page?.title || heroBlock?.title || (isAr ? "احجز جلسة تشخيص مع خبراء التنفيذ" : "Book a Diagnostic Session with Execution Experts");
-  const descText = heroBlock?.subtitle || (isAr
+  const badgeText = contactPage?.badge || heroBlock?.badgeText || (isAr ? "جلسة تشخيصية تخصصية" : "Specialized Diagnostic Session");
+  const titleText = contactPage?.heroTitle || contactPage?.title || heroBlock?.title || page?.title || (isAr ? "احجز جلسة تشخيص مع خبراء التنفيذ" : "Book a Diagnostic Session with Execution Experts");
+  const descText = contactPage?.heroSubtitle || heroBlock?.subtitle || (isAr
     ? "حدد نوع جهتك والتحدي الحالي، وسيقوم فريقنا بدراسة وضعكم واقتراح المسار التشغيلي والحلول المناسبة."
     : "Specify your entity type and current challenges. Our team will review your situation and propose the optimal operational roadmap.");
 
@@ -66,13 +74,31 @@ export default async function ContactUsPage({
         </p>
       </div>
       <div className="bg-card p-6 sm:p-10 rounded-3xl shadow-xl border border-border/70 backdrop-blur-sm">
-        <ContactForm />
+        <ContactForm
+          step1Title={contactPage?.step1Title}
+          entityTypeLabel={contactPage?.entityTypeLabel}
+          entityTypeOptions={contactPage?.entityTypeOptions}
+          desiredServiceLabel={contactPage?.desiredServiceLabel}
+          desiredServiceOptions={contactPage?.desiredServiceOptions}
+          challengeLabel={contactPage?.challengeLabel}
+          challengeOptions={contactPage?.challengeOptions}
+          step2Title={contactPage?.step2Title}
+          fullNameLabel={contactPage?.fullNameLabel}
+          emailLabel={contactPage?.emailLabel}
+          phoneLabel={contactPage?.phoneLabel}
+          companyLabel={contactPage?.companyLabel}
+          preferredDateLabel={contactPage?.preferredDateLabel}
+          messageLabel={contactPage?.messageLabel}
+          submitButtonText={contactPage?.submitButtonText}
+          submittingButtonText={contactPage?.submittingButtonText}
+          successMessage={contactPage?.successMessage}
+        />
       </div>
 
       {otherBlocks.length > 0 && (
         <div className="mt-16">
           <PageContent
-            page={{ ...page!, blocks: otherBlocks }}
+            page={{ ...(page as any), blocks: otherBlocks }}
             locale={locale}
           />
         </div>
