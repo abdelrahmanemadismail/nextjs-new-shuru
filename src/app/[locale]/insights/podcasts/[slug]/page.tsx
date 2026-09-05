@@ -5,8 +5,6 @@ import { getPodcastBySlugCached } from "@/strapi/insights";
 import Image from "next/image";
 import { ArticleLayout } from "@/components/insights/article-layout";
 import { RichTextBlock } from "@/components/shared/rich-text-block";
-import { getMe } from "@/lib/actions/auth";
-import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { buildMetadata } from "@/lib/seo";
 import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
@@ -54,11 +52,6 @@ export default async function PodcastPage({ params }: Props) {
   const pageUrl = `${baseUrl}/${locale}/insights/podcasts/${podcast.slug}`;
 
   const blocks = podcast.content ? [{ __component: "shared.rich-text" as const, id: 1, body: podcast.content }] : [];
-
-  const [session, isSaved] = await Promise.all([
-    getMe(),
-    isInsightSavedAction(podcast.documentId, 'podcast'),
-  ]);
 
   return (
     <div className="flex-1 pb-16 lg:pb-24">
@@ -130,10 +123,6 @@ export default async function PodcastPage({ params }: Props) {
       <ArticleLayout
         shareUrl={pageUrl}
         shareTitle={podcast.title}
-        insightId={podcast.documentId}
-        insightType="podcast"
-        isLoggedIn={!!session}
-        initialIsSaved={isSaved}
         locale={locale}
       >
         {blocks.length > 0 && (

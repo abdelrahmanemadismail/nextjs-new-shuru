@@ -5,8 +5,6 @@ import { getNewsItemBySlugCached } from "@/strapi/insights";
 import Image from "next/image";
 import { ArticleLayout } from "@/components/insights/article-layout";
 import { RichTextBlock } from "@/components/shared/rich-text-block";
-import { getMe } from "@/lib/actions/auth";
-import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { buildMetadata } from "@/lib/seo";
 import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
@@ -55,11 +53,6 @@ export default async function NewsPage({ params }: Props) {
 
   const blocks = news.content ? [{ __component: "shared.rich-text" as const, id: 1, body: news.content }] : [];
 
-  const [session, isSaved] = await Promise.all([
-    getMe(),
-    isInsightSavedAction(news.documentId, 'news-item'),
-  ]);
-
   return (
     <div className="flex-1 pb-16 lg:pb-24">
       <BreadcrumbTitleSetter path={`/${locale}/insights/news/${news.slug}`} title={news.title} />
@@ -90,10 +83,6 @@ export default async function NewsPage({ params }: Props) {
       <ArticleLayout
         shareUrl={pageUrl}
         shareTitle={news.title}
-        insightId={news.documentId}
-        insightType="news-item"
-        isLoggedIn={!!session}
-        initialIsSaved={isSaved}
         locale={locale}
       >
         {blocks.map((block) => (

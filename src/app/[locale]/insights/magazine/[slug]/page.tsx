@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n";
 import { getMagazineIssueBySlugCached } from "@/strapi/insights";
 import Image from "next/image";
@@ -8,9 +8,6 @@ import { ArticlesGrid } from "@/components/insights/articles-grid";
 import ReactMarkdown from 'react-markdown';
 import { DownloadPdfButton } from "@/components/ui/download-pdf-button";
 import { ShareButtons } from "@/components/insights/share-buttons";
-import { SaveButton } from "@/components/insights/save-button";
-import { getMe } from "@/lib/actions/auth";
-import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { Calendar, Eye, Download } from "lucide-react";
 import { buildMetadata } from "@/lib/seo";
 import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
@@ -24,27 +21,26 @@ export async function generateMetadata({ params }: Props) {
   const issue = await getMagazineIssueBySlugCached(slug, locale);
 
   if (!issue) {
-    return {
-      title: "Not Found",
-    };
+    return {};
   }
 
-  const seo = issue.seo;
-  const ogImg = (issue.cover_image || seo?.og_image) as any;
+  const issueNumberText = issue.issue_number ? ` #${issue.issue_number}` : '';
+  const title = issue.title ? `${issue.title}${issueNumberText}` : `Magazine Issue${issueNumberText}`;
+
+  const ogImg = issue.cover_image as any;
 
   return buildMetadata({
     locale,
-    path: `/insights/magazine/${slug}`,
-    title: seo?.meta_title || issue.title,
-    description: seo?.meta_description || issue.description || undefined,
-    keywords: seo?.meta_keywords ? seo.meta_keywords.split(",").map((k) => k.trim()) : undefined,
+    path: `/insights/magazine/${issue.slug}`,
+    title,
+    description: issue.description || undefined,
     ogImage: ogImg ? {
       url: ogImg.url,
       width: ogImg.width,
       height: ogImg.height,
       alt: ogImg.alternativeText,
     } : undefined,
-    type: "article",
+    ogType: "magazine",
   });
 }
 
@@ -53,29 +49,24 @@ export default async function MagazineIssuePage({ params }: Props) {
   setRequestLocale(locale);
 
   const issue = await getMagazineIssueBySlugCached(slug, locale);
+
   if (!issue) {
-    redirect(`/${locale}`);
+    redirect(`/${locale}/insights/magazine`);
   }
 
-  const t = await getTranslations({ locale, namespace: 'insights' });
+  const issueNumberText = issue.issue_number
+    ? (locale === 'ar' ? `العدد #${issue.issue_number}` : `Issue #${issue.issue_number}`)
+    : (locale === 'ar' ? 'عدد المجلة' : 'Magazine Issue');
 
-  const issueNumberText = issue.issue_number 
-    ? t('magazineSingle.issueNumber', { number: issue.issue_number }) 
-    : issue.title;
-
-  const publishDateText = issue.publish_date
-    ? t('magazineSingle.publishDate', { date: new Date(issue.publish_date).toLocaleDateString(locale) })
-    : '';
-
-  const readPdfText = t('magazineSingle.readPdf');
-  const downloadPdfText = t('magazineSingle.downloadPdf');
-  const shareText = t('magazineSingle.share');
-  const exploreOtherText = t('magazineSingle.exploreOther');
-  const browseAllText = t('magazineSingle.browseAll');
-  const articlesInIssueText = t('magazineSingle.articlesInIssue');
+  const downloadPdfText = locale === 'ar' ? 'تحميل النسخة الرقمية' : 'Download Digital Copy';
+  const readPdfText = locale === 'ar' ? 'قراءة المجلة' : 'Read Magazine';
+  const articlesInIssueText = locale === 'ar' ? 'مقالات في هذا العدد' : 'Articles in this Issue';
+  const exploreOtherText = locale === 'ar' ? 'استكشف أعداداً أخرى' : 'Explore Other Issues';
+  const browseAllText = locale === 'ar' ? 'تصفح جميع الأعداد' : 'Browse All Issues';
+  const shareText = locale === 'ar' ? 'مشاركة' : 'Share';
 
   const labels = {
-    empty: locale === 'ar' ? 'لا توجد مقالات هنا.' : 'No articles found here.',
+    empty: locale === 'ar' ? 'لا توجد مقالات مرتبطة بهذا العدد.' : 'No articles linked to this issue.',
     readMore: locale === 'ar' ? 'اقرأ المزيد' : 'Read More',
     featured: locale === 'ar' ? 'مميز' : 'Featured',
   };
@@ -83,69 +74,62 @@ export default async function MagazineIssuePage({ params }: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
   const pageUrl = `${baseUrl}/${locale}/insights/magazine/${issue.slug}`;
 
-  const [session, isSaved] = await Promise.all([
-    getMe(),
-    isInsightSavedAction(issue.documentId, 'magazine-issue'),
-  ]);
-
   return (
     <div className="flex-1 pb-16 lg:pb-24">
       <BreadcrumbTitleSetter path={`/${locale}/insights/magazine/${issue.slug}`} title={issueNumberText} />
 
       {/* Main Details Section */}
-      <section className="container mx-auto px-4 py-6 md:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-16 items-start">
-          {/* Cover Image Column */}
-          <div className="lg:sticky lg:top-8 w-full max-w-sm mx-auto lg:col-span-1">
-            <div className="aspect-[3/4] relative bg-neutral-100 dark:bg-neutral-800 shadow-2xl rounded-2xl overflow-hidden border border-border/50">
-              {issue.cover_image?.url ? (
+      <section className="container mx-auto px-4 py-8 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-start">
+          {/* Cover image column */}
+          <div className="md:col-span-5 lg:col-span-4 w-full flex justify-center">
+            <div className="relative w-full max-w-sm aspect-[2480/3508] rounded-2xl overflow-hidden shadow-2xl border border-border/60 bg-neutral-100">
+              {issue.cover_image?.url && (
                 <Image
                   src={issue.cover_image.url}
                   alt={issue.title}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 384px"
+                  sizes="(max-width: 768px) 100vw, 400px"
                   className="object-cover"
                   priority
                 />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-muted-foreground">
-                  No Cover
-                </div>
               )}
             </div>
           </div>
 
-          {/* Issue Details Column */}
-          <div className="lg:col-span-2 space-y-6 md:space-y-8">
-            <div>
+          {/* Details column */}
+          <div className="md:col-span-7 lg:col-span-8 flex flex-col gap-6">
+            <div className="flex flex-wrap items-center gap-3">
               {issue.issue_number && (
-                <span className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-extrabold mb-4 select-none">
+                <span className="bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
                   {issueNumberText}
                 </span>
               )}
-
-              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4 leading-tight">
-                {issue.title}
-              </h1>
-
               {issue.publish_date && (
-                <div className="flex items-center text-muted-foreground text-sm gap-2 mb-6">
-                  <Calendar className="w-4.5 h-4.5" />
-                  <span>{publishDateText}</span>
-                </div>
-              )}
-
-              {issue.description && (
-                <div className="prose prose-neutral dark:prose-invert md:prose-lg max-w-none mb-6 leading-relaxed">
-                  <ReactMarkdown>{issue.description}</ReactMarkdown>
-                </div>
+                <span className="text-sm text-neutral-500 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-neutral-400" />
+                  {new Date(issue.publish_date).toLocaleDateString(locale, {
+                    year: 'numeric',
+                    month: 'long',
+                  })}
+                </span>
               )}
             </div>
 
-            {/* Actions Section */}
+            <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight">
+              {issue.title}
+            </h1>
+
+            {issue.description && (
+              <div className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                <ReactMarkdown>{issue.description}</ReactMarkdown>
+              </div>
+            )}
+
+            {/* Action buttons */}
             {issue.pdf_attachment?.url && (
-              <div className="border-t border-border/50 pt-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
+              <div className="pt-4 flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-wrap gap-3">
                   <Link
                     href={`/${locale}/insights/magazine/${issue.slug}/read`}
                     className="inline-flex items-center justify-center rounded-xl bg-foreground text-background hover:opacity-90 active:scale-[0.98] px-6 py-3.5 font-bold transition-all gap-2"
@@ -167,16 +151,8 @@ export default async function MagazineIssuePage({ params }: Props) {
             )}
 
             {/* Share Section */}
-            <div className="border-t border-border/50 pt-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="border-t border-border/50 pt-6">
               <ShareButtons url={pageUrl} title={issue.title} shareLabel={shareText} />
-              <SaveButton
-                insightId={issue.documentId}
-                insightType="magazine-issue"
-                initialIsSaved={isSaved}
-                isLoggedIn={!!session}
-                locale={locale}
-                variant="default"
-              />
             </div>
           </div>
         </div>

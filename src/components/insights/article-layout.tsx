@@ -6,17 +6,12 @@ import { useHasHeaders } from '@/hooks/use-has-headers';
 import type { StrapiAuthor } from '@/strapi/insights';
 import { ShareButtons } from './share-buttons';
 import { useTranslations } from 'next-intl';
-import { SaveButton } from './save-button';
 
 interface ArticleLayoutProps {
   children: React.ReactNode;
   author?: StrapiAuthor;
   shareUrl?: string;
   shareTitle?: string;
-  insightId?: string;
-  insightType?: string;
-  isLoggedIn?: boolean;
-  initialIsSaved?: boolean;
   locale?: string;
 }
 
@@ -25,10 +20,6 @@ export function ArticleLayout({
   author,
   shareUrl,
   shareTitle,
-  insightId,
-  insightType,
-  isLoggedIn = false,
-  initialIsSaved = false,
   locale = 'en',
 }: ArticleLayoutProps) {
   const hasHeaders = useHasHeaders('article-content');
@@ -104,21 +95,8 @@ export function ArticleLayout({
 
           {/* Share Buttons */}
           {shareUrl && shareTitle && (
-            <div className="bg-white p-6 lg:p-8 border border-neutral-200 shadow-sm rounded-xl space-y-6">
+            <div className="bg-white p-6 lg:p-8 border border-neutral-200 shadow-sm rounded-xl">
               <ShareButtons url={shareUrl} title={shareTitle} shareLabel={t('share')} />
-              {insightId && insightType && (
-                <div className="pt-4 border-t border-neutral-100">
-                  <SaveButton
-                    insightId={insightId}
-                    insightType={insightType}
-                    initialIsSaved={initialIsSaved}
-                    isLoggedIn={isLoggedIn}
-                    locale={locale}
-                    variant="default"
-                    className="w-full justify-center"
-                  />
-                </div>
-              )}
             </div>
           )}
 
@@ -142,18 +120,6 @@ export function ArticleLayout({
         {shareUrl && shareTitle && (
           <div className="mt-12 pt-6 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <ShareButtons url={shareUrl} title={shareTitle} shareLabel={t('share')} />
-            {insightId && insightType && (
-              <div className="sm:self-end">
-                <SaveButton
-                  insightId={insightId}
-                  insightType={insightType}
-                  initialIsSaved={initialIsSaved}
-                  isLoggedIn={isLoggedIn}
-                  locale={locale}
-                  variant="default"
-                />
-              </div>
-            )}
           </div>
         )}
 

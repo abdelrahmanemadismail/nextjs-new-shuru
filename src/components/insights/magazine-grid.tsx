@@ -5,14 +5,11 @@ import Link from 'next/link';
 import { Calendar, Hash, ArrowRight, ArrowLeft } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiMagazineIssue } from '@/strapi/insights';
-import { SaveButton } from './save-button';
 
 type MagazineGridProps = {
   issues: StrapiMagazineIssue[];
   locale: Locale;
   labels: Record<string, string>;
-  savedIds?: string[];
-  isLoggedIn?: boolean;
 };
 
 function formatDate(dateStr: string, locale: Locale) {
@@ -30,8 +27,6 @@ export function MagazineGrid({
   issues,
   locale,
   labels,
-  savedIds = [],
-  isLoggedIn = false,
 }: MagazineGridProps) {
   const isRtl = locale === 'ar';
   const Arrow = isRtl ? ArrowLeft : ArrowRight;
@@ -86,16 +81,6 @@ export function MagazineGrid({
                   #{issue.issue_number}
                 </div>
               )}
-              {/* Save button overlay */}
-              <div className="absolute top-2 end-2 z-20">
-                <SaveButton
-                  insightId={issue.documentId}
-                  insightType="magazine-issue"
-                  initialIsSaved={savedIds.includes(issue.documentId)}
-                  isLoggedIn={isLoggedIn}
-                  locale={locale}
-                />
-              </div>
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
                 <span className="text-white text-xs font-semibold flex items-center gap-1">

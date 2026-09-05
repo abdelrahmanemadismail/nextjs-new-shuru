@@ -8,31 +8,17 @@ import * as zod from 'zod';
 import { useTranslations } from 'next-intl';
 import { type Locale } from '@/lib/i18n';
 import { logoutAction, updateProfileAction, changePasswordAction } from '@/lib/actions/auth';
-import type { SavedInsightsData } from '@/lib/actions/saved-insights';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import {
   User,
-  Settings,
-  BookOpen,
-  Mic,
-  Newspaper,
-  BookMarked,
-  Users,
   LogOut,
   Loader2,
   Lock,
 } from 'lucide-react';
-
-// Grids
-import { ArticlesGrid } from '@/components/insights/articles-grid';
-import { NewsGrid } from '@/components/insights/news-grid';
-import { MagazineGrid } from '@/components/insights/magazine-grid';
-import { MajlisGrid } from '@/components/insights/majlis-grid';
-import { PodcastsGrid } from '@/components/insights/podcasts-grid';
 
 // Schemas
 const createProfileSchema = (t: any) =>
@@ -62,15 +48,13 @@ type ProfileClientProps = {
     username: string;
     email: string;
   };
-  savedInsights: SavedInsightsData;
   locale: Locale;
 };
 
-export function ProfileClient({ user: initialUser, savedInsights, locale }: ProfileClientProps) {
+export function ProfileClient({ user: initialUser, locale }: ProfileClientProps) {
   const router = useRouter();
   const t = useTranslations();
   const [user, setUser] = useState(initialUser);
-  const [activeTab, setActiveTab] = useState<string>('articles');
   const [isPending, startTransition] = useTransition();
 
   const isRtl = locale === 'ar';
@@ -140,24 +124,8 @@ export function ProfileClient({ user: initialUser, savedInsights, locale }: Prof
     });
   };
 
-  // Construct labels for the grids
-  const gridLabels = {
-    empty: t('auth.noSavedItems') || "No items saved yet.",
-    featured: locale === 'ar' ? 'مميز' : 'Featured',
-    readMore: locale === 'ar' ? 'اقرأ المزيد' : 'Read More',
-  };
-
-  const tabsList = [
-    { id: 'articles', label: t('insights.tabs.articles') || 'Articles', icon: BookOpen, count: savedInsights.articles.length },
-    { id: 'podcasts', label: t('insights.tabs.podcasts') || 'Podcasts', icon: Mic, count: savedInsights.podcasts.length },
-    { id: 'magazine', label: t('insights.tabs.magazine') || 'Magazine', icon: BookMarked, count: savedInsights.magazineIssues.length },
-    { id: 'majlis', label: t('insights.tabs.majlis') || 'Majlis', icon: Users, count: savedInsights.majlises.length },
-    { id: 'news', label: t('insights.tabs.news') || 'News', icon: Newspaper, count: savedInsights.newsItems.length },
-    { id: 'settings', label: t('auth.editProfile') || 'Settings', icon: Settings, count: null },
-  ];
-
   return (
-    <div className="container mx-auto px-4 py-12 max-w-7xl" dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className="container mx-auto px-4 py-12 max-w-5xl" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* Header Profile Section */}
       <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-card/65 backdrop-blur-md p-6 sm:p-8 shadow-xl mb-10 flex flex-col sm:flex-row items-center gap-6 sm:text-start text-center">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent -z-10" />
@@ -185,84 +153,14 @@ export function ProfileClient({ user: initialUser, savedInsights, locale }: Prof
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-        {/* Navigation Sidebar */}
-        <aside className="lg:sticky lg:top-28 h-fit space-y-2">
-          <div className="rounded-2xl border border-border/50 bg-card p-3 shadow-md space-y-1.5">
-            {tabsList.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
-                  }`}
-                >
-                  <Icon className="h-4.5 w-4.5" />
-                  <span className="flex-1 text-start">{tab.label}</span>
-                  {tab.count !== null && (
-                    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                      isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </aside>
-
-        {/* Content Panel */}
-        <main className="min-h-[50vh]">
-          {activeTab === 'articles' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-foreground mb-4">{t('insights.tabs.articles') || 'Saved Articles'}</h2>
-              <ArticlesGrid articles={savedInsights.articles} locale={locale} labels={gridLabels} />
-            </div>
-          )}
-
-          {activeTab === 'podcasts' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-foreground mb-4">{t('insights.tabs.podcasts') || 'Saved Podcasts'}</h2>
-              <PodcastsGrid podcasts={savedInsights.podcasts} locale={locale} labels={gridLabels} />
-            </div>
-          )}
-
-          {activeTab === 'magazine' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-foreground mb-4">{t('insights.tabs.magazine') || 'Saved Magazines'}</h2>
-              <MagazineGrid issues={savedInsights.magazineIssues} locale={locale} labels={gridLabels} />
-            </div>
-          )}
-
-          {activeTab === 'majlis' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-foreground mb-4">{t('insights.tabs.majlis') || 'Saved Majlis'}</h2>
-              <MajlisGrid majlises={savedInsights.majlises} locale={locale} labels={gridLabels} />
-            </div>
-          )}
-
-          {activeTab === 'news' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-foreground mb-4">{t('insights.tabs.news') || 'Saved News'}</h2>
-              <NewsGrid news={savedInsights.newsItems} locale={locale} labels={gridLabels} />
-            </div>
-          )}
-
-          {activeTab === 'settings' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-              {/* Account Details Form */}
-              <Card className="border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
-                <CardHeader className="border-b border-border/30 bg-muted/10">
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <User className="h-4.5 w-4.5 text-primary" />
-                    {t('auth.accountDetails') || 'Account Details'}
-                  </CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        {/* Account Details Form */}
+        <Card className="border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
+          <CardHeader className="border-b border-border/30 bg-muted/10">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <User className="h-4.5 w-4.5 text-primary" />
+              {t('auth.accountDetails') || 'Account Details'}
+            </CardTitle>
                   <CardDescription className="text-xs">
                     Update your primary account contact information.
                   </CardDescription>
@@ -327,7 +225,7 @@ export function ProfileClient({ user: initialUser, savedInsights, locale }: Prof
                     {t('auth.changePassword') || 'Change Password'}
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Update your password regularly to secure your bookmarks.
+                    Update your password regularly to secure your account.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6 space-y-4">
@@ -400,9 +298,6 @@ export function ProfileClient({ user: initialUser, savedInsights, locale }: Prof
                   </form>
                 </CardContent>
               </Card>
-            </div>
-          )}
-        </main>
       </div>
     </div>
   );

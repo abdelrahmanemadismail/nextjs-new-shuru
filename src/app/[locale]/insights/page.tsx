@@ -29,8 +29,6 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
 }
 
 import { InsightsContent } from "@/components/insights/insights-content";
-import { getMe } from "@/lib/actions/auth";
-import { getSavedInsightIdsAction } from "@/lib/actions/saved-insights";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -63,8 +61,6 @@ export default async function Page({ params, searchParams }: Props) {
   // Inactive tabs get page 1 with a tiny page size — enough for a preview
   // and to return pagination.total for the tab count badge.
   const [
-    session,
-    savedIds,
     author,
     articlesData,
     newsData,
@@ -73,8 +69,6 @@ export default async function Page({ params, searchParams }: Props) {
     podcastsData,
     categories,
   ] = await Promise.all([
-    getMe(),
-    getSavedInsightIdsAction(),
     authorId ? getAuthorCached(authorId, locale) : Promise.resolve(null),
     getArticlesPaginatedCached(
       locale,
@@ -140,8 +134,6 @@ export default async function Page({ params, searchParams }: Props) {
         searchQuery={searchQuery || ""}
         categorySlug={categorySlug || "all"}
         sortOrder={sortOrder}
-        savedIds={savedIds}
-        isLoggedIn={!!session}
       />
     </main>
   );

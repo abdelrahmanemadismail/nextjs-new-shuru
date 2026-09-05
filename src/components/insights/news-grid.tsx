@@ -5,14 +5,11 @@ import Link from 'next/link';
 import { Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiNewsItem } from '@/strapi/insights';
-import { SaveButton } from './save-button';
 
 type NewsGridProps = {
   news: StrapiNewsItem[];
   locale: Locale;
   labels: Record<string, string>;
-  savedIds?: string[];
-  isLoggedIn?: boolean;
 };
 
 function formatDate(dateStr: string, locale: Locale) {
@@ -31,8 +28,6 @@ export function NewsGrid({
   news,
   locale,
   labels,
-  savedIds = [],
-  isLoggedIn = false,
 }: NewsGridProps) {
   const isRtl = locale === 'ar';
   const Arrow = isRtl ? ArrowLeft : ArrowRight;
@@ -45,16 +40,18 @@ export function NewsGrid({
     );
   }
 
-  const featured = news.find((n) => n.is_featured);
-  const rest = news.filter((n) => !n.is_featured || n.id !== featured?.id);
+  const featured = news.find((a) => a.is_featured) || news[0];
+  const rest = news.filter((a) => a.id !== featured?.id);
 
   return (
-    <div className="space-y-8">
-      {/* Featured news - wide card */}
+    <div className="space-y-12">
+      {/* Featured News Hero-style */}
       {featured && (
-        <div>
+        <div
+          className="w-full"
+        >
           <div
-            className="group relative flex flex-col sm:flex-row overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300"
+            className="group relative flex flex-col sm:flex-row overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-300"
           >
             {/* Absolute link overlay */}
             <Link
@@ -76,28 +73,9 @@ export function NewsGrid({
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjUiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4="
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10" />
-                <div className="absolute top-4 end-4 z-20">
-                  <SaveButton
-                    insightId={featured.documentId}
-                    insightType="news-item"
-                    initialIsSaved={savedIds.includes(featured.documentId)}
-                    isLoggedIn={isLoggedIn}
-                    locale={locale}
-                  />
-                </div>
               </div>
             ) : (
-              <div className="relative sm:w-1/2 aspect-[1536/1024] sm:aspect-auto sm:min-h-full bg-gradient-to-br from-primary/20 to-accent/20 shrink-0">
-                <div className="absolute top-4 end-4 z-20">
-                  <SaveButton
-                    insightId={featured.documentId}
-                    insightType="news-item"
-                    initialIsSaved={savedIds.includes(featured.documentId)}
-                    isLoggedIn={isLoggedIn}
-                    locale={locale}
-                  />
-                </div>
-              </div>
+              <div className="relative sm:w-1/2 aspect-[1536/1024] sm:aspect-auto sm:min-h-full bg-gradient-to-br from-primary/20 to-accent/20 shrink-0" />
             )}
             <div className="flex flex-col justify-center p-6 sm:p-8 flex-1 z-20 pointer-events-none">
               <span className="inline-flex items-center gap-1 self-start rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold mb-4">
@@ -151,28 +129,9 @@ export function NewsGrid({
                     placeholder="blur"
                     blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjUiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4="
                   />
-                  <div className="absolute top-4 end-4 z-20">
-                    <SaveButton
-                      insightId={item.documentId}
-                      insightType="news-item"
-                      initialIsSaved={savedIds.includes(item.documentId)}
-                      isLoggedIn={isLoggedIn}
-                      locale={locale}
-                    />
-                  </div>
                 </div>
               ) : (
-                <div className="relative aspect-[1536/1024] bg-gradient-to-br from-primary/10 to-accent/10">
-                  <div className="absolute top-4 end-4 z-20">
-                    <SaveButton
-                      insightId={item.documentId}
-                      insightType="news-item"
-                      initialIsSaved={savedIds.includes(item.documentId)}
-                      isLoggedIn={isLoggedIn}
-                      locale={locale}
-                    />
-                  </div>
-                </div>
+                <div className="relative aspect-[1536/1024] bg-gradient-to-br from-primary/10 to-accent/10" />
               )}
               <div className="flex flex-col flex-1 p-5 z-20 pointer-events-none">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2.5">

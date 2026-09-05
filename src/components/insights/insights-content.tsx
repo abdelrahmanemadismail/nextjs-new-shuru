@@ -30,8 +30,6 @@ type InsightsContentProps = {
   searchQuery?: string;
   categorySlug?: string;
   sortOrder?: 'newest' | 'oldest';
-  savedIds?: string[];
-  isLoggedIn?: boolean;
 };
 
 const defaultLabels = {
@@ -71,8 +69,6 @@ export function InsightsContent({
   searchQuery = '',
   categorySlug = 'all',
   sortOrder = 'newest',
-  savedIds = [],
-  isLoggedIn = false,
 }: InsightsContentProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -86,7 +82,8 @@ export function InsightsContent({
     }
   }, [initialTab]);
 
-  // When tab changes, we want to update the URL so we get page 1 for the new tab
+  const labels = defaultLabels[locale] || defaultLabels.en;
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     const params = new URLSearchParams(searchParams.toString());
@@ -98,11 +95,9 @@ export function InsightsContent({
   const handleClearAuthorFilter = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('author');
-    params.set('page', '1');
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname);
   };
-
-  const labels = defaultLabels[locale] || defaultLabels['en'];
 
   return (
     <>
@@ -113,7 +108,6 @@ export function InsightsContent({
         labels={labels}
       />
       <div className="container mx-auto px-4 pb-24 pt-12" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-        {/* Search & Filters Controls */}
         <SearchFilterControls
           searchQuery={searchQuery}
           sortOrder={sortOrder}
@@ -122,7 +116,6 @@ export function InsightsContent({
           showCategoryFilter={activeTab === 'articles'}
         />
 
-        {/* Author filter banner */}
         {activeTab === 'articles' && author && (
           <div className="mb-8 flex items-center justify-between rounded-lg bg-primary/10 border border-primary/20 px-4 py-3 text-sm text-primary">
             <span className="font-semibold">
@@ -138,10 +131,10 @@ export function InsightsContent({
           </div>
         )}
 
-        {activeTab === 'articles' && <ArticlesGrid articles={articles} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
-        {activeTab === 'news' && <NewsGrid news={news} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
-        {activeTab === 'magazine' && <MagazineGrid issues={magazines} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
-        {activeTab === 'majlis' && <MajlisGrid majlises={majlises} locale={locale} labels={labels} savedIds={savedIds} isLoggedIn={isLoggedIn} />}
+        {activeTab === 'articles' && <ArticlesGrid articles={articles} locale={locale} labels={labels} />}
+        {activeTab === 'news' && <NewsGrid news={news} locale={locale} labels={labels} />}
+        {activeTab === 'magazine' && <MagazineGrid issues={magazines} locale={locale} labels={labels} />}
+        {activeTab === 'majlis' && <MajlisGrid majlises={majlises} locale={locale} labels={labels} />}
 
         {meta && meta[activeTab] && meta[activeTab].pagination.pageCount > 1 && (
           <PaginationControls

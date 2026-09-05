@@ -5,14 +5,11 @@ import Link from 'next/link';
 import { Calendar, Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { type Locale } from '@/lib/i18n';
 import { type StrapiMajlis } from '@/strapi/insights';
-import { SaveButton } from './save-button';
 
 type MajlisGridProps = {
   majlises: StrapiMajlis[];
   locale: Locale;
   labels: Record<string, string>;
-  savedIds?: string[];
-  isLoggedIn?: boolean;
 };
 
 function formatDate(dateStr: string, locale: Locale) {
@@ -31,8 +28,6 @@ export function MajlisGrid({
   majlises,
   locale,
   labels,
-  savedIds = [],
-  isLoggedIn = false,
 }: MajlisGridProps) {
   const isRtl = locale === 'ar';
   const Arrow = isRtl ? ArrowLeft : ArrowRight;
@@ -73,28 +68,10 @@ export function MajlisGrid({
                   placeholder="blur"
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iOSIgZmlsbD0iI2UyZThmMCIvPjwvc3ZnPg=="
                 />
-                <div className="absolute top-3 end-3 z-20">
-                  <SaveButton
-                    insightId={majlis.documentId}
-                    insightType="majlis"
-                    initialIsSaved={savedIds.includes(majlis.documentId)}
-                    isLoggedIn={isLoggedIn}
-                    locale={locale}
-                  />
-                </div>
               </div>
             ) : (
               <div className="relative w-full sm:w-[40%] md:w-[45%] lg:w-[480px] xl:w-[540px] aspect-[1376/768] bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
                 <Users className="h-12 w-12 text-primary/30" />
-                <div className="absolute top-3 end-3 z-20">
-                  <SaveButton
-                    insightId={majlis.documentId}
-                    insightType="majlis"
-                    initialIsSaved={savedIds.includes(majlis.documentId)}
-                    isLoggedIn={isLoggedIn}
-                    locale={locale}
-                  />
-                </div>
               </div>
             )}
 

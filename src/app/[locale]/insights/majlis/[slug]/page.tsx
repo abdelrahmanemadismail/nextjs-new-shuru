@@ -5,8 +5,6 @@ import { getMajlisBySlugCached } from "@/strapi/insights";
 import Image from "next/image";
 import { ArticleLayout } from "@/components/insights/article-layout";
 import { RichTextBlock } from "@/components/shared/rich-text-block";
-import { getMe } from "@/lib/actions/auth";
-import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { buildMetadata } from "@/lib/seo";
 import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
@@ -56,11 +54,6 @@ export default async function MajlisPage({ params }: Props) {
   // Create blocks array for RichTextBlock from 'content' using a dummy ID
   const blocks = majlis.content ? [{ __component: "shared.rich-text" as const, id: 1, body: majlis.content }] : [];
 
-  const [session, isSaved] = await Promise.all([
-    getMe(),
-    isInsightSavedAction(majlis.documentId, 'majlis'),
-  ]);
-
   return (
     <div className="flex-1 pb-16 lg:pb-24">
       <BreadcrumbTitleSetter path={`/${locale}/insights/majlis/${majlis.slug}`} title={majlis.title} />
@@ -91,10 +84,6 @@ export default async function MajlisPage({ params }: Props) {
       <ArticleLayout
         shareUrl={pageUrl}
         shareTitle={majlis.title}
-        insightId={majlis.documentId}
-        insightType="majlis"
-        isLoggedIn={!!session}
-        initialIsSaved={isSaved}
         locale={locale}
       >
         {blocks.map((block) => (

@@ -22,8 +22,6 @@ import { getPodcastsPaginatedCached } from "@/strapi/insights";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { SearchFilterControls } from "@/components/insights/search-filter-controls";
 import { PodcastsGrid } from "@/components/insights/podcasts-grid";
-import { getMe } from "@/lib/actions/auth";
-import { getSavedInsightIdsAction } from "@/lib/actions/saved-insights";
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -45,11 +43,6 @@ export default async function Page({ params, searchParams }: Props) {
   const { data: podcasts, meta } = await getPodcastsPaginatedCached(locale, current_page, 9, searchQuery, sortOrder);
   const t = await getTranslations({ locale, namespace: 'insights' });
 
-  const [session, savedIds] = await Promise.all([
-    getMe(),
-    getSavedInsightIdsAction(),
-  ]);
-
   return (
     <main className="container py-24 mx-auto px-4 max-w-7xl">
       <div className="mb-12 border-b border-border/50 pb-8">
@@ -67,8 +60,6 @@ export default async function Page({ params, searchParams }: Props) {
         <PodcastsGrid
           podcasts={podcasts}
           locale={locale}
-          savedIds={savedIds}
-          isLoggedIn={!!session}
         />
       </div>
 

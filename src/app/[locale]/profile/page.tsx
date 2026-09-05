@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { type Locale } from '@/lib/i18n';
 import { getMe } from '@/lib/actions/auth';
-import { getSavedInsightsAction } from '@/lib/actions/saved-insights';
 import { ProfileClient } from '@/components/profile/profile-client';
 import { buildMetadata } from '@/lib/seo';
 
@@ -17,7 +16,7 @@ export async function generateMetadata({ params }: Props) {
     locale,
     path: '/profile',
     title: t('profile') || 'User Profile',
-    description: 'Manage your bookmarks and contact settings.',
+    description: 'Manage your profile and account settings.',
     noIndex: true,
   });
 }
@@ -32,14 +31,10 @@ export default async function ProfilePage({ params }: Props) {
     redirect(`/${locale}/auth/login?redirect=/${locale}/profile`);
   }
 
-  // Load saved insights
-  const savedInsights = await getSavedInsightsAction(locale);
-
   return (
     <main className="flex-1 bg-background">
       <ProfileClient
         user={session.user}
-        savedInsights={savedInsights}
         locale={locale}
       />
     </main>

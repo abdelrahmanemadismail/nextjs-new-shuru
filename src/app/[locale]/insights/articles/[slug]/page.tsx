@@ -7,8 +7,6 @@ import { ArticleLayout } from "@/components/insights/article-layout";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { getMe } from "@/lib/actions/auth";
-import { isInsightSavedAction } from "@/lib/actions/saved-insights";
 import { buildMetadata } from "@/lib/seo";
 import { BreadcrumbTitleSetter } from "@/components/shared/breadcrumb-context";
 
@@ -56,11 +54,6 @@ export default async function ArticlePage({ params }: Props) {
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shuru.sa';
   const pageUrl = `${baseUrl}/${locale}/insights/articles/${article.slug}`;
-
-  const [session, isSaved] = await Promise.all([
-    getMe(),
-    isInsightSavedAction(article.documentId, 'article'),
-  ]);
 
   // Pass an empty testimonials array since generic blocks might require it but usually don't if they aren't the testimonial block
   return (
@@ -111,10 +104,6 @@ export default async function ArticlePage({ params }: Props) {
         author={article.author}
         shareUrl={pageUrl}
         shareTitle={article.title}
-        insightId={article.documentId}
-        insightType="article"
-        isLoggedIn={!!session}
-        initialIsSaved={isSaved}
         locale={locale}
       >
         {article.blocks?.map((block) => (
