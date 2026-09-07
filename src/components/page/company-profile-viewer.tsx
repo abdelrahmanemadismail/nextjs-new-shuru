@@ -111,6 +111,11 @@ export function CompanyProfileViewer({
   const locale = localeMatch ? localeMatch[1] : "ar";
   const isAr = locale === "ar";
 
+  const currentPdfUrl = pdfUrl || "/documents/shuru-company-profile.pdf";
+  const currentFileName = fileName || "shuru-company-profile.pdf";
+  const primaryLink = ctaPrimaryButtonLink || "/request-info";
+  const secondaryLink = ctaSecondaryButtonLink || "/contact";
+
   const [isIOS, setIsIOS] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -191,8 +196,8 @@ export function CompanyProfileViewer({
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-start md:justify-end">
           {/* Download Button */}
           <DownloadPdfButton
-            pdfUrl={pdfUrl}
-            fileName={fileName}
+            pdfUrl={currentPdfUrl}
+            fileName={currentFileName}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
             loadingText={isAr ? "جاري التحميل..." : "Downloading..."}
           >
@@ -202,7 +207,7 @@ export function CompanyProfileViewer({
 
           {/* Open in new tab */}
           <a
-            href={pdfUrl}
+            href={currentPdfUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition-all duration-200 shadow-sm"
@@ -230,7 +235,7 @@ export function CompanyProfileViewer({
             <span className="w-3 h-3 rounded-full bg-amber-400/80 inline-block" />
             <span className="w-3 h-3 rounded-full bg-emerald-400/80 inline-block" />
             <span className="text-xs font-semibold text-muted-foreground ms-2">
-              {fileName}
+              {currentFileName}
             </span>
           </div>
 
@@ -255,7 +260,7 @@ export function CompanyProfileViewer({
               </p>
               <div className="flex flex-col gap-2 pt-2">
                 <a
-                  href={pdfUrl}
+                  href={currentPdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3 text-sm hover:bg-primary/90 transition-all"
@@ -267,7 +272,7 @@ export function CompanyProfileViewer({
             </div>
           ) : (
             <iframe
-              src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
+              src={`${currentPdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
               className="w-full h-full border-none"
               title={fileTitle || (isAr ? "بروفايل شركة شروع" : "SHURU Company Profile")}
             />
@@ -317,14 +322,14 @@ export function CompanyProfileViewer({
 
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Link
-            href={ctaPrimaryButtonLink.startsWith("/") ? `/${locale}${ctaPrimaryButtonLink.replace(/^\/(ar|en)/, "")}` : ctaPrimaryButtonLink}
+            href={primaryLink.startsWith("/") ? `/${locale}${primaryLink.replace(/^\/(ar|en)/, "")}` : primaryLink}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-6 py-3.5 text-sm shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:-translate-y-0.5 transition-all"
           >
             <span>{ctaPrimaryButtonText || t("requestInfoBtn")}</span>
             <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
           </Link>
           <Link
-            href={ctaSecondaryButtonLink.startsWith("/") ? `/${locale}${ctaSecondaryButtonLink.replace(/^\/(ar|en)/, "")}` : ctaSecondaryButtonLink}
+            href={secondaryLink.startsWith("/") ? `/${locale}${secondaryLink.replace(/^\/(ar|en)/, "")}` : secondaryLink}
             className="inline-flex items-center justify-center rounded-full border border-border bg-card text-foreground font-semibold px-6 py-3.5 text-sm hover:bg-accent transition-all"
           >
             <span>{ctaSecondaryButtonText || t("contactBtn")}</span>

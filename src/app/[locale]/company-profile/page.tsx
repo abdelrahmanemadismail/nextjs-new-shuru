@@ -34,6 +34,14 @@ export async function generateMetadata({ params }: CompanyProfilePageProps): Pro
     keywords: pageData?.seo?.meta_keywords
       ? pageData.seo.meta_keywords.split(",").map((s) => s.trim())
       : undefined,
+    ogImage: pageData?.seo?.og_image
+      ? {
+          url: pageData.seo.og_image.url,
+          width: pageData.seo.og_image.width,
+          height: pageData.seo.og_image.height,
+          alt: pageData.seo.og_image.alternativeText,
+        }
+      : undefined,
   });
 }
 
@@ -77,8 +85,8 @@ export default async function CompanyProfilePage({ params }: CompanyProfilePageP
 
       <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-5xl space-y-12">
         <CompanyProfileViewer
-          pdfUrl={pageData?.pdfUrl || "/documents/shuru-company-profile.pdf"}
-          fileName={pageData?.fileName || "shuru-company-profile.pdf"}
+          pdfUrl={pageData?.pdfUrl}
+          fileName={pageData?.fileName}
           fileTitle={pageData?.fileTitle}
           fileSubtitle={pageData?.fileSubtitle}
           downloadButtonText={pageData?.downloadButtonText}

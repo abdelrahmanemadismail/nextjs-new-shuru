@@ -23,6 +23,7 @@ export function DownloadPdfButton({
     setDownloading(true);
     try {
       const response = await fetch(pdfUrl);
+      if (!response.ok) throw new Error("Network response was not ok");
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -32,9 +33,16 @@ export function DownloadPdfButton({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      alert('حدث خطأ في تحميل الملف. يرجى المحاولة مرة أخرى.');
+    } catch {
+      // Graceful fallback for cross-origin media URLs (e.g. S3 / CDN)
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = fileName;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } finally {
       setDownloading(false);
     }

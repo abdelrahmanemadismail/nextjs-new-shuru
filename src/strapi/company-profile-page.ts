@@ -59,7 +59,7 @@ async function fetchCompanyProfilePage(locale: Locale): Promise<StrapiCompanyPro
     const params = new URLSearchParams();
     params.append("locale", locale);
     params.append("populate[blocks][populate]", "*");
-    params.append("populate[pdfMedia]", "*");
+    params.append("populate[pdfMedia]", "true");
     params.append("populate[seo][populate]", "*");
 
     // 1. Try /api/company-profile-page
@@ -82,7 +82,7 @@ async function fetchCompanyProfilePage(locale: Locale): Promise<StrapiCompanyPro
       fallbackParams.append("locale", locale);
       fallbackParams.append("filters[slug][$eq]", "company-profile");
       fallbackParams.append("populate[blocks][populate]", "*");
-      fallbackParams.append("populate[pdfMedia]", "*");
+      fallbackParams.append("populate[pdfMedia]", "true");
       fallbackParams.append("populate[seo][populate]", "*");
 
       response = await fetch(`${getStrapiBaseUrl()}/api/pages?${fallbackParams.toString()}`, {
@@ -92,6 +92,7 @@ async function fetchCompanyProfilePage(locale: Locale): Promise<StrapiCompanyPro
     }
 
     if (!response.ok) {
+      console.warn(`[company-profile-page] Failed to fetch company profile page (${response.status})`);
       return null;
     }
 
@@ -104,11 +105,19 @@ async function fetchCompanyProfilePage(locale: Locale): Promise<StrapiCompanyPro
     // Resolve PDF media URL
     let resolvedPdfUrl = attrs.pdfUrl;
     if (attrs.pdfMedia) {
-      const rawMediaUrl = extractMediaUrl(attrs.pdfMedia as StrapiMedia);
+      const rawMediaUrl =
+        extractMediaUrl(attrs.pdfMedia as StrapiMedia) ||
+        (attrs.pdfMedia as { url?: string })?.url;
       if (rawMediaUrl) {
         resolvedPdfUrl = toAbsoluteUrl(rawMediaUrl) || rawMediaUrl;
       }
     }
+
+    // Resolve fileName from attrs or uploaded media
+    const resolvedFileName =
+      attrs.fileName ||
+      (attrs.pdfMedia as { name?: string })?.name ||
+      (resolvedPdfUrl ? resolvedPdfUrl.split("/").pop()?.split("?")[0] : undefined);
 
     // Build pillars array
     const pillars: CompanyProfilePillar[] = [];
@@ -144,7 +153,7 @@ async function fetchCompanyProfilePage(locale: Locale): Promise<StrapiCompanyPro
       fileTitle: attrs.fileTitle,
       fileSubtitle: attrs.fileSubtitle,
       pdfUrl: resolvedPdfUrl,
-      fileName: attrs.fileName,
+      fileName: resolvedFileName,
       downloadButtonText: attrs.downloadButtonText,
       openNewTabButtonText: attrs.openNewTabButtonText,
       shareButtonText: attrs.shareButtonText,
@@ -180,5 +189,6 @@ export const getCompanyProfilePageCached = unstable_cache(
   [COMPANY_PROFILE_PAGE_TAG],
   {
     revalidate: 60,
+    tags: [COMPANY_PROFILE_PAGE_TAG],
   }
 );
