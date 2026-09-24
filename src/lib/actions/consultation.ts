@@ -1,7 +1,7 @@
 "use server";
 
 import nodemailer from "nodemailer";
-import { getStrapiBaseUrl } from "@/lib/strapi";
+import { getStrapiBaseUrl, getStrapiWriteHeaders } from "@/lib/strapi";
 
 export async function sendConsultationForm(data: {
   fullName: string;
@@ -16,12 +16,10 @@ export async function sendConsultationForm(data: {
   try {
     // 1. Submit to Strapi
     const strapiUrl = `${getStrapiBaseUrl()}/api/consultations`;
-    const headers: Record<string, string> = {
+    const headers = {
+      ...getStrapiWriteHeaders(),
       "Content-Type": "application/json",
     };
-    if (process.env.STRAPI_FULL_ACCESS_API_TOKEN) {
-      headers["Authorization"] = `Bearer ${process.env.STRAPI_FULL_ACCESS_API_TOKEN}`;
-    }
 
     const response = await fetch(strapiUrl, {
       method: "POST",

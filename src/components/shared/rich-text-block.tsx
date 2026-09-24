@@ -1,5 +1,6 @@
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { useLocale } from "next-intl";
 
 type RichTextBlockProps = {
@@ -35,9 +36,30 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
     >
       <div className="prose prose-lg md:prose-xl dark:prose-invert prose-headings:font-bold prose-a:text-primary max-w-none">
         <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}
           components={{
             p: ({ node, ...props }) => <div className="parse-p mb-4" {...props} />,
+            table: ({ node, ...props }) => (
+              <div className="my-6 w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs not-prose">
+                <table className="w-full text-sm md:text-base border-collapse text-start" {...props} />
+              </div>
+            ),
+            thead: ({ node, ...props }) => (
+              <thead className="bg-muted/70 border-b border-border text-foreground font-semibold" {...props} />
+            ),
+            tbody: ({ node, ...props }) => (
+              <tbody className="divide-y divide-border/60 bg-card" {...props} />
+            ),
+            tr: ({ node, ...props }) => (
+              <tr className="transition-colors hover:bg-muted/40 even:bg-muted/20" {...props} />
+            ),
+            th: ({ node, ...props }) => (
+              <th className="px-4 py-3 text-start font-bold text-foreground align-middle border-b border-border whitespace-nowrap" {...props} />
+            ),
+            td: ({ node, ...props }) => (
+              <td className="px-4 py-3 text-start text-foreground/90 align-middle [&_a]:text-primary [&_a:hover]:underline [&_strong]:font-bold" {...props} />
+            ),
             a: ({ node, href, children, ...props }) => {
               if (href) {
                 const videoId = getYouTubeId(href);

@@ -1,7 +1,7 @@
 "use server";
 
 import nodemailer from "nodemailer";
-import { getStrapiBaseUrl, getStrapiRequestHeaders } from "@/lib/strapi";
+import { getStrapiBaseUrl, getStrapiWriteHeaders } from "@/lib/strapi";
 
 export interface RequestInfoAttachment {
   name: string;
@@ -83,7 +83,7 @@ export async function sendRequestInfoAction(payload: RequestInfoPayload) {
       const strapiRes = await fetch(`${strapiBaseUrl}/api/information-requests`, {
         method: "POST",
         headers: {
-          ...getStrapiRequestHeaders(),
+          ...getStrapiWriteHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify(strapiPayload),

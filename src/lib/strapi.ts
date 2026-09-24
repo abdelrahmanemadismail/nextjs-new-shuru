@@ -77,6 +77,22 @@ export const getStrapiRequestHeaders = (): HeadersInit => {
   };
 };
 
+export const getStrapiWriteHeaders = (): HeadersInit => {
+  const token =
+    process.env.STRAPI_FULL_ACCESS_API_TOKEN ||
+    process.env.STRAPI_WRITE_API_TOKEN ||
+    process.env.STRAPI_READ_ONLY_API_TOKEN ||
+    "";
+
+  if (!token) {
+    return {};
+  }
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
+
 export const toAbsoluteUrl = (url: string | null | undefined) => {
   if (!url) {
     return null;

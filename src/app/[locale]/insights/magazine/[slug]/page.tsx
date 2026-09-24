@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArticlesGrid } from "@/components/insights/articles-grid";
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { DownloadPdfButton } from "@/components/ui/download-pdf-button";
 import { ShareButtons } from "@/components/insights/share-buttons";
 import { Calendar, Eye, Download } from "lucide-react";
@@ -122,7 +123,7 @@ export default async function MagazineIssuePage({ params }: Props) {
 
             {issue.description && (
               <div className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                <ReactMarkdown>{issue.description}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{issue.description}</ReactMarkdown>
               </div>
             )}
 
