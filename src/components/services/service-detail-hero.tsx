@@ -15,7 +15,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
-  CalendarDays,
   FileCheck2,
   Briefcase,
   Layers,
@@ -135,21 +134,6 @@ export function ServiceDetailHero({
               </p>
             )}
 
-            {/* Trust Badges Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-              <div className="flex items-center gap-2 rounded-xl bg-card/60 border border-border/60 p-3 text-xs font-medium text-foreground">
-                <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-                <span>{isAr ? "منهجيات دولية معتمدة" : "Accredited Frameworks"}</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl bg-card/60 border border-border/60 p-3 text-xs font-medium text-foreground">
-                <FileCheck2 className="h-4 w-4 text-primary shrink-0" />
-                <span>{isAr ? "مواءمة رؤية 2030" : "Vision 2030 Aligned"}</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl bg-card/60 border border-border/60 p-3 text-xs font-medium text-foreground col-span-2 sm:col-span-1">
-                <CalendarDays className="h-4 w-4 text-primary shrink-0" />
-                <span>{isAr ? "تنفيذ ومتابعة لحظية" : "Real-time Execution"}</span>
-              </div>
-            </div>
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4">
